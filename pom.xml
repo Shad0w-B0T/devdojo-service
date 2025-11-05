@@ -14,6 +14,9 @@
     <module>backend/service-rest</module>
     <module>backend/service-graphql</module>
     <module>compiler/service-compiler</module>
+    <module>compiler/service-compiler-java</module>
+    <module>compiler/service-compiler-javascript</module>
+    <module>compiler/service-compiler-python</module>
   </modules>
 
   <properties>
