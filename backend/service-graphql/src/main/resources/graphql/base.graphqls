@@ -1,0 +1,4 @@
+interface DateAuditable {
+    createdAt: Long!
+    updatedAt: Long!
+}

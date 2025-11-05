@@ -1,0 +1,46 @@
+input GetLanguage {
+    languageId: ID!
+}
+
+input GetLanguages {
+    onlyActive: Boolean!
+}
+
+input CreateLanguage {
+    languageName: String!
+    description: String!
+    active: Boolean!
+}
+
+input UpdateLanguage {
+    languageId: ID!
+    languageName: String!
+    description: String!
+    active: Boolean!
+}
+
+input DeleteLanguage {
+    languageId: ID!
+}
+
+"""Represents possible query for calling the language"""
+type Query {
+    languages(input: GetLanguages): [Language!]!
+    language(input: GetLanguage!): Language!
+}
+
+"""Represents possible mutation for changing a language"""
+type Mutation {
+    createLanguage(input: CreateLanguage!) : Language!
+    updateLanguage(input: UpdateLanguage!) : Language!
+    deleteLanguage(input: DeleteLanguage!) : Boolean!
+}
+
+"""Represents a programming language"""
+type Language {
+    id: ID
+    token: String!
+    languageName: String
+    description: String
+    active: Boolean!
+}

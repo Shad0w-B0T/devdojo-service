@@ -1,0 +1,143 @@
+enum ArgumentType {
+    INPUT
+    OUTPUT
+    THROWABLE
+}
+
+enum TaskDifficulty {
+    EASY,
+    MEDIUM,
+    HARD,
+    GOTTLOS
+}
+
+enum TaskProgressState {
+    NOT_STARTED,
+    RUNNING,
+    FINISHED,
+}
+
+type Test {
+    input: [TestArgument!]!
+    output: TestArgument
+}
+
+type TestArgument {
+    type: ArgumentType!
+    variant: String
+    value: JSON!
+}
+
+type Task {
+    id: ID!
+    language: Language!
+    name: String!
+    description: String!
+    difficulty: TaskDifficulty!
+    template: String!
+    complete: String!
+    unitTests: [Test!]!
+    active: Boolean!
+    userProgress(userId: ID): TaskUserProgress!
+}
+
+type TaskUserProgress {
+    input: String
+    state: TaskProgressState!
+    score: Int!
+}
+
+type UserRanking {
+    userId: ID!
+    totalScore: Long!
+    rank: Long!
+}
+
+input TestArgumentInput {
+    type: ArgumentType!
+    variant: String
+    value: JSON!
+}
+
+input TaskUnitTestInput {
+    input: [TestArgumentInput!]!
+    output: TestArgumentInput!
+}
+
+
+input CreateTaskInput {
+    languageId: ID!
+    name: String!
+    description: String!
+    difficulty: TaskDifficulty!
+    template: String!
+    complete: String!
+    unitTests: [TaskUnitTestInput!]!
+    active: Boolean!
+}
+
+input UpdateTaskInput {
+    taskId: ID!
+    name: String!
+    description: String!
+    difficulty: TaskDifficulty!
+    template: String!
+    complete: String!
+    unitTests: [TaskUnitTestInput!]!
+    active: Boolean!
+}
+
+input AppendTestInput {
+    taskId: ID!
+    unitTest: TaskUnitTestInput!
+}
+
+input UpdateTaskUserInput {
+    userId: ID
+    taskId: ID!
+    input: String!
+}
+
+input GetTask {
+    taskId: ID!
+}
+
+input GetTasks {
+    languageId: ID
+}
+
+input GetNextTask {
+    userId: ID!
+    languageId: ID
+    state: TaskProgressState!
+}
+
+input GetUserRank {
+    userId: ID!
+    languageId: ID!
+}
+
+input GetLeaderboard {
+    languageId: ID!
+    start: Long!,
+    end: Long!
+}
+
+extend type Query {
+    tasks(input: GetTasks): [Task!]!
+    task(input: GetTask!): Task!
+
+    nextTask(input: GetNextTask): Task!
+
+    userRank(input: GetUserRank!): Int
+    leaderboard(input: GetLeaderboard): [UserRanking!]!
+}
+
+extend type Mutation {
+    createTask(input: CreateTaskInput!): Task!
+    updateTask(input: UpdateTaskInput!): Task!
+    appendUnitTest(input: AppendTestInput!): Test!
+    deleteTask(taskId: ID!): Boolean!     # optional
+
+    updateTaskUserInput(input: UpdateTaskUserInput!): Boolean!
+}

@@ -1,0 +1,155 @@
+variables:
+  MAVEN_CLI_OPTS: "-B -s .m2/settings.xml"
+  BASE_IMAGE: "maven:3.8.8-eclipse-temurin-21"
+  PROJECT_VERSION: "1.0-SNAPSHOT"
+  PROJECT_PATH: "devdojo/backend/core"
+  DOCKERFILE: "docker/Dockerfile"
+  PROJECT_REGISTRY: "registry.mi.hdm-stuttgart.de"
+  RUNTIME_PATH: "core-runtime"
+
+cache:
+  paths:
+    - .m2/repository
+
+stages:
+  - renovate
+  - build
+  - test
+  - package
+  - deploy
+
+renovate:
+  stage: renovate
+  image: renovate/renovate:latest
+  variables:
+    RENOVATE_PLATFORM: "gitlab"
+    RENOVATE_ENDPOINT: "https://gitlab.mi.hdm-stuttgart.de/api/v4"
+    LOG_LEVEL: "debug"
+  script:
+    - renovate "$CI_PROJECT_PATH"
+  rules:
+    - if: '$RUN_RENOVATE == "true"'
+
+build-core:
+  stage: build
+  image: $BASE_IMAGE
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - echo 'Starting Build Stage'
+    - mvn $MAVEN_CLI_OPTS compile
+
+test-core:
+  stage: test
+  image: $BASE_IMAGE
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - echo 'Starting Test Stage'
+    - mvn $MAVEN_CLI_OPTS test
+  artifacts:
+    reports:
+      junit:
+        - '**/target/surefire-reports/TEST-*.xml'
+        - '**/target/failsafe-reports/TEST-*.xml'
+
+package:
+  stage: package
+  image: $BASE_IMAGE
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - echo 'Starting Package Stage'
+    - mvn $MAVEN_CLI_OPTS package -DskipTests
+    - echo "Extracting version from Maven pom.xml"
+    - VERSION=$(mvn --non-recursive help:evaluate -Dexpression=project.version -q -DforceStdout)
+    - echo $VERSION > version.txt
+  artifacts:
+    paths:
+      #- core-runtime/target/app.jar is deactivated because the limit of gitlab is exceeded.
+      - target/reports/apidocs
+      - version.txt
+  only:
+    - main
+    - development
+
+pages:
+  stage: deploy
+  script:
+    - mv target/reports/apidocs public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: $BASE_IMAGE
+  script:
+    - mvn $MAVEN_CLI_OPTS -pl core-schema -am deploy -X
+  only:
+    - main
+
+docker-deploy:
+  stage: deploy
+  image: $BASE_IMAGE
+  services:
+    - name: docker:dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    BUILDAH_FORMAT: docker
+    BUILDAH_ISOLATION: chroot
+  script:
+    # Quick and dirty workaround to avoid artifcat limit from gitlab
+    - apt-get update && apt-get install -y buildah uidmap fuse-overlayfs
+    - echo 'Running Buildah deployment'
+    - buildah version
+    - echo 'Starting Package Stage'
+    - mvn $MAVEN_CLI_OPTS package
+    - echo "Reading version from file"
+    - VERSION=$(cat version.txt)
+    - echo "VERSION=$VERSION"
+    - export STORAGE_DRIVER=vfs
+    - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - |
+      if [[ "$CI_COMMIT_BRANCH" == "development" ]]; then
+        TAG="dev-${CI_COMMIT_SHORT_SHA}"
+        echo "Deploying development image with tag: $TAG"
+        buildah bud -t "$CI_REGISTRY_IMAGE:$TAG" -f docker/Dockerfile .
+        buildah push "$CI_REGISTRY_IMAGE:$TAG"
+      else
+        echo "Deploying release image with tags: $VERSION and latest"
+        buildah bud -t "$CI_REGISTRY_IMAGE:$VERSION" -t "$CI_REGISTRY_IMAGE:latest" -f docker/Dockerfile .
+        buildah push "$CI_REGISTRY_IMAGE:$VERSION"
+        buildah push "$CI_REGISTRY_IMAGE:latest"
+      fi
+  only:
+    - main
+    - development
+  needs:
+    - job: package
+      artifacts: true
+  artifacts:
+    reports:
+      dotenv: version.env
+
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/Dependency-Scanning.gitlab-ci.yml
+

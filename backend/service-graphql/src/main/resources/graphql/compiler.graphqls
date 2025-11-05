@@ -1,0 +1,51 @@
+type Compiler {
+    id: ID!
+    cpuCores: Int!
+    memoryTotal: Float!
+    language: Language!
+    analytics: [CompilerResourceAnalytic!]!
+    lastReportedAt: Long!
+    createdAt: Long!
+}
+
+type CompilerResourceAnalytic {
+    timestamp: Long!
+    averageCpu: Float!
+    averageMemory: Float!
+}
+
+type TestRun {
+    id: ID!
+    results: [TestRunResult!]!
+    taskComplete: Boolean!
+    taskScore: Int!
+}
+
+type TestRunResult {
+    input: [JSON!]!
+    output: JSON
+    logs: [String!]!
+    errors: [TestError!]!
+    compileTimeMs: Long!
+    runTimeMs: Long!
+    pass: Boolean!
+}
+
+type TestError {
+    type: String!
+    message: String
+}
+
+input GetCompiler {
+    id: ID!
+}
+
+input GetTestRun {
+    runId: ID!
+}
+
+extend  type Query {
+    compilers: [Compiler!]!
+    compiler(input: GetCompiler!): Compiler!
+    testRun(input: GetTestRun!): TestRun
+}

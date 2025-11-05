@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>devdojo</groupId>
+  <artifactId>service</artifactId>
+  <version>1.5.2</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>service-schema</module>
+    <module>backend/service-logic</module>
+    <module>backend/service-rest</module>
+    <module>backend/service-graphql</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.release>21</maven.compiler.release>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- ### Project dependencies ### -->
+    <dependency.version.spring>3.4.2</dependency.version.spring>
+
+    <!-- ### Logging-->
+    <dependency.version.slf4j>2.0.16</dependency.version.slf4j>
+    <dependency.version.lombok>1.18.36</dependency.version.lombok>
+    <dependency.version.log4j>2.24.3</dependency.version.log4j>
+    <dependency.version.logback>1.5.16</dependency.version.logback>
+
+    <!-- ### DB -->
+    <dependency.version.postgresql>42.7.5</dependency.version.postgresql>
+    <dependency.version.flyway.core>11.8.0</dependency.version.flyway.core>
+    <dependency.version.hibernate>6.6.7.Final</dependency.version.hibernate>
+    <dependency.version.shedlock>6.9.2</dependency.version.shedlock>
+
+    <!-- ### Security -->
+    <dependency.version.jjwt>0.12.6</dependency.version.jjwt>
+    <dependency.version.owasp.sanitizer>20240325.1</dependency.version.owasp.sanitizer>
+
+    <!-- ### Annotations -->
+    <dependency.version.annoations>26.0.2</dependency.version.annoations>
+
+    <!-- ### API -->
+    <dependency.version.graphql>22.0</dependency.version.graphql>
+    <dependency.jackson.version>2.18.2</dependency.jackson.version>
+    <dependency.version.bucket4j>8.14.0</dependency.version.bucket4j>
+
+    <!-- ### Code style -->
+    <dependency.version.checkstyle.tools>10.21.2</dependency.version.checkstyle.tools>
+
+    <!-- ### Test dependencies ### -->
+    <dependency.version.mockito>5.15.2</dependency.version.mockito>
+    <dependency.version.mockito.junit>5.18.0</dependency.version.mockito.junit>
+    <dependency.version.junit>5.11.4</dependency.version.junit>
+    <dependency.version.junit.jupiter>5.8.1</dependency.version.junit.jupiter>
+    <dependency.version.testcontainers>1.21.3</dependency.version.testcontainers>
+
+    <!-- ### Plugins -->
+    <plugin.version.javadocs>3.11.2</plugin.version.javadocs>
+    <plugin.version.buildhelper>3.6.0</plugin.version.buildhelper>
+    <plugin.version.surefire>3.5.3</plugin.version.surefire>
+    <plugin.version.checkstyle>3.6.0</plugin.version.checkstyle>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>gitlab-devdojo-maven</id>
+      <url>https://gitlab.mi.hdm-stuttgart.de/api/v4/projects/11870/packages/maven</url>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>gitlab-devdojo-maven</id>
+      <url>${env.CI_SERVER_URL}/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+    </repository>
+    <snapshotRepository>
+      <id>gitlab-devdojo-maven</id>
+      <url>${env.CI_SERVER_URL}/api/v4/projects/${env.CI_PROJECT_ID}/packages/maven</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <build>
+    <plugins>
+      <!-- Javadoc Plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${plugin.version.javadocs}</version>
+        <executions>
+          <execution>
+            <id>aggregate</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <source>${java.version}</source>
+          <doclint>none</doclint>
+          <show>public</show>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>${plugin.version.buildhelper}</version>
+        <executions>
+          <execution>
+            <id>update-properties</id>
+            <phase>validate</phase>
+            <configuration>
+              <newVersion>${project.version}</newVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${plugin.version.surefire}</version>
+        <configuration>
+          <skipTests>false</skipTests>
+          <testFailureIgnore>true</testFailureIgnore>
+          <failIfNoTests>false</failIfNoTests>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>${plugin.version.checkstyle}</version>
+        <configuration>
+          <consoleOutput>true</consoleOutput>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <failOnViolation>true</failOnViolation>
+          <failsOnError>true</failsOnError>
+          <configLocation>config/checkstyle/checkstyle.xml</configLocation>
+          <suppressionsLocation>config/checkstyle/suppressions.xml</suppressionsLocation>
+          <suppressionsFileExpression>suppressions.xml</suppressionsFileExpression>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.puppycrawl.tools</groupId>
+            <artifactId>checkstyle</artifactId>
+            <version>${dependency.version.checkstyle.tools}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${dependency.version.lombok}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- ### JUnit -->
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${dependency.version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${dependency.version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${dependency.version.junit.jupiter}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${dependency.version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ### Mockito -->
+    <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>${dependency.version.mockito}</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter/5.18.0 -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>${dependency.version.mockito.junit}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ### API -->
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${dependency.jackson.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${dependency.jackson.version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <version>${dependency.jackson.version}</version>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <spring.profiles.active>dev</spring.profiles.active>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>prod</id>
+      <properties>
+        <spring.profiles.active>prod</spring.profiles.active>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>debug</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <logging.level.root>DEBUG</logging.level.root>
+      </properties>
+    </profile>
+  </profiles>
+
+</project>
