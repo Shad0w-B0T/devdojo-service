@@ -13,6 +13,7 @@
     <module>backend/service-logic</module>
     <module>backend/service-rest</module>
     <module>backend/service-graphql</module>
+    <module>compiler/service-compiler</module>
   </modules>
 
   <properties>

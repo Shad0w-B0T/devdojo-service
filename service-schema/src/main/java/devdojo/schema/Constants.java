@@ -6,4 +6,5 @@ public interface Constants {
 
   int EMAIL_LENGTH = 300;
 
+  int RABBIT_MQ_PORT = 5672;
 }
