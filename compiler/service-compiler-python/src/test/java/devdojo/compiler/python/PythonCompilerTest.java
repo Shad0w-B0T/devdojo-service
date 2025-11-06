@@ -13,14 +13,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("PythonExecutor Unit Tests")
-class CompilerTest {
+class PythonCompilerTest {
 
   private ICompiler compiler;
 
   @BeforeEach
   @DisplayName("Initialize PythonExecutor before each test")
   void setUp() {
-    compiler = new Compiler();
+    compiler = new PythonCompiler();
   }
 
   @Test

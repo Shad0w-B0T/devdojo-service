@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class Compiler implements ICompiler {
+public final class JavaScriptCompiler implements ICompiler {
   private static final long SECOND_MS = 1000;
   private static final long TIMEOUT_SECONDS = 10;
   private final ObjectMapper objectMapper = new ObjectMapper();

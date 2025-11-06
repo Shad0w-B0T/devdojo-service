@@ -1,13 +1,13 @@
-package devdojo.compiler.javascript;
+package devdojo.compiler.python;
 
 import devdojo.compiler.CompilerContext;
 import devdojo.compiler.CompilerServer;
 
-public final class Runtime {
+public final class PythonRuntime {
   public static void main(final String[] args) throws Exception {
     CompilerContext
       .instance()
-      .compiler(new Compiler());
+      .compiler(new PythonCompiler());
     CompilerServer.instance().begin();
   }
 }

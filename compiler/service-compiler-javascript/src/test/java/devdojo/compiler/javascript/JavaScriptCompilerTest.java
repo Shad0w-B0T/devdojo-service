@@ -13,14 +13,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("JavaScriptExecutor Unit Tests")
-class CompilerTest {
+class JavaScriptCompilerTest {
 
   private ICompiler compiler;
 
   @BeforeEach
   @DisplayName("Initialize JavaScriptExecutor before each test")
   void setUp() {
-    this.compiler = new Compiler();
+    this.compiler = new JavaScriptCompiler();
   }
 
   @Test
