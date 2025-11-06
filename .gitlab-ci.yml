@@ -1,5 +1,5 @@
 variables:
-  MAVEN_CLI_OPTS: "-B -s .m2/settings.xml"
+  MAVEN_CLI_OPTS: "-B -s $CI_PROJECT_DIR/.m2/settings.xml"
   BASE_IMAGE: "maven:3.8.8-eclipse-temurin-21"
   PROJECT_VERSION: "1.0-SNAPSHOT"
   PROJECT_PATH: "devdojo/backend/core"
