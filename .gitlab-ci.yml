@@ -133,6 +133,9 @@ docker-deploy:
     - |
       for dir in "${PROJECTS[@]}"; do
         echo "----------------------------------------"
+        echo "Building project: $dir"
+        cd "$dir"
+
         # Tag-Handling
         if [[ "$CI_COMMIT_BRANCH" == "development" ]]; then
           TAG="dev-${CI_COMMIT_SHORT_SHA}"
