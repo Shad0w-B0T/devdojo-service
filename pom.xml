@@ -64,6 +64,7 @@
     <dependency.version.testcontainers>1.21.3</dependency.version.testcontainers>
 
     <!-- ### Plugins -->
+    <plugin.version.shade>3.6.0</plugin.version.shade>
     <plugin.version.javadocs>3.11.2</plugin.version.javadocs>
     <plugin.version.buildhelper>3.6.0</plugin.version.buildhelper>
     <plugin.version.surefire>3.5.3</plugin.version.surefire>
