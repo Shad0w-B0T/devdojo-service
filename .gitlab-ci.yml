@@ -99,7 +99,7 @@ deploy:
   stage: deploy
   image: $BASE_IMAGE
   script:
-    - mvn $MAVEN_CLI_OPTS -pl core-schema -am deploy -X
+    - mvn $MAVEN_CLI_OPTS -pl service-schema -am deploy -X
   only:
     - main
 
@@ -114,30 +114,52 @@ docker-deploy:
     DOCKER_TLS_CERTDIR: ""
     BUILDAH_FORMAT: docker
     BUILDAH_ISOLATION: chroot
+    STORAGE_DRIVER: vfs
   script:
-    # Quick and dirty workaround to avoid artifcat limit from gitlab
     - apt-get update && apt-get install -y buildah uidmap fuse-overlayfs
-    - echo 'Running Buildah deployment'
+    - echo "Running Buildah deployment"
     - buildah version
-    - echo 'Starting Package Stage'
-    - mvn $MAVEN_CLI_OPTS package
-    - echo "Reading version from file"
+
+    - echo "Reading version from root version.txt"
     - VERSION=$(cat version.txt)
     - echo "VERSION=$VERSION"
-    - export STORAGE_DRIVER=vfs
+
     - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+
+    - PROJECTS=("backend/graphql" "backend/rest" "compiler/java" "compiler/javascript" "compiler/python")
+
     - |
-      if [[ "$CI_COMMIT_BRANCH" == "development" ]]; then
-        TAG="dev-${CI_COMMIT_SHORT_SHA}"
-        echo "Deploying development image with tag: $TAG"
-        buildah bud -t "$CI_REGISTRY_IMAGE:$TAG" -f docker/Dockerfile .
-        buildah push "$CI_REGISTRY_IMAGE:$TAG"
-      else
-        echo "Deploying release image with tags: $VERSION and latest"
-        buildah bud -t "$CI_REGISTRY_IMAGE:$VERSION" -t "$CI_REGISTRY_IMAGE:latest" -f docker/Dockerfile .
-        buildah push "$CI_REGISTRY_IMAGE:$VERSION"
-        buildah push "$CI_REGISTRY_IMAGE:latest"
-      fi
+      for dir in "${PROJECTS[@]}"; do
+        echo "----------------------------------------"
+        echo "Building project: $dir"
+        cd "$dir"
+
+        # Maven-Build
+        if [ -f "pom.xml" ]; then
+          echo "Running Maven package for $dir"
+          mvn $MAVEN_CLI_OPTS package
+        else
+          echo "No pom.xml found in $dir — skipping Maven build"
+        fi
+
+        # Tag-Handling
+        if [[ "$CI_COMMIT_BRANCH" == "development" ]]; then
+          TAG="dev-${CI_COMMIT_SHORT_SHA}"
+          IMAGE_TAG="$CI_REGISTRY_IMAGE/${dir//\//-}:$TAG"
+          echo "Deploying DEV image: $IMAGE_TAG"
+          buildah bud -t "$IMAGE_TAG" -f Dockerfile .
+          buildah push "$IMAGE_TAG"
+        else
+          IMAGE_TAG="$CI_REGISTRY_IMAGE/${dir//\//-}:$VERSION"
+          LATEST_TAG="$CI_REGISTRY_IMAGE/${dir//\//-}:latest"
+          echo "Deploying RELEASE images: $IMAGE_TAG and $LATEST_TAG"
+          buildah bud -t "$IMAGE_TAG" -t "$LATEST_TAG" -f Dockerfile .
+          buildah push "$IMAGE_TAG"
+          buildah push "$LATEST_TAG"
+        fi
+
+        cd - >/dev/null
+      done
   only:
     - main
     - development
