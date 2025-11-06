@@ -54,7 +54,7 @@ public class ForbiddenConstants {
   private final static String FILE_EXTENSION_TXT = ".txt";
   private final static String FILE_EXTENSION_MD = ".md";
   private final static String FILE_EXTENSION_BAT = ".bat";
-  private final static String FILE_EXTENSION_cmd = ".cmd";
+  private final static String FILE_EXTENSION_CMD = ".cmd";
   private final static String FILE_EXTENSION_JAR = ".jar";
   private final static String FILE_EXTENSION_JAVASCRIPT = ".js";
   private final static String FILE_EXTENSION_JAVA = ".java";
@@ -119,7 +119,7 @@ public class ForbiddenConstants {
         FILE_EXTENSION_TXT,
         FILE_EXTENSION_MD,
         FILE_EXTENSION_BAT,
-        FILE_EXTENSION_cmd,
+        FILE_EXTENSION_CMD,
         FILE_EXTENSION_JAR,
         FILE_EXTENSION_JAVASCRIPT,
         FILE_EXTENSION_JAVA,
