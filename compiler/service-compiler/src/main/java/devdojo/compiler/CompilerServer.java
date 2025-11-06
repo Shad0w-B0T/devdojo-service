@@ -9,6 +9,7 @@ import devdojo.compiler.amqp.RabbitConnection;
 import devdojo.compiler.config.ServerConfig;
 import devdojo.compiler.heartbeat.HeartbeatProcess;
 import devdojo.compiler.heartbeat.IHeartbeatProcess;
+import devdojo.compiler.security.ISecurityFilter;
 import devdojo.schema.amqp.CompileRequestPayload;
 import devdojo.schema.amqp.CompileResponsePayload;
 import devdojo.schema.amqp.RabbitConst;
@@ -16,8 +17,6 @@ import devdojo.schema.code.TestRunResult;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**

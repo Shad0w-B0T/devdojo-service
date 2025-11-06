@@ -1,4 +1,4 @@
-package devdojo.compiler;
+package devdojo.compiler.security;
 
 public interface ISecurityFilter {
 
