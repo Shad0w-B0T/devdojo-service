@@ -99,7 +99,7 @@ deploy:
   stage: deploy
   image: $BASE_IMAGE
   script:
-    - mvn $MAVEN_CLI_OPTS -pl service-schema -am deploy -X
+    - mvn $MAVEN_CLI_OPTS -pl compiler/service-compiler -am deploy -X
   only:
     - main
 
