@@ -31,18 +31,25 @@
 
     <!-- ### Logging-->
     <dependency.version.slf4j>2.0.16</dependency.version.slf4j>
+
     <dependency.version.lombok>1.18.36</dependency.version.lombok>
+
     <dependency.version.log4j>2.24.3</dependency.version.log4j>
+
     <dependency.version.logback>1.5.16</dependency.version.logback>
 
     <!-- ### DB -->
     <dependency.version.postgresql>42.7.5</dependency.version.postgresql>
+
     <dependency.version.flyway.core>11.8.0</dependency.version.flyway.core>
+
     <dependency.version.hibernate>6.6.7.Final</dependency.version.hibernate>
+
     <dependency.version.shedlock>6.9.2</dependency.version.shedlock>
 
     <!-- ### Security -->
     <dependency.version.jjwt>0.12.6</dependency.version.jjwt>
+
     <dependency.version.owasp.sanitizer>20240325.1</dependency.version.owasp.sanitizer>
 
     <!-- ### Annotations -->
@@ -50,7 +57,9 @@
 
     <!-- ### API -->
     <dependency.version.graphql>22.0</dependency.version.graphql>
+
     <dependency.jackson.version>2.18.2</dependency.jackson.version>
+
     <dependency.version.bucket4j>8.14.0</dependency.version.bucket4j>
 
     <!-- ### Code style -->
@@ -58,16 +67,24 @@
 
     <!-- ### Test dependencies ### -->
     <dependency.version.mockito>5.15.2</dependency.version.mockito>
+
     <dependency.version.mockito.junit>5.18.0</dependency.version.mockito.junit>
+
     <dependency.version.junit>5.11.4</dependency.version.junit>
+
     <dependency.version.junit.jupiter>5.8.1</dependency.version.junit.jupiter>
+
     <dependency.version.testcontainers>1.21.3</dependency.version.testcontainers>
 
     <!-- ### Plugins -->
     <plugin.version.shade>3.6.0</plugin.version.shade>
+
     <plugin.version.javadocs>3.11.2</plugin.version.javadocs>
+
     <plugin.version.buildhelper>3.6.0</plugin.version.buildhelper>
+
     <plugin.version.surefire>3.5.3</plugin.version.surefire>
+
     <plugin.version.checkstyle>3.6.0</plugin.version.checkstyle>
   </properties>
 
