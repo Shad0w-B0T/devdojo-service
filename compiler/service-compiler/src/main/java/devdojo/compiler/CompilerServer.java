@@ -117,18 +117,22 @@ public final class CompilerServer {
   }
 
 
-  private void securityCheck(final String methodCode) throws Exception {
+  private void securityCheck(final String methodCode) {
     final List<ISecurityFilter> securityFilters = CompilerContext.instance().securityFilters();
 
     if (securityFilters == null || securityFilters.isEmpty()) {
       log.warn("No security filters found... Thats not good :c");
+      return;
     }
 
     for (final ISecurityFilter securityFilter : securityFilters) {
-      if (securityFilter.check(methodCode)) {
-        continue;
+      try {
+        if (securityFilter.check(methodCode)) {
+          continue;
+        }
+      } catch (final Exception exception) {
+        log.warn("Error while checking security filters.", exception);
       }
-
       throw new RuntimeException("Security filter " + securityFilter.getClass().getName());
     }
   }
