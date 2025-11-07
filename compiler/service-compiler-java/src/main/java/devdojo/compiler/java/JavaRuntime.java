@@ -1,13 +1,15 @@
-package devdojo.compiler.python;
+package devdojo.compiler.java;
 
 import devdojo.compiler.CompilerContext;
 import devdojo.compiler.CompilerServer;
+import devdojo.compiler.java.security.ForbiddenJavaInputFilter;
 
-public final class Runtime {
+public final class JavaRuntime {
   public static void main(final String[] args) throws Exception {
     CompilerContext
       .instance()
-      .compiler(new Compiler());
+      .addSecurityFilter(new ForbiddenJavaInputFilter())
+      .compiler(new JavaCompiler());
     CompilerServer.instance().begin();
   }
 }

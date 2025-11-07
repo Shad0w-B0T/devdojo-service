@@ -14,7 +14,7 @@ import javax.tools.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class Compiler implements ICompiler {
+public final class JavaCompiler implements ICompiler {
 
   private static final long TIMEOUT_MS = 10_000;
 
@@ -106,11 +106,11 @@ public final class Compiler implements ICompiler {
    */
   private static boolean compileSource(final File sourceFile,
                                        final DiagnosticCollector<JavaFileObject> diagnostics) throws IOException {
-    final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    final javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
     final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
     final Iterable<? extends JavaFileObject> compilationUnits =
       fileManager.getJavaFileObjectsFromFiles(List.of(sourceFile));
-    final JavaCompiler.CompilationTask task =
+    final javax.tools.JavaCompiler.CompilationTask task =
       compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
     final boolean success = task.call();
     fileManager.close();
