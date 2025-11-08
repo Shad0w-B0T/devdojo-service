@@ -15,7 +15,7 @@ final class JavaInputFilterTests {
 
   @BeforeEach
   void setUp() {
-    filter = new ForbiddenJavaInputFilter();
+    filter = new JavaInputFilter();
   }
 
   @Test
