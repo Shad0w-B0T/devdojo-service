@@ -78,7 +78,7 @@ public final class ForbiddenJavaScriptConstants {
 
   private final static String CONSTRUCTOR = ".constructor";
   private final static String PROTOTYPE = "prototype";
-  private final static String __PROTO__ = "__proto__";
+  private final static String PROTO = "__proto__";
 
 
   private final static String WHILE_TRUE = "while(true)";
@@ -142,7 +142,7 @@ public final class ForbiddenJavaScriptConstants {
       BUFFER,
       CONSTRUCTOR,
       PROTOTYPE,
-      __PROTO__,
+      PROTO,
       WHILE_TRUE,
       FOR_LOOP_INFINITE,
       WINDOW,
