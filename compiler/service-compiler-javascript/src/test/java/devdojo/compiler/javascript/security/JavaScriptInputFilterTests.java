@@ -16,7 +16,7 @@ final class JavaScriptInputFilterTests {
 
   @BeforeEach
   void setUp() {
-    filter = new ForbiddenJavaScriptInputFilter();
+    filter = new JavaScriptInputFilter();
   }
 
   @Test

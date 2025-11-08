@@ -8,7 +8,7 @@ import devdojo.compiler.security.ISecurityFilter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ForbiddenJavaScriptInputFilter implements ISecurityFilter {
+public class JavaScriptInputFilter implements ISecurityFilter {
 
   @Override
   public boolean check(final String methodCode) {
