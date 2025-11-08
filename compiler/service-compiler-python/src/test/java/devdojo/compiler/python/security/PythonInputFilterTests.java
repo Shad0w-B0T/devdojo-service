@@ -2,7 +2,6 @@ package devdojo.compiler.python.security;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import devdojo.compiler.security.ISecurityFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,10 +36,10 @@ final class PythonInputFilterTests {
   @DisplayName("returns true for safe Python code")
   void testValidPythonCode() {
     String safeCode = """
-        def greet(name):
-            print(f"Hello, {name}!")
-        greet("world")
-        """;
+      def greet(name):
+          print(f"Hello, {name}!")
+      greet("world")
+      """;
 
     assertTrue(filter.check(safeCode), "Safe Python code should pass");
   }
