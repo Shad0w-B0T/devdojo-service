@@ -86,7 +86,7 @@ class ExceptionHandlerTest {
   @DisplayName("Should return 500 for RuntimeException")
   void testHandleRuntimeException() {
     final ResponseEntity<ErrorResponse> response =
-      handler.handleRuntimeException(new RuntimeException("Boom"));
+      handler.handleThrowable(new RuntimeException("Boom"));
 
     assertEquals(500, response.getStatusCodeValue());
     assertEquals("An unexpected error occurred.", response.getBody().message());
@@ -106,7 +106,7 @@ class ExceptionHandlerTest {
   @DisplayName("Should return 500 for generic Exception")
   void testHandleGenericException() {
     final ResponseEntity<ErrorResponse> response =
-      handler.handleException(new Exception("Unknown"));
+      handler.handleThrowable(new Exception("Unknown"));
 
     assertEquals(500, response.getStatusCodeValue());
     assertEquals("An unexpected error occurred.", response.getBody().message());

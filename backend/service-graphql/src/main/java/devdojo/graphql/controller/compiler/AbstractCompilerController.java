@@ -151,13 +151,13 @@ public abstract class AbstractCompilerController implements ICompilerController 
   @SchemaMapping(typeName = "TestRunResult")
   @Override
   public List<String> logs(final TestRunResultChecked result) {
-    return result.logs();
+    return Optional.ofNullable(result.logs()).orElse(Collections.emptyList());
   }
 
   @SchemaMapping(typeName = "TestRunResult")
   @Override
   public List<TestError> errors(final TestRunResultChecked result) {
-    return result.errors();
+    return Optional.ofNullable(result.errors()).orElse(Collections.emptyList());
   }
 
   @SchemaMapping(typeName = "TestRunResult")

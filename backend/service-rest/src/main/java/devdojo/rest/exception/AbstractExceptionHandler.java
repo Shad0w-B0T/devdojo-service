@@ -11,11 +11,13 @@ import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.exception.permissions.UnauthenticatedException;
 import devdojo.schema.exception.permissions.UnauthorizedException;
 import java.time.Instant;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 public abstract class AbstractExceptionHandler implements IExceptionHandler {
 
   @ExceptionHandler(UnauthorizedException.class)
@@ -89,36 +91,11 @@ public abstract class AbstractExceptionHandler implements IExceptionHandler {
     ));
   }
 
-  @ExceptionHandler(value = RuntimeException.class)
-  @Override
-  public ResponseEntity<ErrorResponse> handleRuntimeException(final RuntimeException exception) {
-    final ErrorResponse errorResponse = new ErrorResponse(
-      "An unexpected error occurred.",
-      HttpStatus.INTERNAL_SERVER_ERROR,
-      Instant.now().toString()
-    );
-
-    return ResponseEntity
-      .status(errorResponse.httpStatus())
-      .body(errorResponse);
-  }
-
-  @ExceptionHandler(Exception.class)
-  @Override
-  public ResponseEntity<ErrorResponse> handleException(final Exception exception) {
-    final ErrorResponse errorResponse = new ErrorResponse("An unexpected error occurred.",
-      HttpStatus.INTERNAL_SERVER_ERROR,
-      Instant.now().toString()
-    );
-
-    return ResponseEntity
-      .status(errorResponse.httpStatus())
-      .body(errorResponse);
-  }
-
   @ExceptionHandler(Throwable.class)
   @Override
   public ResponseEntity<ErrorResponse> handleThrowable(final Throwable throwable) {
+    log.error("Unhandled exception occurred: {}", throwable.getMessage(), throwable);
+
     final ErrorResponse errorResponse = new ErrorResponse(
       "An unexpected error occurred.",
       HttpStatus.INTERNAL_SERVER_ERROR,

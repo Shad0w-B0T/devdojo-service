@@ -24,9 +24,5 @@ public interface IExceptionHandler {
 
   @NotNull ResponseEntity<ErrorResponse> handleHttp(final HttpException exception);
 
-  @NotNull  ResponseEntity<ErrorResponse> handleRuntimeException(@NotNull final RuntimeException exception);
-
-  @NotNull  ResponseEntity<ErrorResponse> handleException(@NotNull final Exception exception);
-
   @NotNull  ResponseEntity<ErrorResponse> handleThrowable(@NotNull final Throwable throwable);
 }
