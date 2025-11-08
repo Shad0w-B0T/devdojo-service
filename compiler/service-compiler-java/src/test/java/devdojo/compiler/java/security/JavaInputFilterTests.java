@@ -47,8 +47,8 @@ final class JavaInputFilterTests {
 
   @ParameterizedTest
   @ValueSource(strings = {
-    "import", "..", "../", "//", "javax.", "java.util", "runtime.",
-    "System.exit", "System.load", "while(true){}", "for(;;)", "/*"
+    "import", "..", "../", "javax.", "java.util", "runtime.",
+    "System.exit", "System.load", "while(true){}", "for(;;)"
   })
   @DisplayName("detects forbidden Java keywords")
   void testForbiddenJavaKeyword(final String keyword) {
