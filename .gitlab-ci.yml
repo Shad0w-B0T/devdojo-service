@@ -131,27 +131,40 @@ docker-deploy:
     - mvn $MAVEN_CLI_OPTS package
 
     - |
+      declare -A IMAGE_NAMES=(
+        ["backend/service-graphql"]="graphql"
+        ["backend/service-rest"]="rest"
+        ["compiler/service-compiler-java"]="compiler-java"
+        ["compiler/service-compiler-javascript"]="compiler-js"
+        ["compiler/service-compiler-python"]="compiler-py"
+      )
+      
       for dir in "${PROJECTS[@]}"; do
         echo "----------------------------------------"
         echo "Building project: $dir"
         cd "$dir"
-
-        # Tag-Handling
+    
+        CUSTOM_NAME=${IMAGE_NAMES[$dir]}
+        if [ -z "$CUSTOM_NAME" ]; then
+          echo "No Custom-Name for $dir found, using directory name"
+          CUSTOM_NAME=${dir//\//-}
+        fi
+    
         if [[ "$CI_COMMIT_BRANCH" == "development" ]]; then
           TAG="dev-${CI_COMMIT_SHORT_SHA}"
-          IMAGE_TAG="$CI_REGISTRY_IMAGE/${dir//\//-}:$TAG"
+          IMAGE_TAG="$CI_REGISTRY_IMAGE/$CUSTOM_NAME:$TAG"
           echo "Deploying DEV image: $IMAGE_TAG"
           buildah bud -t "$IMAGE_TAG" -f Dockerfile .
           buildah push "$IMAGE_TAG"
         else
-          IMAGE_TAG="$CI_REGISTRY_IMAGE/${dir//\//-}:$VERSION"
-          LATEST_TAG="$CI_REGISTRY_IMAGE/${dir//\//-}:latest"
+          IMAGE_TAG="$CI_REGISTRY_IMAGE/$CUSTOM_NAME:$VERSION"
+          LATEST_TAG="$CI_REGISTRY_IMAGE/$CUSTOM_NAME:latest"
           echo "Deploying RELEASE images: $IMAGE_TAG and $LATEST_TAG"
           buildah bud -t "$IMAGE_TAG" -t "$LATEST_TAG" -f Dockerfile .
           buildah push "$IMAGE_TAG"
           buildah push "$LATEST_TAG"
         fi
-
+    
         cd - >/dev/null
       done
   only:
