@@ -6,7 +6,7 @@
   <parent>
     <groupId>devdojo</groupId>
     <artifactId>service</artifactId>
-    <version>1.5.2</version>
+    <version>1.5.3</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -45,5 +45,26 @@
       <version>${dependency.version.hibernate}</version>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>${dependency.version.spring}</version>
+        <configuration>
+          <finalName>app</finalName>
+          <mainClass>devdojo.RestService</mainClass>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

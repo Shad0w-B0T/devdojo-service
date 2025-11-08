@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @PreAuthorize("@clientEvaluator.isValid(authentication) && " +
-  "@clientEvaluator.hasRole(authentication, T(de.hdm.devdojo.schema.user.UserRole).{role})")
+  "@clientEvaluator.hasRole(authentication, T(devdojo.schema.user.UserRole).{role})")
 public @interface RoleRequired {
 
   @NotNull UserRole role();

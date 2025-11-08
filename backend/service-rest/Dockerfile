@@ -14,7 +14,7 @@ RUN mkdir -p /home/application-user && \
     chown -R 1000:1000 /app /home/application-user
 
 # copy app JAR with correct access rights
-COPY --chown=1000:1000 service-rest/target/app.jar app.jar
+COPY --chown=1000:1000 target/app.jar app.jar
 
 # Set the user to avoid running as root
 USER application-user
