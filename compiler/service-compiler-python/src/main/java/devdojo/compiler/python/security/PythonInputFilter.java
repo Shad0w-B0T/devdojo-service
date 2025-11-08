@@ -1,14 +1,14 @@
-package devdojo.compiler.javascript.security;
+package devdojo.compiler.python.security;
 
 
-import static devdojo.compiler.javascript.security.ForbiddenJavaScriptConstants.JAVASCRIPT_FORBIDDEN;
+import static devdojo.compiler.python.security.ForbiddenPythonConstants.PYTHON_FORBIDDEN;
 import static devdojo.compiler.security.ForbiddenCommands.FORBIDDEN_COMMANDS;
 import static devdojo.compiler.security.ForbiddenFiles.FORBIDDEN_FILE_ENDINGS;
 import devdojo.compiler.security.ISecurityFilter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ForbiddenJavaScriptInputFilter implements ISecurityFilter {
+public class PythonInputFilter implements ISecurityFilter {
 
   @Override
   public boolean check(final String methodCode) {
@@ -23,8 +23,8 @@ public class ForbiddenJavaScriptInputFilter implements ISecurityFilter {
     final StringBuilder forbiddenInput = new StringBuilder();
 
 
-    // JavaScript stuff
-    for (String keyword : JAVASCRIPT_FORBIDDEN) {
+    // Python stuff
+    for (String keyword : PYTHON_FORBIDDEN) {
       if (lowerCaseMethodCode.contains(keyword)) {
         hasForbiddenInput = true;
         forbiddenInput.append("\"").append(keyword).append("\"").append(", ");
