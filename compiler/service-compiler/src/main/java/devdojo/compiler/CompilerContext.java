@@ -1,6 +1,7 @@
 package devdojo.compiler;
 
 import devdojo.compiler.heartbeat.IHeartbeatProcess;
+import devdojo.compiler.security.ISecurityFilter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;

@@ -9,6 +9,7 @@ import devdojo.compiler.amqp.RabbitConnection;
 import devdojo.compiler.config.ServerConfig;
 import devdojo.compiler.heartbeat.HeartbeatProcess;
 import devdojo.compiler.heartbeat.IHeartbeatProcess;
+import devdojo.compiler.security.ISecurityFilter;
 import devdojo.schema.amqp.CompileRequestPayload;
 import devdojo.schema.amqp.CompileResponsePayload;
 import devdojo.schema.amqp.RabbitConst;
@@ -16,8 +17,6 @@ import devdojo.schema.code.TestRunResult;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -118,18 +117,22 @@ public final class CompilerServer {
   }
 
 
-  private void securityCheck(final String methodCode) throws Exception {
+  private void securityCheck(final String methodCode) {
     final List<ISecurityFilter> securityFilters = CompilerContext.instance().securityFilters();
 
     if (securityFilters == null || securityFilters.isEmpty()) {
       log.warn("No security filters found... Thats not good :c");
+      return;
     }
 
     for (final ISecurityFilter securityFilter : securityFilters) {
-      if (securityFilter.check(methodCode)) {
-        continue;
+      try {
+        if (securityFilter.check(methodCode)) {
+          continue;
+        }
+      } catch (final Exception exception) {
+        log.warn("Error while checking security filters.", exception);
       }
-
       throw new RuntimeException("Security filter " + securityFilter.getClass().getName());
     }
   }
