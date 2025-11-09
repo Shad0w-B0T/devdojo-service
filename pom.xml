@@ -60,7 +60,7 @@
 
     <dependency.jackson.version>2.18.2</dependency.jackson.version>
 
-    <dependency.version.bucket4j>8.14.0</dependency.version.bucket4j>
+    <dependency.version.bucket4j>8.15.0</dependency.version.bucket4j>
 
     <!-- ### Code style -->
     <dependency.version.checkstyle.tools>10.21.2</dependency.version.checkstyle.tools>
