@@ -32,7 +32,7 @@
     <!-- ### Logging-->
     <dependency.version.slf4j>2.0.16</dependency.version.slf4j>
 
-    <dependency.version.lombok>1.18.36</dependency.version.lombok>
+    <dependency.version.lombok>1.18.42</dependency.version.lombok>
 
     <dependency.version.log4j>2.24.3</dependency.version.log4j>
 
