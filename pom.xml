@@ -79,7 +79,7 @@
     <!-- ### Plugins -->
     <plugin.version.shade>3.6.0</plugin.version.shade>
 
-    <plugin.version.javadocs>3.11.2</plugin.version.javadocs>
+    <plugin.version.javadocs>3.12.0</plugin.version.javadocs>
 
     <plugin.version.buildhelper>3.6.0</plugin.version.buildhelper>
 
