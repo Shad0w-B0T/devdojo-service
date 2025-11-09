@@ -43,7 +43,7 @@
 
     <dependency.version.flyway.core>11.8.0</dependency.version.flyway.core>
 
-    <dependency.version.hibernate>6.6.7.Final</dependency.version.hibernate>
+    <dependency.version.hibernate>7.1.7.Final</dependency.version.hibernate>
 
     <dependency.version.shedlock>6.9.2</dependency.version.shedlock>
 
