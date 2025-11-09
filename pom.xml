@@ -70,9 +70,9 @@
 
     <dependency.version.mockito.junit>5.18.0</dependency.version.mockito.junit>
 
-    <dependency.version.junit>5.11.4</dependency.version.junit>
+    <dependency.version.junit>5.14.1</dependency.version.junit>
 
-    <dependency.version.junit.jupiter>5.8.1</dependency.version.junit.jupiter>
+    <dependency.version.junit.jupiter>5.14.1</dependency.version.junit.jupiter>
 
     <dependency.version.testcontainers>1.21.3</dependency.version.testcontainers>
 
