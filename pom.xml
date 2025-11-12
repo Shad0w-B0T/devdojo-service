@@ -63,7 +63,7 @@
     <dependency.version.bucket4j>8.14.0</dependency.version.bucket4j>
 
     <!-- ### Code style -->
-    <dependency.version.checkstyle.tools>10.21.2</dependency.version.checkstyle.tools>
+    <dependency.version.checkstyle.tools>12.1.2</dependency.version.checkstyle.tools>
 
     <!-- ### Test dependencies ### -->
     <dependency.version.mockito>5.15.2</dependency.version.mockito>
