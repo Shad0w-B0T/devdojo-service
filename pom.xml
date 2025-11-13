@@ -48,7 +48,7 @@
     <dependency.version.shedlock>6.10.0</dependency.version.shedlock>
 
     <!-- ### Security -->
-    <dependency.version.jjwt>0.12.6</dependency.version.jjwt>
+    <dependency.version.jjwt>0.13.0</dependency.version.jjwt>
 
     <dependency.version.owasp.sanitizer>20240325.1</dependency.version.owasp.sanitizer>
 
