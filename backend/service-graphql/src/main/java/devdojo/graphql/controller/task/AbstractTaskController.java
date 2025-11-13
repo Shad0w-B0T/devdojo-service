@@ -2,6 +2,7 @@ package devdojo.graphql.controller.task;
 
 import devdojo.graphql.input.task.*;
 import devdojo.logic.database.language.LanguageEntity;
+import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
@@ -14,6 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -85,6 +87,18 @@ public abstract class AbstractTaskController implements ITaskController {
   public boolean updateTaskUserInput(@Argument("input") @NotNull final UpdateTaskUserInput input) {
     this.tasksProgressService.updateTaskProgress(input);
     return true;
+  }
+
+
+  @MutationMapping("removeTagFromTask")
+  public boolean removeTagFromTask(@Argument("input") @NotNull final RemoveTagFromTask input) {
+    return this.taskService.removeTagFromTask(input);
+  }
+
+  @SchemaMapping(typeName = "Task", value = "tags")
+  @Override
+  public @NotNull List<String> tags(@NotNull final TaskEntity task) {
+    return task.tagEntities().stream().map(TagEntity::name).collect(Collectors.toList());
   }
 
   @SchemaMapping(typeName = "Task", value = "id")

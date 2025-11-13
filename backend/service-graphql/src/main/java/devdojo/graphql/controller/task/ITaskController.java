@@ -75,6 +75,8 @@ public interface ITaskController {
   @NotNull
   List<ITest> taskUnitTests(@NotNull final TaskEntity task);
 
+  List<String> tags(@NotNull final TaskEntity task);
+
   boolean active(@NotNull final TaskEntity task);
 
   @NotNull

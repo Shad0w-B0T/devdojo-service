@@ -14,6 +14,7 @@ public record UpdateTask(
   @NotNull(message = "Template cannot be null.") String template,
   @NotNull(message = "Complete cannot be null.") String complete,
   @NotNull(message = "UnitTests cannot be null.") List<Test> unitTests,
+  @NotNull(message = "Tags cannot be null.") List<String> tags,
   @NotNull(message = "Active cannot be null.") boolean active
 ) implements ITaskService.UpdateTask {
 }

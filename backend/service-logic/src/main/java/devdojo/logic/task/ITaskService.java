@@ -36,6 +36,12 @@ public interface ITaskService {
     @NotNull(message = "DeleteTask data must not be null")
     @Valid final DeleteTask deleteTask);
 
+  @NotNull(message = "Remove tag from task must not be null")
+  boolean removeTagFromTask(
+    @NotNull(message = "RemoveTagFromTask data must not be null")
+    @Valid final RemoveTagFromTask removeTagFromTask
+  );
+
   @NotNull(message = "Appended unit test task must not be null")
   TaskEntity appendUnitTest(
     @NotNull(message = "AppendTest data must not be null")
@@ -77,6 +83,9 @@ public interface ITaskService {
 
     @NotNull(message = "Active must not be null")
     boolean active();
+
+    @NotNull(message = "Tags must not be null")
+    List<String> tags();
   }
 
   interface UpdateTask {
@@ -104,6 +113,9 @@ public interface ITaskService {
 
     @NotNull(message = "Active must not be null")
     boolean active();
+
+    @NotNull(message = "Tags must not be null")
+    List<String> tags();
   }
 
   interface DeleteTask {
@@ -128,6 +140,14 @@ public interface ITaskService {
     @NotNull(message = "Output argument must not be null")
     @Valid
     TestArgumentData output();
+  }
+
+  interface RemoveTagFromTask {
+    @NotNull(message = "Task ID must not be null")
+    UUID taskId();
+
+    @NotNull(message = "Tag ID must not be null")
+    UUID tagId();
   }
 
   interface TestArgumentData {
