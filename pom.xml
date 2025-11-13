@@ -83,7 +83,7 @@
 
     <plugin.version.buildhelper>3.6.1</plugin.version.buildhelper>
 
-    <plugin.version.surefire>3.5.3</plugin.version.surefire>
+    <plugin.version.surefire>3.5.4</plugin.version.surefire>
 
     <plugin.version.checkstyle>3.6.0</plugin.version.checkstyle>
   </properties>
