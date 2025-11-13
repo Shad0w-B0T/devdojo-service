@@ -66,9 +66,9 @@
     <dependency.version.checkstyle.tools>12.1.2</dependency.version.checkstyle.tools>
 
     <!-- ### Test dependencies ### -->
-    <dependency.version.mockito>5.15.2</dependency.version.mockito>
+    <dependency.version.mockito>5.20.0</dependency.version.mockito>
 
-    <dependency.version.mockito.junit>5.18.0</dependency.version.mockito.junit>
+    <dependency.version.mockito.junit>5.20.0</dependency.version.mockito.junit>
 
     <dependency.version.junit>6.0.1</dependency.version.junit>
 
