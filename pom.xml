@@ -56,7 +56,7 @@
     <dependency.version.annoations>26.0.2</dependency.version.annoations>
 
     <!-- ### API -->
-    <dependency.version.graphql>22.0</dependency.version.graphql>
+    <dependency.version.graphql>2023-01-24T02-11-56-babda5f</dependency.version.graphql>
 
     <dependency.jackson.version>2.18.2</dependency.jackson.version>
 
