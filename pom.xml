@@ -45,7 +45,7 @@
 
     <dependency.version.hibernate>7.1.7.Final</dependency.version.hibernate>
 
-    <dependency.version.shedlock>6.9.2</dependency.version.shedlock>
+    <dependency.version.shedlock>6.10.0</dependency.version.shedlock>
 
     <!-- ### Security -->
     <dependency.version.jjwt>0.12.6</dependency.version.jjwt>
