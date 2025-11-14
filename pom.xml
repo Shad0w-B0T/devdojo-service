@@ -80,7 +80,7 @@
     <dependency.version.testcontainers>1.21.3</dependency.version.testcontainers>
 
     <!-- ### Plugins -->
-    <plugin.version.shade>3.6.0</plugin.version.shade>
+    <plugin.version.shade>3.6.1</plugin.version.shade>
 
     <plugin.version.javadocs>3.12.0</plugin.version.javadocs>
 
