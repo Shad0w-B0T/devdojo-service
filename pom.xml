@@ -6,7 +6,7 @@
 
   <groupId>devdojo</groupId>
   <artifactId>service</artifactId>
-  <version>1.5.4</version>
+  <version>1.5.5</version>
   <packaging>pom</packaging>
   <modules>
     <module>service-schema</module>
@@ -46,7 +46,7 @@
     <dependency.version.hibernate>7.1.8.Final</dependency.version.hibernate>
 
 
-    <dependency.version.shedlock>7.1.0</dependency.version.shedlock>
+    <dependency.version.shedlock>6.10.0</dependency.version.shedlock>
 
     <!-- ### Security -->
     <dependency.version.jjwt>0.13.0</dependency.version.jjwt>
