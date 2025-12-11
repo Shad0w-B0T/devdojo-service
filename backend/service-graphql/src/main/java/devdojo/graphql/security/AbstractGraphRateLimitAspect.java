@@ -21,7 +21,7 @@ public abstract class AbstractGraphRateLimitAspect {
     " @annotation(org.springframework.graphql.data.method.annotation.MutationMapping)")
   public Object rateLimitAllGraphQL(final ProceedingJoinPoint joinPoint) throws Throwable {
     final String bucketSpel =
-      "#{'rate-graphql-' + T(de.hdm.devdojo.logic.security.SecurityUtils).localThreadClient().userId()}";
+      "#{'rate-graphql-' + T(devdojo.logic.security.SecurityUtils).localThreadClient().userId()}";
 
     this.rateLimitService.applyRateLimit(
       "ratelimit-graphql",

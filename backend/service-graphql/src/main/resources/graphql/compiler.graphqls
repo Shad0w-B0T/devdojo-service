@@ -22,7 +22,7 @@ type TestRun {
 }
 
 type TestRunResult {
-    input: [JSON!]!
+    input: [JSON]
     output: JSON
     logs: [String!]!
     errors: [TestError!]!

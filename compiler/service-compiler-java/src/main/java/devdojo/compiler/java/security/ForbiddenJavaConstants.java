@@ -49,9 +49,6 @@ public final class ForbiddenJavaConstants {
   private final static String WHILE_LOOP = "while(true)";
   private final static String FOR_LOOP = "for(;;)";
 
-  private final static String COMMENT = "//";
-  private final static String COMMENT_MULTILINE = "/*";
-
 
   public final static Set<String> JAVA_FORBIDDEN = Stream.of(
       IMPORT,
@@ -79,9 +76,7 @@ public final class ForbiddenJavaConstants {
       SECURITY_MANAGER,
       ACCESSCONTROLLER_DO_PRIVILEGED,
       WHILE_LOOP,
-      FOR_LOOP,
-      COMMENT,
-      COMMENT_MULTILINE
+      FOR_LOOP
     ).map(String::toLowerCase)
     .collect(Collectors.toUnmodifiableSet());
 }

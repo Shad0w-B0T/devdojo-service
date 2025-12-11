@@ -6,7 +6,7 @@
   <parent>
     <groupId>devdojo</groupId>
     <artifactId>service</artifactId>
-    <version>1.5.3</version>
+    <version>1.5.4</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -60,7 +60,7 @@
               <createDependencyReducedPom>false</createDependencyReducedPom>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>devdojo.compiler.python.Runtime</mainClass>
+                  <mainClass>devdojo.compiler.python.PythonRuntime</mainClass>
                 </transformer>
               </transformers>
             </configuration>

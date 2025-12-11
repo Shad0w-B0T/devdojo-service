@@ -41,7 +41,7 @@ public abstract class AbstractCodeController implements ICodeController {
 
 
   @RateLimited(
-    bucket = "#{'rate-code-' + T(de.hdm.devdojo.logic.security.SecurityUtils).localThreadClient().userId()}",
+    bucket = "#{'rate-code-' + T(devdojo.logic.security.SecurityUtils).localThreadClient().userId()}",
     refillDurationMillis = CODE_RATE_LIMIT_REFILL,
     totalTokens = 1)
   @PostMapping("/exercises")
