@@ -6,7 +6,7 @@
   <parent>
     <groupId>devdojo</groupId>
     <artifactId>service</artifactId>
-    <version>1.5.4</version>
+    <version>1.5.5</version>
   </parent>
 
   <artifactId>service-schema</artifactId>
