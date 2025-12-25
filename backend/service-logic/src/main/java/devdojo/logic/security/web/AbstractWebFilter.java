@@ -28,16 +28,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public abstract class AbstractWebFilter extends OncePerRequestFilter implements IWebFilter {
 
-  private final @NotNull ISupabaseEvaluator supabaseEvaluator;
   private final @NotNull IUserService userService;
   private final @NotNull IClient internal;
 
-  protected AbstractWebFilter(final ISupabaseEvaluator supabaseEvaluator,
-                              final IUserService userService) {
-    Objects.requireNonNull(supabaseEvaluator, "For the filter, the supabase evaluator must be provided.");
+  protected AbstractWebFilter(final IUserService userService) {
     Objects.requireNonNull(userService, "For the filter, the userService must be provided.");
 
-    this.supabaseEvaluator = supabaseEvaluator;
     this.userService = userService;
 
     final UserEntity internalUser = new UserEntity(UUID.randomUUID(), "", "",
@@ -51,12 +47,6 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
   protected void doFilterInternal(@NotNull final HttpServletRequest request,
                                   @NotNull final HttpServletResponse response,
                                   @NotNull final FilterChain filterChain) throws ServletException, IOException {
-    String path = request.getRequestURI();
-    if (path.startsWith("/ws/")) {
-      filterChain.doFilter(request, response);
-      return;
-    }
-    
     final String userAgent = SecurityUtils.owaspHtmlSanitize(request.getHeader(HttpHeaders.USER_AGENT), null);
 
     SecurityContextHolder.getContext().setAuthentication(internal);
