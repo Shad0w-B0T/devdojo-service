@@ -121,24 +121,6 @@
       <artifactId>owasp-java-html-sanitizer</artifactId>
       <version>${dependency.version.owasp.sanitizer}</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
-    <dependency>
-      <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt-api</artifactId>
-      <version>${dependency.version.jjwt}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl -->
-    <dependency>
-      <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt-impl</artifactId>
-      <version>${dependency.version.jjwt}</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson -->
-    <dependency>
-      <groupId>io.jsonwebtoken</groupId>
-      <artifactId>jjwt-jackson</artifactId>
-      <version>${dependency.version.jjwt}</version>
-    </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.springframework.ldap/spring-ldap-core -->
     <dependency>

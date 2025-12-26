@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface UserRepository extends EntityRepository<UserEntity> {
   boolean existsByDisplayName(final String displayName);
 
-  @NotNull Optional<UserEntity> findBySupabaseId(final UUID supabaseId);
+  @NotNull Optional<UserEntity> findByAuthId(final String authId);
 }

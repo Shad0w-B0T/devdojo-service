@@ -12,7 +12,6 @@ type User implements DateAuditable{
     name: String!
     role: UserRole!
     active: Boolean!
-    emailVerified: Boolean!
     lastLogin: Long!
     createdAt: Long!
     updatedAt: Long!

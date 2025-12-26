@@ -2,13 +2,7 @@ package devdojo.logic.security.web;
 
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
-import devdojo.logic.security.client.Client;
-import devdojo.logic.security.client.IClient;
-import devdojo.logic.security.supabase.ISupabaseEvaluator;
-import devdojo.logic.security.supabase.ISupabaseUser;
 import devdojo.logic.user.IUserService;
-import devdojo.schema.exception.database.NotFoundException;
-import devdojo.schema.exception.permissions.UnauthenticatedException;
 import devdojo.schema.user.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,6 +16,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -29,17 +24,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public abstract class AbstractWebFilter extends OncePerRequestFilter implements IWebFilter {
 
   private final @NotNull IUserService userService;
-  private final @NotNull IClient internal;
 
   protected AbstractWebFilter(final IUserService userService) {
     Objects.requireNonNull(userService, "For the filter, the userService must be provided.");
 
     this.userService = userService;
-
-    final UserEntity internalUser = new UserEntity(UUID.randomUUID(), "", "",
-      UserRole.SYSTEM, true, false, new Date());
-    internalUser.id(UUID.randomUUID());
-    this.internal = new Client("", internalUser);
     log.info("Web filter for supabase evaluator.");
   }
 
@@ -49,24 +38,19 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
                                   @NotNull final FilterChain filterChain) throws ServletException, IOException {
     final String userAgent = SecurityUtils.owaspHtmlSanitize(request.getHeader(HttpHeaders.USER_AGENT), null);
 
-    SecurityContextHolder.getContext().setAuthentication(internal);
-    try {
-      final ISupabaseUser user = this.supabaseEvaluator.authenticate(request);
-      final UserEntity userEntity = this.userEntityFromRequest(user);
-      final IClient client = new Client(userAgent, userEntity);
+    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println(authentication.getPrincipal());
+    System.out.println(authentication.isAuthenticated());
 
-      //Set fingerprint for logs.
-      MDC.put("user", userEntity.id().toString());
-
-      SecurityContextHolder.getContext().setAuthentication(client);
-    } catch (final UnauthenticatedException exception) {
-      SecurityContextHolder.clearContext();
+    //Set fingerprint for logs.
+    if (authentication.getPrincipal() != null) {
+      MDC.put("user", authentication.getPrincipal().toString());
     }
 
     filterChain.doFilter(request, response);
   }
 
-  private UserEntity userEntityFromRequest(final ISupabaseUser supabaseUser) {
+/*  private UserEntity userEntityFromRequest(final ISupabaseUser supabaseUser) {
     try {
       final UserEntity userEntity = this.userService.getUser(new GetUserBySupabase(supabaseUser.id()));
 
@@ -80,37 +64,34 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
     }
   }
 
-  private record GetUserBySupabase(UUID supabaseId) implements IUserService.UserGet {
+  private record GetUserByAuthId(String authId) implements IUserService.UserGet {
 
     @Override
     public UUID userId() {
       return null;
     }
 
-  }
+  }*/
 
-  private record CreateUser(UUID supabaseId,
-                            String supabaseEmail,
+  private record CreateUser(String authId,
+                            String email,
                             String displayName,
                             UserRole role,
-                            boolean active,
-                            boolean emailVerified) implements IUserService.UserCreate {
+                            boolean active) implements IUserService.UserCreate {
 
   }
 
   private record UpdateUser(UserEntity userEntity,
-                            String supabaseEmail,
-                            boolean emailVerified,
+                            String email,
                             Date lastLogin) implements IUserService.UserUpdate {
-
     @Override
     public UUID userId() {
       return this.userEntity.id();
     }
 
     @Override
-    public String supabaseEmail() {
-      return this.supabaseEmail;
+    public String email() {
+      return this.email;
     }
 
     @Override
@@ -126,11 +107,6 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
     @Override
     public boolean active() {
       return this.userEntity.active();
-    }
-
-    @Override
-    public boolean emailVerified() {
-      return this.emailVerified;
     }
 
     @Override
