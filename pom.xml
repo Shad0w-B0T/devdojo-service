@@ -43,18 +43,13 @@
 
     <dependency.version.flyway.core>11.17.0</dependency.version.flyway.core>
 
-    <dependency.version.hibernate>7.1.8.Final</dependency.version.hibernate>
+    <dependency.version.hibernate>6.6.34.Final</dependency.version.hibernate>
 
 
     <dependency.version.shedlock>6.10.0</dependency.version.shedlock>
 
     <!-- ### Security -->
-    <dependency.version.jjwt>0.13.0</dependency.version.jjwt>
-
     <dependency.version.owasp.sanitizer>20240325.1</dependency.version.owasp.sanitizer>
-
-    <!-- ### Annotations -->
-    <dependency.version.annoations>26.0.2</dependency.version.annoations>
 
     <!-- ### API -->
     <dependency.version.graphql>2023-01-24T02-11-56-babda5f</dependency.version.graphql>

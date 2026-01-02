@@ -145,7 +145,7 @@ public abstract class AbstractTaskController implements ITaskController {
   @Override
   public @NotNull ITaskUserProgress userProgress(@NotNull final TaskEntity task,
                                                  @Argument("userId") final UUID userId) {
-    final UUID progressUserId = userId != null ? userId : SecurityUtils.localThreadClient().userId();
+    final UUID progressUserId = userId != null ? userId : SecurityUtils.currentTokenDetails().userId();
 
     try {
       final TaskProgressEntity taskProgressEntity =

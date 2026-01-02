@@ -11,7 +11,7 @@ public record UpdateTaskUserInput(UUID userId,
   public UpdateTaskUserInput(final UUID userId,
                              final UUID taskId,
                              final String input) {
-    this.userId = userId != null ? userId : SecurityUtils.localThreadClient().userId();
+    this.userId = userId != null ? userId : SecurityUtils.currentTokenDetails().userId();
     this.taskId = taskId;
     this.input = input;
   }

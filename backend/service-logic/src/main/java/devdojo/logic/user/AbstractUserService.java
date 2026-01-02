@@ -3,7 +3,6 @@ package devdojo.logic.user;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.database.user.UserRepository;
 import devdojo.logic.security.SecurityUtils;
-import devdojo.logic.security.client.IClient;
 import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.AlreadyExistsException;
 import devdojo.schema.exception.database.DatabaseException;
@@ -29,8 +28,7 @@ public abstract class AbstractUserService implements IUserService {
   private final @NotNull UserRepository userRepository;
 
   protected AbstractUserService(
-    @NotNull(message = "UserRepository must not be null")
-    final UserRepository userRepository) {
+    @NotNull(message = "UserRepository must not be null") final UserRepository userRepository) {
 
     this.userRepository = userRepository;
   }
@@ -60,9 +58,9 @@ public abstract class AbstractUserService implements IUserService {
   @Transactional
   public UserEntity getUser(final UserGet userGet) {
 
-    if (userGet.supabaseId() != null) {
-      return this.userRepository.findBySupabaseId(userGet.supabaseId())
-        .orElseThrow(() -> new NotFoundException("No user found with supabaseId: " + userGet.supabaseId()));
+    if (userGet.authId() != null) {
+      return this.userRepository.findByAuthId(userGet.authId())
+        .orElseThrow(() -> new NotFoundException("No user found with authId: " + userGet.authId()));
     }
 
     return this.userElseThrow(userGet.userId());
@@ -92,12 +90,11 @@ public abstract class AbstractUserService implements IUserService {
     final UserEntity userEntity;
     try {
       userEntity = this.userRepository.save(new UserEntity(
-        userCreate.supabaseId(),
-        userCreate.supabaseEmail(),
+        userCreate.authId(),
+        userCreate.email(),
         userCreate.displayName(),
         userCreate.role(),
         userCreate.active(),
-        userCreate.emailVerified(),
         new Date()
       ));
       log.info("User {} successfully created.", userEntity.id());
@@ -132,18 +129,15 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     if (userEntity.role() != userUpdate.role()) {
-      final IClient client = SecurityUtils.localThreadClient();
-
-      if (client.userRole().id() < userUpdate.role().id()) {
+      if (SecurityUtils.currentTokenDetails().userRole().id() < userUpdate.role().id()) {
         throw new UnauthenticatedException("You do not have enough permissions to set the role.");
       }
     }
 
-    userEntity.supabaseEmail(userUpdate.supabaseEmail());
+    userEntity.email(userUpdate.email());
     userEntity.displayName(userUpdate.displayName());
     userEntity.role(userUpdate.role());
     userEntity.active(userUpdate.active());
-    userEntity.emailVerified(userUpdate.emailVerified());
     userEntity.lastLogin(userUpdate.lastLogin());
 
     final UserEntity updatedUserEntity;
@@ -169,8 +163,8 @@ public abstract class AbstractUserService implements IUserService {
       }
 
       @Override
-      public String supabaseEmail() {
-        return userEntity.supabaseEmail();
+      public String email() {
+        return userEntity.email();
       }
 
       @Override
@@ -186,11 +180,6 @@ public abstract class AbstractUserService implements IUserService {
       @Override
       public boolean active() {
         return userEntity.active();
-      }
-
-      @Override
-      public boolean emailVerified() {
-        return userEntity.emailVerified();
       }
 
       @Override
@@ -211,8 +200,8 @@ public abstract class AbstractUserService implements IUserService {
       }
 
       @Override
-      public String supabaseEmail() {
-        return userEntity.supabaseEmail();
+      public String email() {
+        return userEntity.email();
       }
 
       @Override
@@ -228,11 +217,6 @@ public abstract class AbstractUserService implements IUserService {
       @Override
       public boolean active() {
         return userEntity.active();
-      }
-
-      @Override
-      public boolean emailVerified() {
-        return userEntity.emailVerified();
       }
 
       @Override
