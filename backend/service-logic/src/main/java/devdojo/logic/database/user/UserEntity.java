@@ -4,9 +4,7 @@ import devdojo.logic.database.AbstractEntity;
 import devdojo.schema.Constants;
 import devdojo.schema.user.IUser;
 import devdojo.schema.user.UserRole;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -55,6 +53,14 @@ public final class UserEntity extends AbstractEntity implements IUser {
   @Past(message = "Last login date must be in the past")
   @Column(name = "lastLogin", nullable = false)
   private Date lastLogin;
+
+  @OneToOne(
+    mappedBy = "user",
+    fetch = FetchType.LAZY,
+    cascade = CascadeType.ALL,
+    optional = false
+  )
+  private UserSettingsEntity settings;
 
   /**
    * Creates a new UserEntity.

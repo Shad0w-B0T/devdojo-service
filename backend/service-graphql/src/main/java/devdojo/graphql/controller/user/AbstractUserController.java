@@ -32,7 +32,7 @@ public abstract class AbstractUserController implements IUserController {
   @QueryMapping("userSelf")
   @Override
   public @NotNull UserEntity userSelf() {
-    return this.userService.getUser(SecurityUtils.localThreadClient().userId());
+    return this.userService.getUser(SecurityUtils.currentTokenDetails().userId());
   }
 
   @MutationMapping("updateUserName")

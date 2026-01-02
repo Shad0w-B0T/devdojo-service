@@ -3,7 +3,6 @@ package devdojo.logic.user;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.database.user.UserRepository;
 import devdojo.logic.security.SecurityUtils;
-import devdojo.logic.security.client.IClient;
 import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.AlreadyExistsException;
 import devdojo.schema.exception.database.DatabaseException;
@@ -29,8 +28,7 @@ public abstract class AbstractUserService implements IUserService {
   private final @NotNull UserRepository userRepository;
 
   protected AbstractUserService(
-    @NotNull(message = "UserRepository must not be null")
-    final UserRepository userRepository) {
+    @NotNull(message = "UserRepository must not be null") final UserRepository userRepository) {
 
     this.userRepository = userRepository;
   }
@@ -131,9 +129,7 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     if (userEntity.role() != userUpdate.role()) {
-      final IClient client = SecurityUtils.localThreadClient();
-
-      if (client.userRole().id() < userUpdate.role().id()) {
+      if (SecurityUtils.currentTokenDetails().userRole().id() < userUpdate.role().id()) {
         throw new UnauthenticatedException("You do not have enough permissions to set the role.");
       }
     }

@@ -2,6 +2,7 @@ package devdojo.logic.security.ldap;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.context.annotation.Bean;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -27,6 +28,7 @@ public abstract class AbstractLdapConfig implements ILdapConfig {
     this.ldapUserPattern = ldapUserPattern;
   }
 
+  @Bean
   @Override
   public LdapContextSource ldapContextSource() {
     final LdapContextSource contextSource = new LdapContextSource();
@@ -36,11 +38,13 @@ public abstract class AbstractLdapConfig implements ILdapConfig {
     return contextSource;
   }
 
+  @Bean
   @Override
   public LdapTemplate ldapTemplate(final LdapContextSource contextSource) {
     return new LdapTemplate(contextSource);
   }
 
+  @Bean
   @Override
   public AuthenticationProvider ldapAuthenticationProvider() {
     final BindAuthenticator authenticator = new BindAuthenticator(ldapContextSource());

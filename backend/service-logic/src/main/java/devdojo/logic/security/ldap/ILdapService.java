@@ -1,5 +1,6 @@
 package devdojo.logic.security.ldap;
 
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 
 /**
@@ -8,6 +9,6 @@ import java.util.Map;
 
 public interface ILdapService {
 
-  public Map<String, Object> loadUserAttributes(final String uid);
+  Map<String, Object> loadUserAttributes(@NotBlank(message = "UID darf nicht leer sein") final String uid);
 
 }

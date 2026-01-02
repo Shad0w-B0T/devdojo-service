@@ -25,7 +25,7 @@ public abstract class AbstractGraphRateLimitAspect {
 
     this.rateLimitService.applyRateLimit(
       "ratelimit-graphql",
-      "ratelimit-graphql-%s".formatted(SecurityUtils.localThreadClient().userId().toString()),
+      "ratelimit-graphql-%s".formatted(SecurityUtils.currentTokenDetails().userId().toString()),
       this.tokensPerSecond,
       SECOND,
       1,

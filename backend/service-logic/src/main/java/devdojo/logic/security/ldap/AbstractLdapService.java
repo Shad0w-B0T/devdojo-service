@@ -25,16 +25,12 @@ public abstract class AbstractLdapService implements ILdapService {
     this.ldapTemplate = ldapTemplate;
   }
 
-  @Override
   @Cacheable(
     cacheNames = "ldapUserAttributes",
-    key = "#uid",
+    key = "#p0",
     unless = "#result == null"
   )
-  public Map<String, Object> loadUserAttributes(
-    @NotBlank(message = "UID darf nicht leer sein") final String uid
-  ) {
-
+  public Map<String, Object> loadUserAttributes(final String uid) {
     final List<Map<String, Object>> results = ldapTemplate.search(
       USERS_BASE_DN,
       "(uid=" + uid + ")",
