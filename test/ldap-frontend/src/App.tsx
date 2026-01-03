@@ -26,7 +26,7 @@ export default function App() {
     };
 
     const logout = async () => {
-        await fetch("/logout", { method: "POST" });
+        await fetch("/api/logout", { method: "POST" });
         setLoggedIn(false);
         setResult("");
     };

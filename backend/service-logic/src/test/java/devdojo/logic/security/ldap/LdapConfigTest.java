@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationProvider;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("AbstractLdapConfig Unit Tests")

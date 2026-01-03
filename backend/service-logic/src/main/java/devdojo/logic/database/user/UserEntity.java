@@ -54,18 +54,20 @@ public final class UserEntity extends AbstractEntity implements IUser {
   @Column(name = "lastLogin", nullable = false)
   private Date lastLogin;
 
-  @OneToOne(
+  /*@OneToOne(
     mappedBy = "user",
     fetch = FetchType.LAZY,
     cascade = CascadeType.ALL,
     optional = false
   )
   private UserSettingsEntity settings;
+    */
 
   /**
    * Creates a new UserEntity.
    *
    * @param authId      the supabase id.
+   * @param email
    * @param displayName the name displayed in the leaderboard.
    * @param role        the role of the user.
    * @param active      whether the user is active or not.

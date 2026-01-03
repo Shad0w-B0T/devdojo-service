@@ -47,11 +47,9 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
     final String userAgent = SecurityUtils.owaspHtmlSanitize(request.getHeader(HttpHeaders.USER_AGENT), null);
 
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
     if (authentication instanceof AbstractAuthenticationToken token &&
       token.getPrincipal() instanceof LdapUserDetailsImpl ldapUserDetails &&
       this.ldapService != null) {
-
       final String authId = ldapUserDetails.getUsername();
       final boolean active = ldapUserDetails.isEnabled() && ldapUserDetails.isAccountNonExpired() &&
         ldapUserDetails.isCredentialsNonExpired() && ldapUserDetails.isAccountNonLocked();
@@ -67,6 +65,7 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
 
       //Set fingerprint for logs.
       MDC.put("user", authId);
+      SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     filterChain.doFilter(request, response);

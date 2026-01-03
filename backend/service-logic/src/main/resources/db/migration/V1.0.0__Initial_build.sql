@@ -85,18 +85,26 @@ CREATE TABLE test_argument
     CONSTRAINT pk_test_argument PRIMARY KEY (id)
 );
 
-CREATE TABLE users
+CREATE TABLE user_settings
 (
-    id             UUID                        NOT NULL,
+    user_id        UUID    NOT NULL,
     created_at     TIMESTAMP WITHOUT TIME ZONE,
     updated_at     TIMESTAMP WITHOUT TIME ZONE,
-    supabase_id    UUID                        NOT NULL,
-    supabase_email VARCHAR(300)                NOT NULL,
-    display_name   VARCHAR(255)                NOT NULL,
-    role           SMALLINT                    NOT NULL,
-    active         BOOLEAN                     NOT NULL,
-    email_verified BOOLEAN                     NOT NULL,
-    last_login     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    profile_public BOOLEAN NOT NULL,
+    CONSTRAINT pk_user_settings PRIMARY KEY (user_id)
+);
+
+CREATE TABLE users
+(
+    id           UUID                        NOT NULL,
+    created_at   TIMESTAMP WITHOUT TIME ZONE,
+    updated_at   TIMESTAMP WITHOUT TIME ZONE,
+    auth_id      VARCHAR(255)                NOT NULL,
+    email        VARCHAR(300)                NOT NULL,
+    display_name VARCHAR(255)                NOT NULL,
+    role         SMALLINT                    NOT NULL,
+    active       BOOLEAN                     NOT NULL,
+    last_login   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
@@ -113,10 +121,10 @@ ALTER TABLE language
     ADD CONSTRAINT uc_language_token UNIQUE (token);
 
 ALTER TABLE users
-    ADD CONSTRAINT uc_users_displayname UNIQUE (display_name);
+    ADD CONSTRAINT uc_users_authid UNIQUE (auth_id);
 
 ALTER TABLE users
-    ADD CONSTRAINT uc_users_supabaseid UNIQUE (supabase_id);
+    ADD CONSTRAINT uc_users_displayname UNIQUE (display_name);
 
 CREATE INDEX contactEmailContactIdAndName ON task_user_progress (user_id, task_id);
 
@@ -140,3 +148,6 @@ ALTER TABLE test_argument
 
 ALTER TABLE test
     ADD CONSTRAINT FK_TEST_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);
+
+ALTER TABLE user_settings
+    ADD CONSTRAINT FK_USER_SETTINGS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);

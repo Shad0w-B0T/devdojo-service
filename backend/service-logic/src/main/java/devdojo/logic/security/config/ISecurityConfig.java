@@ -12,6 +12,7 @@ public interface ISecurityConfig {
   /**
    * Configures a security filter chain for the specified web filter and HTTP security settings.
    *
+   * @param provider
    * @param webFilter the web filter to be applied; must not be null.
    * @param http      the HttpSecurity object used for configuring security features; must not be null.
    * @return the configured security filter chain.

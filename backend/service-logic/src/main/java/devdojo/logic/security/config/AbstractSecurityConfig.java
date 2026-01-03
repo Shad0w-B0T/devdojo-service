@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authorization.method.PrePostTemplateDefaults;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,9 +22,9 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
   @Bean
   @Override
   public @NotNull SecurityFilterChain securityFilterChain(
-    @NotNull AuthenticationProvider provider,
-    @NotNull IWebFilter webFilter,
-    @NotNull HttpSecurity http
+    @NotNull final AuthenticationProvider provider,
+    @NotNull final IWebFilter webFilter,
+    @NotNull final HttpSecurity http
   ) throws Exception {
 
     log.info("Initialized security filter of spring module...");
@@ -31,9 +33,12 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
       .authenticationProvider(provider)
 
       .formLogin(form -> form
-        .loginProcessingUrl("/login")
-        .successHandler((req, res, auth) -> res.setStatus(200))
-        .failureHandler((req, res, ex) -> res.setStatus(401))
+        .loginProcessingUrl("/api/login")
+        .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
+        .failureHandler((req, res, ex) -> {
+          System.out.println(ex.getMessage());
+          res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        })
         .permitAll())
 
       .exceptionHandling(e -> e
@@ -41,11 +46,11 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
           res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
 
       .logout(logout -> logout
-        .logoutUrl("/logout")
-        .logoutSuccessHandler((req, res, auth) -> res.setStatus(200)))
+        .logoutUrl("/api/logout")
+        .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK)))
 
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/login", "/logout").permitAll()
+        .requestMatchers("/api/login", "/api/logout").permitAll()
         .anyRequest().authenticated())
 
       .addFilterAfter(webFilter, UsernamePasswordAuthenticationFilter.class)

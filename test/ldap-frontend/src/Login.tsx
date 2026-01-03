@@ -14,7 +14,7 @@ export default function Login({ onLoginSuccess }: Props) {
         body.append("username", username);
         body.append("password", password);
 
-        const res = await fetch("/login", {
+        const res = await fetch("/api/login", {
             method: "POST",
             body,
             headers: {
@@ -24,7 +24,7 @@ export default function Login({ onLoginSuccess }: Props) {
 
         if (res.ok) {
             setMsg("");
-            onLoginSuccess(); // 🔴 App wird umgeschaltet
+            onLoginSuccess();
         } else {
             setMsg("Login fehlgeschlagen");
         }

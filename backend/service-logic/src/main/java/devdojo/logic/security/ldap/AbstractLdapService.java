@@ -46,9 +46,6 @@ public abstract class AbstractLdapService implements ILdapService {
       );
   }
 
-  /**
-   * Mapper für LDAP-Attribute → Map
-   */
   private AttributesMapper<Map<String, Object>> userAttributesMapper() {
     return attrs -> Map.of(
       "displayName", getSingle(attrs, "displayName"),

@@ -32,6 +32,7 @@ public abstract class AbstractUserController implements IUserController {
   @QueryMapping("userSelf")
   @Override
   public @NotNull UserEntity userSelf() {
+    System.out.println(SecurityUtils.currentTokenDetails().userId());
     return this.userService.getUser(SecurityUtils.currentTokenDetails().userId());
   }
 

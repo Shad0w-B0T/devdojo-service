@@ -2,6 +2,7 @@ package devdojo.logic.security.details;
 
 import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -28,7 +29,11 @@ public abstract class AbstractTokenEvaluator implements ITokenEvaluator {
   public boolean isSelf(@NotNull final AbstractAuthenticationToken token,
                         @NotNull final String userId,
                         @NotNull final UserRole bypassRole) {
-    if (token.getName().equals(userId)) {
+    if (!(token.getDetails() instanceof ITokenDetails tokenDetails)) {
+      return false;
+    }
+
+    if (tokenDetails.userId().equals(UUID.fromString(userId))) {
       return true;
     }
 

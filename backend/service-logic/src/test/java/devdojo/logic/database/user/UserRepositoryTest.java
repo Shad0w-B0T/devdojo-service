@@ -23,7 +23,7 @@ final class UserRepositoryTest extends BaseJpaTest {
   private UserEntity user;
 
   private final Date DATE = Date.from(Instant.parse("2025-04-20T12:00:00Z"));
-  private final UUID ID = UUID.fromString("e25a0f7f-6f46-412c-ac86-4f50bc5faed4");
+  private final String ID = "e25a0f7f-6f46-412c-ac86-4f50bc5faed4";
 
 
   @BeforeEach
@@ -33,7 +33,6 @@ final class UserRepositoryTest extends BaseJpaTest {
       "rick@hdm-stuttgart.de",
       "Rick",
       UserRole.ADMIN,
-      true,
       true,
       this.DATE
     );
@@ -76,16 +75,15 @@ final class UserRepositoryTest extends BaseJpaTest {
     final UserEntity user = this.user;
     this.cut.save(user);
 
-    final Optional<UserEntity> result = this.cut.findBySupabaseId(ID);
+    final Optional<UserEntity> result = this.cut.findByAuthId(ID);
 
     assertTrue(result.isPresent());
     assertEquals(1, this.cut.count());
     assertEquals(user, result.get());
-    assertEquals(user.supabaseEmail(), result.get().supabaseEmail());
+    assertEquals(user.email(), result.get().email());
     assertEquals(user.displayName(), result.get().displayName());
     assertEquals(user.role(), result.get().role());
     assertEquals(user.active(), result.get().active());
-    assertEquals(user.emailVerified(), result.get().emailVerified());
     assertEquals(user.lastLogin(), result.get().lastLogin());
   }
 
@@ -95,7 +93,7 @@ final class UserRepositoryTest extends BaseJpaTest {
     final UserEntity user = this.user;
     this.cut.save(user);
 
-    final Optional<UserEntity> result = this.cut.findBySupabaseId(null);
+    final Optional<UserEntity> result = this.cut.findByAuthId(null);
 
     assertTrue(result.isEmpty());
   }
@@ -107,10 +105,8 @@ final class UserRepositoryTest extends BaseJpaTest {
     this.cut.save(user);
 
     final Optional<UserEntity> result =
-      this.cut.findBySupabaseId(UUID.fromString("5fc95d2a-e881-4b30-aeda-714ad45e770b"));
+      this.cut.findByAuthId("5fc95d2a-e881-4b30-aeda-714ad45e770b");
 
     assertTrue(result.isEmpty());
   }
-
-
 }

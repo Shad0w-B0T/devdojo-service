@@ -57,7 +57,6 @@ public abstract class AbstractUserService implements IUserService {
   @Override
   @Transactional
   public UserEntity getUser(final UserGet userGet) {
-
     if (userGet.authId() != null) {
       return this.userRepository.findByAuthId(userGet.authId())
         .orElseThrow(() -> new NotFoundException("No user found with authId: " + userGet.authId()));
@@ -117,7 +116,8 @@ public abstract class AbstractUserService implements IUserService {
    * @throws NullPointerException if {@code userData} is {@code null}
    * @throws NotFoundException    if no user exists with the provided ID
    */
-  @SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
+  //Todo
+  //@SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
   @Transactional
   @Override
   public UserEntity updateUser(@P("user") final UserUpdate userUpdate) {
@@ -150,7 +150,8 @@ public abstract class AbstractUserService implements IUserService {
     return updatedUserEntity;
   }
 
-  @SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
+  //Todo
+  //@SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
   @Transactional
   @Override
   public UserEntity updateUser(@P("user") final UserDisplayNameUpdate userDisplayNameUpdate) {
@@ -238,7 +239,8 @@ public abstract class AbstractUserService implements IUserService {
    * @throws NotFoundException if no user exists with the provided ID
    * @throws DeletionException if the user was not successfully deleted
    */
-  @SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
+  //Todo
+  //@SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
   @Transactional
   @Override
   public UserEntity deleteUser(@P("user") final UserDelete userDelete) {
