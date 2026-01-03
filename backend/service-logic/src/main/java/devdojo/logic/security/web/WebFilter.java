@@ -1,13 +1,14 @@
 package devdojo.logic.security.web;
 
-import devdojo.logic.security.supabase.ISupabaseEvaluator;
+import devdojo.logic.security.ldap.ILdapService;
 import devdojo.logic.user.IUserService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class WebFilter extends AbstractWebFilter {
-  public WebFilter(final ISupabaseEvaluator supabaseEvaluator,
-                   final IUserService userService) {
-    super(supabaseEvaluator, userService);
+
+  protected WebFilter(final IUserService userService,
+                      final ILdapService ldapService) {
+    super(userService, ldapService);
   }
 }

@@ -10,8 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("@clientEvaluator.isValid(authentication) && " +
-  "@clientEvaluator.isSelf(authentication, {field}, T(devdojo.schema.user.UserRole).{bypassRole})")
+@PreAuthorize("@tokenEvaluator.isValid(authentication) && " +
+  "@tokenEvaluator.isSelf(authentication, {field}, T(devdojo.schema.user.UserRole).{bypassRole})")
 public @interface SelfRequired {
 
   //Spel field
