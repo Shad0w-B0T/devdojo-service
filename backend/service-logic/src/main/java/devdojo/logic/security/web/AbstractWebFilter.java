@@ -2,48 +2,41 @@ package devdojo.logic.security.web;
 
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
-import devdojo.logic.security.client.Client;
-import devdojo.logic.security.client.IClient;
-import devdojo.logic.security.supabase.ISupabaseEvaluator;
-import devdojo.logic.security.supabase.ISupabaseUser;
+import devdojo.logic.security.details.ITokenDetails;
+import devdojo.logic.security.details.TokenDetails;
+import devdojo.logic.security.ldap.ILdapService;
 import devdojo.logic.user.IUserService;
 import devdojo.schema.exception.database.NotFoundException;
-import devdojo.schema.exception.permissions.UnauthenticatedException;
 import devdojo.schema.user.UserRole;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import java.io.*;
-import java.util.Date;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsImpl;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
 public abstract class AbstractWebFilter extends OncePerRequestFilter implements IWebFilter {
 
-  private final @NotNull ISupabaseEvaluator supabaseEvaluator;
   private final @NotNull IUserService userService;
-  private final @NotNull IClient internal;
+  private final @Nullable ILdapService ldapService;
 
-  protected AbstractWebFilter(final ISupabaseEvaluator supabaseEvaluator,
-                              final IUserService userService) {
-    Objects.requireNonNull(supabaseEvaluator, "For the filter, the supabase evaluator must be provided.");
+  protected AbstractWebFilter(final IUserService userService,
+                              @Nullable final ILdapService ldapService) {
     Objects.requireNonNull(userService, "For the filter, the userService must be provided.");
 
-    this.supabaseEvaluator = supabaseEvaluator;
     this.userService = userService;
-
-    final UserEntity internalUser = new UserEntity(UUID.randomUUID(), "", "",
-      UserRole.SYSTEM, true, false, new Date());
-    internalUser.id(UUID.randomUUID());
-    this.internal = new Client("", internalUser);
+    this.ldapService = ldapService;
     log.info("Web filter for supabase evaluator.");
   }
 
@@ -51,76 +44,150 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
   protected void doFilterInternal(@NotNull final HttpServletRequest request,
                                   @NotNull final HttpServletResponse response,
                                   @NotNull final FilterChain filterChain) throws ServletException, IOException {
-    String path = request.getRequestURI();
-    if (path.startsWith("/ws/")) {
-      filterChain.doFilter(request, response);
-      return;
-    }
-    
     final String userAgent = SecurityUtils.owaspHtmlSanitize(request.getHeader(HttpHeaders.USER_AGENT), null);
 
-    SecurityContextHolder.getContext().setAuthentication(internal);
-    try {
-      final ISupabaseUser user = this.supabaseEvaluator.authenticate(request);
-      final UserEntity userEntity = this.userEntityFromRequest(user);
-      final IClient client = new Client(userAgent, userEntity);
+    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication instanceof AbstractAuthenticationToken token &&
+      token.getPrincipal() instanceof LdapUserDetailsImpl ldapUserDetails &&
+      this.ldapService != null) {
+      final String authId = ldapUserDetails.getUsername();
+      final boolean active = ldapUserDetails.isEnabled() && ldapUserDetails.isAccountNonExpired() &&
+        ldapUserDetails.isCredentialsNonExpired() && ldapUserDetails.isAccountNonLocked();
+
+      final Map<String, Object> ldapAttributes = this.ldapService.loadUserAttributes(authId);
+      final String displayName = ldapAttributes.getOrDefault("displayName", "").toString();
+      final String email = ldapAttributes.getOrDefault("mail", "").toString();
+      final UserRole role = this.mapLdapUserRole(ldapAttributes.get("eduPersonAffiliation"));
+
+      final UserEntity userEntity = this.updateUserEntity(authId, email, displayName, active, role);
+      final ITokenDetails tokenDetails = new TokenDetails(userEntity.id(), authId, email, displayName, role);
+      token.setDetails(tokenDetails);
 
       //Set fingerprint for logs.
-      MDC.put("user", userEntity.id().toString());
-
-      SecurityContextHolder.getContext().setAuthentication(client);
-    } catch (final UnauthenticatedException exception) {
-      SecurityContextHolder.clearContext();
+      MDC.put("user", authId);
+      SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     filterChain.doFilter(request, response);
   }
 
-  private UserEntity userEntityFromRequest(final ISupabaseUser supabaseUser) {
+  private UserEntity updateUserEntity(final String authId,
+                                      final String email,
+                                      final String displayName,
+                                      final boolean active,
+                                      final UserRole userRole) {
     try {
-      final UserEntity userEntity = this.userService.getUser(new GetUserBySupabase(supabaseUser.id()));
+      final UserEntity userEntity = this.userService.getUser(new IUserService.UserGet() {
+        @Override
+        public UUID userId() {
+          return null;
+        }
 
-      return this.userService.updateUser(
-        new UpdateUser(userEntity, supabaseUser.email(), supabaseUser.aal(), new Date()));
+        @Override
+        public String authId() {
+          return authId;
+        }
+      });
+
+      return this.userService.updateUser(new IUserService.UserUpdate() {
+        @Override
+        public UUID userId() {
+          return userEntity.id();
+        }
+
+        @Override
+        public String email() {
+          return email;
+        }
+
+        @Override
+        public String displayName() {
+          return displayName;
+        }
+
+        @Override
+        public UserRole role() {
+          return userRole;
+        }
+
+        @Override
+        public boolean active() {
+          return active;
+        }
+
+        @Override
+        public Date lastLogin() {
+          return new Date();
+        }
+      });
     } catch (final NotFoundException exception) {
       final boolean admin = this.userService.isAdminNeeded();
 
-      return this.userService.createUser(new CreateUser(supabaseUser.id(), supabaseUser.email(),
-        supabaseUser.username(), admin ? UserRole.ADMIN : UserRole.USER, true, supabaseUser.aal()));
+      return this.userService.createUser(new IUserService.UserCreate() {
+        @Override
+        public String authId() {
+          return authId;
+        }
+
+        @Override
+        public String email() {
+          return email;
+        }
+
+        @Override
+        public String displayName() {
+          return displayName;
+        }
+
+        @Override
+        public UserRole role() {
+          return userRole;
+        }
+
+        @Override
+        public boolean active() {
+          return active;
+        }
+      });
     }
   }
 
-  private record GetUserBySupabase(UUID supabaseId) implements IUserService.UserGet {
+  private UserRole mapLdapUserRole(final Object attributeObject) {
 
-    @Override
-    public UUID userId() {
-      return null;
+    if (!(attributeObject instanceof List<?> list)) {
+      return UserRole.GUEST;
     }
 
+    if (list.contains("student")) {
+      return UserRole.STUDENT;
+    }
+
+    if (list.contains("employee") || list.contains("staff")) {
+      return UserRole.ADMIN;
+    }
+
+    return UserRole.GUEST;
   }
 
-  private record CreateUser(UUID supabaseId,
-                            String supabaseEmail,
+  private record CreateUser(String authId,
+                            String email,
                             String displayName,
                             UserRole role,
-                            boolean active,
-                            boolean emailVerified) implements IUserService.UserCreate {
+                            boolean active) implements IUserService.UserCreate {
 
   }
 
   private record UpdateUser(UserEntity userEntity,
-                            String supabaseEmail,
-                            boolean emailVerified,
+                            String email,
                             Date lastLogin) implements IUserService.UserUpdate {
-
     @Override
     public UUID userId() {
       return this.userEntity.id();
     }
 
     @Override
-    public String supabaseEmail() {
-      return this.supabaseEmail;
+    public String email() {
+      return this.email;
     }
 
     @Override
@@ -136,11 +203,6 @@ public abstract class AbstractWebFilter extends OncePerRequestFilter implements 
     @Override
     public boolean active() {
       return this.userEntity.active();
-    }
-
-    @Override
-    public boolean emailVerified() {
-      return this.emailVerified;
     }
 
     @Override

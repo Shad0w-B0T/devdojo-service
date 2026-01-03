@@ -32,7 +32,7 @@ public abstract class AbstractUserController implements IUserController {
   @QueryMapping("userSelf")
   @Override
   public @NotNull UserEntity userSelf() {
-    return this.userService.getUser(SecurityUtils.localThreadClient().userId());
+    return this.userService.getUser(SecurityUtils.currentTokenDetails().userId());
   }
 
   @MutationMapping("updateUserName")
@@ -57,7 +57,7 @@ public abstract class AbstractUserController implements IUserController {
   @SchemaMapping(typeName = "User")
   @Override
   public @NotNull String email(@NotNull final UserEntity userEntity) {
-    return userEntity.supabaseEmail();
+    return userEntity.email();
   }
 
   @SchemaMapping(typeName = "User")
@@ -76,12 +76,6 @@ public abstract class AbstractUserController implements IUserController {
   @Override
   public @NotNull boolean active(@NotNull final UserEntity userEntity) {
     return userEntity.active();
-  }
-
-  @SchemaMapping(typeName = "User")
-  @Override
-  public @NotNull boolean emailVerified(@NotNull final UserEntity userEntity) {
-    return userEntity.emailVerified();
   }
 
   @SchemaMapping(typeName = "User")

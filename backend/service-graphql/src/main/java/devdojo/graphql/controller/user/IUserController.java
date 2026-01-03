@@ -45,9 +45,6 @@ public interface IUserController {
   boolean active(@NotNull final UserEntity userEntity);
 
   @NotNull
-  boolean emailVerified(@NotNull final UserEntity userEntity);
-
-  @NotNull
   long lastLogin(@NotNull final UserEntity userEntity);
 
   @NotNull

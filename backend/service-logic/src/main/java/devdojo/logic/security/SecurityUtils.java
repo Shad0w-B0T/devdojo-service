@@ -1,12 +1,13 @@
 package devdojo.logic.security;
 
-import devdojo.logic.security.client.IClient;
+import devdojo.logic.security.details.ITokenDetails;
 import devdojo.schema.exception.permissions.UnauthorizedException;
 import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import java.util.function.Supplier;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.PolicyFactory;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +17,7 @@ public final class SecurityUtils {
   private SecurityUtils() {
   }
 
-  public static @NotNull IClient localThreadClient() {
+  private static @NotNull Authentication currentAuthentication() {
     final SecurityContext context = SecurityContextHolder.getContext();
 
     if (context == null) {
@@ -30,11 +31,19 @@ public final class SecurityUtils {
         "You are not logged in, no authentication found.");
     }
 
-    if (authentication instanceof IClient client) {
-      return client;
+    return authentication;
+  }
+
+  public static @NotNull ITokenDetails currentTokenDetails() {
+    final Authentication authentication = currentAuthentication();
+
+    if (!(authentication instanceof AbstractAuthenticationToken token &&
+      token.getDetails() instanceof ITokenDetails tokenDetails)) {
+
+      throw new UnauthorizedException("No token detials present.");
     }
 
-    throw new UnauthorizedException("Invalid authenticated type.");
+    return tokenDetails;
   }
 
   /**

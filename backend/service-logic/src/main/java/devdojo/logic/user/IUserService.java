@@ -36,7 +36,7 @@ public interface IUserService {
       }
 
       @Override
-      public UUID supabaseId() {
+      public String authId() {
         return null;
       }
     });
@@ -84,16 +84,16 @@ public interface IUserService {
     @NotNull(message = "User ID must not be null")
     UUID userId();
 
-    @NotNull(message = "Supabase ID must not be null")
-    UUID supabaseId();
+    @NotNull(message = "Auth ID must not be null")
+    String authId();
   }
 
   interface UserCreate {
-    @NotNull(message = "Supabase ID must not be null")
-    UUID supabaseId();
+    @NotNull(message = "Auth ID must not be null")
+    String authId();
 
-    @NotNull(message = "Supabase Email must not be null")
-    String supabaseEmail();
+    @NotNull(message = "Email must not be null")
+    String email();
 
     @NotNull(message = "Display name must not be null")
     String displayName();
@@ -102,16 +102,14 @@ public interface IUserService {
     UserRole role();
 
     boolean active();
-
-    boolean emailVerified();
   }
 
   interface UserUpdate {
     @NotNull(message = "User ID must not be null")
     UUID userId();
 
-    @NotNull(message = "Supabase Email must not be null")
-    String supabaseEmail();
+    @NotNull(message = "Email must not be null")
+    String email();
 
     @NotNull(message = "Display name must not be null")
     String displayName();
@@ -120,8 +118,6 @@ public interface IUserService {
     UserRole role();
 
     boolean active();
-
-    boolean emailVerified();
 
     @NotNull(message = "Last login date must not be null")
     Date lastLogin();
