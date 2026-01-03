@@ -16,6 +16,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Slf4j
 public abstract class AbstractSecurityConfig implements ISecurityConfig {
+  private final static String LOGIN_URL = "/api/login";
+  private final static String LOGOUT_URL = "/api/logout";
+
   /**
    * {@inheritDoc}
    */
@@ -33,7 +36,7 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
       .authenticationProvider(provider)
 
       .formLogin(form -> form
-        .loginProcessingUrl("/api/login")
+        .loginProcessingUrl(LOGIN_URL)
         .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
         .failureHandler((req, res, ex) -> {
           System.out.println(ex.getMessage());
@@ -46,11 +49,11 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
           res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
 
       .logout(logout -> logout
-        .logoutUrl("/api/logout")
+        .logoutUrl(LOGOUT_URL)
         .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK)))
 
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/login", "/api/logout").permitAll()
+        .requestMatchers(LOGIN_URL, LOGOUT_URL).permitAll()
         .anyRequest().authenticated())
 
       .addFilterAfter(webFilter, UsernamePasswordAuthenticationFilter.class)

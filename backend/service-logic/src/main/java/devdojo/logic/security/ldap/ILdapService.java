@@ -9,6 +9,6 @@ import java.util.Map;
 
 public interface ILdapService {
 
-  Map<String, Object> loadUserAttributes(@NotBlank(message = "UID darf nicht leer sein") final String uid);
+  Map<String, Object> loadUserAttributes(@NotBlank(message = "UID must not be empty") final String uid);
 
 }

@@ -19,9 +19,9 @@ public abstract class AbstractLdapConfig implements ILdapConfig {
   private final String ldapUserPattern;
 
   protected AbstractLdapConfig(
-    @NotBlank(message = "LDAP URL darf nicht leer sein") final String ldapUrl,
-    @NotBlank(message = "LDAP Base darf nicht leer sein") final String ldapBase,
-    @NotBlank(message = "LDAP User DN Pattern darf nicht leer sein") final String ldapUserPattern
+    @NotBlank(message = "LDAP URL must not be empty") final String ldapUrl,
+    @NotBlank(message = "LDAP Base must not be empty") final String ldapBase,
+    @NotBlank(message = "LDAP user DN pattern must not be empty") final String ldapUserPattern
   ) {
     this.ldapUrl = ldapUrl;
     this.ldapBase = ldapBase;

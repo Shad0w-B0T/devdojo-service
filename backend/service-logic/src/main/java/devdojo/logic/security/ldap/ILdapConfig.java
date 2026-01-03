@@ -10,7 +10,7 @@ public interface ILdapConfig {
   LdapContextSource ldapContextSource();
 
   LdapTemplate ldapTemplate(
-    @NotNull(message = "LdapContextSource darf nicht null sein") final LdapContextSource contextSource);
+    @NotNull(message = "LdapContextSource must not be null") final LdapContextSource contextSource);
 
   AuthenticationProvider ldapAuthenticationProvider();
 }

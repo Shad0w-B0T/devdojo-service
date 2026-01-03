@@ -20,7 +20,7 @@ public abstract class AbstractLdapService implements ILdapService {
   private final LdapTemplate ldapTemplate;
 
   protected AbstractLdapService(
-    @NotNull(message = "LdapTemplate darf nicht null sein") final LdapTemplate ldapTemplate
+    @NotNull(message = "LdapTemplate must not be null") final LdapTemplate ldapTemplate
   ) {
     this.ldapTemplate = ldapTemplate;
   }
