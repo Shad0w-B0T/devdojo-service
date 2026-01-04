@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class GraphRateLimitAspect extends AbstractGraphRateLimitAspect {
 
   protected GraphRateLimitAspect(final IRateLimitService rateLimitService,
-                                 @Value("${application.security.ratelimit.graphql.tokens_per_second:25}")
+                                 @Value("${security.ratelimit.graphql.tokens_per_second:25}")
                                  final int tokensPerSecond) {
     super(rateLimitService, tokensPerSecond);
   }
