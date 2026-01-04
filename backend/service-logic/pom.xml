@@ -122,6 +122,29 @@
       <version>${dependency.version.owasp.sanitizer}</version>
     </dependency>
 
+    <!-- JJWT API -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>0.12.5</version>
+    </dependency>
+
+    <!-- JJWT Runtime Implementation -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>0.12.5</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- JSON Serializer (Jackson) -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>0.12.5</version>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/org.springframework.ldap/spring-ldap-core -->
     <dependency>
       <groupId>org.springframework.ldap</groupId>

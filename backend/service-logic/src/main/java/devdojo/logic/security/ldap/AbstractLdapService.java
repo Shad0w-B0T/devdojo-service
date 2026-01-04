@@ -1,90 +1,84 @@
 package devdojo.logic.security.ldap;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.naming.directory.Attributes;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.LdapTemplate;
+import devdojo.logic.database.user.UserEntity;
+import devdojo.logic.user.IUserService;
+import devdojo.schema.exception.database.NotFoundException;
+import devdojo.schema.user.UserRole;
+import java.util.*;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
 public abstract class AbstractLdapService implements ILdapService {
 
-  private static final String USERS_BASE_DN = "ou=userlist";
+  private final IUserService userService;
+  private final ILdapAttributeService ldapAttributeService;
 
-  private final LdapTemplate ldapTemplate;
-
-  protected AbstractLdapService(
-    @NotNull(message = "LdapTemplate must not be null") final LdapTemplate ldapTemplate
-  ) {
-    this.ldapTemplate = ldapTemplate;
+  protected AbstractLdapService(final IUserService userService,
+                                final ILdapAttributeService ldapAttributeService) {
+    this.userService = userService;
+    this.ldapAttributeService = ldapAttributeService;
   }
 
-  @Cacheable(
-    cacheNames = "ldapUserAttributes",
-    key = "#p0",
-    unless = "#result == null"
-  )
-  public Map<String, Object> loadUserAttributes(final String uid) {
-    final List<Map<String, Object>> results = ldapTemplate.search(
-      USERS_BASE_DN,
-      "(uid=" + uid + ")",
-      userAttributesMapper()
-    );
-
-    return results.stream()
-      .findFirst()
-      .orElseThrow(() ->
-        new IllegalStateException(
-          "Kein LDAP-User mit uid=" + uid + " gefunden"
-        )
-      );
-  }
-
-  private AttributesMapper<Map<String, Object>> userAttributesMapper() {
-    return attrs -> Map.of(
-      "displayName", getSingle(attrs, "displayName"),
-      "mail", getSingle(attrs, "mail"),
-      "eduPersonAffiliation", getMulti(attrs, "eduPersonAffiliation"),
-      "employeeType", getSingle(attrs, "employeeType"),
-      "givenName", getSingle(attrs, "givenName"),
-      "sn", getSingle(attrs, "sn")
-    );
-  }
-
-  private String getSingle(final Attributes attrs, final String name) {
+  @Override
+  public UserEntity loadOrSyncUser(String authId) {
     try {
-      return Optional.ofNullable(attrs.get(name))
-        .map(attr -> {
-          try {
-            return attr.get().toString();
-          } catch (Exception e) {
-            return null;
-          }
-        })
-        .orElse(null);
-    } catch (Exception e) {
-      return null;
+      return userService.getUser(new IUserService.UserGet() {
+        @Override
+        public String authId() {
+          return authId;
+        }
+
+        @Override
+        public java.util.UUID userId() {
+          return null;
+        }
+      });
+    } catch (NotFoundException e) {
+      Map<String, Object> attrs = this.ldapAttributeService.loadUserAttributes(authId);
+
+      UserRole role =
+        mapLdapUserRole(attrs.get("eduPersonAffiliation"));
+
+      return userService.createUser(new IUserService.UserCreate() {
+        @Override
+        public String authId() {
+          return authId;
+        }
+
+        @Override
+        public String email() {
+          return Objects.toString(attrs.get("mail"), "");
+        }
+
+        @Override
+        public String displayName() {
+          return Objects.toString(attrs.get("displayName"), "");
+        }
+
+        @Override
+        public UserRole role() {
+          return role;
+        }
+
+        @Override
+        public boolean active() {
+          return true;
+        }
+      });
     }
   }
 
-  private List<String> getMulti(final Attributes attrs, final String name) {
-    try {
-      final var attr = attrs.get(name);
-      if (attr == null) {
-        return List.of();
-      }
-      return Collections.list(attr.getAll())
-        .stream()
-        .map(Object::toString)
-        .toList();
-    } catch (Exception e) {
-      return List.of();
+  private UserRole mapLdapUserRole(Object attributeObject) {
+    if (!(attributeObject instanceof java.util.List<?> list)) {
+      return UserRole.GUEST;
     }
+    if (list.contains("employee") || list.contains("staff")) {
+      return UserRole.ADMIN;
+    }
+    if (list.contains("student")) {
+      return UserRole.STUDENT;
+    }
+    return UserRole.GUEST;
   }
+
 }
