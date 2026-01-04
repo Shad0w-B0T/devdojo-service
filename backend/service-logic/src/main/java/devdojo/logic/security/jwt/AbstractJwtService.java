@@ -14,24 +14,26 @@ import javax.crypto.SecretKey;
 
 public abstract class AbstractJwtService implements IJwtService {
 
+  private final static int EXPIRE_MINUTES = 15;
+
   private final SecretKey key;
 
   protected AbstractJwtService(final String secretHash) {
-    this.key =  Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretHash));
+    this.key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretHash));
   }
 
-  public String generateToken(UserEntity userEntity) {
+  public String generateToken(final UserEntity userEntity) {
     return Jwts.builder()
       .id(UUID.randomUUID().toString())
       .subject(userEntity.authId())
       .claim("role", userEntity.role().name())
       .issuedAt(new Date())
-      .expiration(Date.from(Instant.now().plus(15, ChronoUnit.MINUTES)))
+      .expiration(Date.from(Instant.now().plus(EXPIRE_MINUTES, ChronoUnit.MINUTES)))
       .signWith(key)
       .compact();
   }
 
-  public String extractUsername(String token) {
+  public String extractUsername(final String token) {
     return Jwts.parser()
       .verifyWith(key)
       .build()
@@ -40,7 +42,7 @@ public abstract class AbstractJwtService implements IJwtService {
       .getSubject();
   }
 
-  public String extractJti(String token) {
+  public String extractJti(final String token) {
     return Jwts.parser()
       .verifyWith(key)
       .build()
@@ -49,7 +51,7 @@ public abstract class AbstractJwtService implements IJwtService {
       .getId();
   }
 
-  public Duration getRemainingValidityDuration(String token) {
+  public Duration getRemainingValidityDuration(final String token) {
     final Instant exp = Jwts.parser()
       .verifyWith(key)
       .build()
@@ -64,8 +66,8 @@ public abstract class AbstractJwtService implements IJwtService {
   }
 
   @Override
-  public UserRole extractRole(String token) {
-    String role = Jwts.parser()
+  public UserRole extractRole(final String token) {
+    final String role = Jwts.parser()
       .verifyWith(key)
       .build()
       .parseSignedClaims(token)

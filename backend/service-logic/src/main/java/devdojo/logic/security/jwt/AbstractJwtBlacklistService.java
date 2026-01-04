@@ -13,17 +13,17 @@ public abstract class AbstractJwtBlacklistService implements IJwtBlacklistServic
     this.jwtService = jwtService;
   }
 
-  public void blacklist(String token) {
-    String jti = jwtService.extractJti(token);
-    Duration ttl = jwtService.getRemainingValidityDuration(token);
-    redis.opsForValue().set(
+  public void blacklist(final String token) {
+    final String jti = jwtService.extractJti(token);
+    final Duration ttl = jwtService.getRemainingValidityDuration(token);
+    this.redis.opsForValue().set(
       "jwt:blacklist:" + jti,
       "1",
       ttl
     );
   }
 
-  public boolean isBlacklisted(String jti) {
+  public boolean isBlacklisted(final String jti) {
     return Boolean.TRUE.equals(redis.hasKey("jwt:blacklist:" + jti));
   }
 }

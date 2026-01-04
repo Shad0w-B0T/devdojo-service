@@ -67,7 +67,7 @@ public class AuthController {
     final Optional<String> authIdOpt = refreshTokenService.rotate(rt);
     if (authIdOpt.isEmpty()) {
       this.refreshCookie.clear(response);
-      return ResponseEntity.status(401).build();
+      return ResponseEntity.status(HttpServletResponse.SC_UNAUTHORIZED).build();
     }
 
     final String authId = authIdOpt.get();

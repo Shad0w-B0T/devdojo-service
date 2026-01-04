@@ -20,7 +20,7 @@ public abstract class AbstractLdapService implements ILdapService {
   }
 
   @Override
-  public UserEntity loadOrSyncUser(String authId) {
+  public UserEntity loadOrSyncUser(final String authId) {
     try {
       return userService.getUser(new IUserService.UserGet() {
         @Override
@@ -68,7 +68,7 @@ public abstract class AbstractLdapService implements ILdapService {
     }
   }
 
-  private UserRole mapLdapUserRole(Object attributeObject) {
+  private UserRole mapLdapUserRole(final Object attributeObject) {
     if (!(attributeObject instanceof java.util.List<?> list)) {
       return UserRole.GUEST;
     }
