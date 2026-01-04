@@ -3,8 +3,6 @@ package devdojo.logic.security.web;
 
 import devdojo.logic.security.jwt.IJwtBlacklistService;
 import devdojo.logic.security.jwt.IJwtService;
-import devdojo.logic.security.jwt.JwtBlacklistService;
-import devdojo.logic.security.jwt.JwtService;
 import devdojo.schema.user.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,8 +21,8 @@ public abstract class AbstractJwtAuthenticationFilter extends OncePerRequestFilt
   private final IJwtService jwtService;
   private final IJwtBlacklistService blacklistService;
 
-  protected AbstractJwtAuthenticationFilter(final JwtService jwtService,
-                                            final JwtBlacklistService blacklistService) {
+  protected AbstractJwtAuthenticationFilter(final IJwtService jwtService,
+                                            final IJwtBlacklistService blacklistService) {
     this.jwtService = jwtService;
     this.blacklistService = blacklistService;
   }
