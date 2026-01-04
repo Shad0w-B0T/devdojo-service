@@ -51,6 +51,8 @@
     <!-- ### Security -->
     <dependency.version.owasp.sanitizer>20240325.1</dependency.version.owasp.sanitizer>
 
+    <dependency.version.jjwt>0.12.5</dependency.version.jjwt>
+
     <!-- ### API -->
     <dependency.version.graphql>2023-01-24T02-11-56-babda5f</dependency.version.graphql>
 

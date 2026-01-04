@@ -126,14 +126,14 @@
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-api</artifactId>
-      <version>0.12.5</version>
+      <version>${dependency.version.jjwt}</version>
     </dependency>
 
     <!-- JJWT Runtime Implementation -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-impl</artifactId>
-      <version>0.12.5</version>
+      <version>${dependency.version.jjwt}</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -141,7 +141,7 @@
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-jackson</artifactId>
-      <version>0.12.5</version>
+      <version>${dependency.version.jjwt}</version>
       <scope>runtime</scope>
     </dependency>
 
