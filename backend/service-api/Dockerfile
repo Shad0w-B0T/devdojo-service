@@ -1,9 +1,3 @@
-FROM docker.io/eclipse-temurin:21-jre-alpine as application
-
-LABEL authors="DevDojo Team" \
-      project="DevDojo" \
-      service="service-rest"
-
 WORKDIR /app
 
 # manually create user and group

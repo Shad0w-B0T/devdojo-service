@@ -10,7 +10,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>service-graphql</artifactId>
+  <artifactId>service-api</artifactId>
 
   <dependencies>
     <dependency>
@@ -35,6 +35,11 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-graphql</artifactId>
+      <version>${dependency.version.spring}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
       <version>${dependency.version.spring}</version>
     </dependency>
 

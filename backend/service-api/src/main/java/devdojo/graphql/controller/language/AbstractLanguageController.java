@@ -1,10 +1,6 @@
 package devdojo.graphql.controller.language;
 
-import devdojo.graphql.input.language.CreateLanguage;
-import devdojo.graphql.input.language.DeleteLanguage;
-import devdojo.graphql.input.language.GetLanguage;
-import devdojo.graphql.input.language.GetLanguages;
-import devdojo.graphql.input.language.UpdateLanguage;
+import devdojo.graphql.input.language.*;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.language.ILanguageService;

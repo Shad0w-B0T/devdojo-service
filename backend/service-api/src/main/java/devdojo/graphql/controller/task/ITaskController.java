@@ -1,17 +1,9 @@
 package devdojo.graphql.controller.task;
 
+import devdojo.graphql.input.task.*;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
-import devdojo.graphql.input.task.AppendTest;
-import devdojo.graphql.input.task.CreateTask;
-import devdojo.graphql.input.task.GetLeaderboard;
-import devdojo.graphql.input.task.GetNextTask;
-import devdojo.graphql.input.task.GetTask;
-import devdojo.graphql.input.task.GetTasks;
-import devdojo.graphql.input.task.GetUserRank;
-import devdojo.graphql.input.task.UpdateTask;
-import devdojo.graphql.input.task.UpdateTaskUserInput;
 import devdojo.schema.task.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;

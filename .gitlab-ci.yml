@@ -126,14 +126,13 @@ docker-deploy:
 
     - echo "$CI_REGISTRY_PASSWORD" | buildah login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 
-    - PROJECTS=("backend/service-graphql" "backend/service-rest" "compiler/service-compiler-java" "compiler/service-compiler-javascript" "compiler/service-compiler-python")
+    - PROJECTS=("backend/service-api" "compiler/service-compiler-java" "compiler/service-compiler-javascript" "compiler/service-compiler-python")
 
     - mvn $MAVEN_CLI_OPTS package
 
     - |
       declare -A IMAGE_NAMES=(
-        ["backend/service-graphql"]="graphql"
-        ["backend/service-rest"]="rest"
+        ["backend/service-api"]="api"
         ["compiler/service-compiler-java"]="compiler-java"
         ["compiler/service-compiler-javascript"]="compiler-js"
         ["compiler/service-compiler-python"]="compiler-py"
