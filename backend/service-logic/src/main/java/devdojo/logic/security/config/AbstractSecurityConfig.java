@@ -1,16 +1,20 @@
 package devdojo.logic.security.config;
 
 import devdojo.logic.security.web.IWebFilter;
+import devdojo.logic.security.web.AbstractJwtAuthenticationFilter;
+import devdojo.logic.security.web.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authorization.method.PrePostTemplateDefaults;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -19,6 +23,11 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
   private final static String LOGIN_URL = "/api/login";
   private final static String LOGOUT_URL = "/api/logout";
 
+  @Bean
+  public AuthenticationManager authenticationManager(final AuthenticationConfiguration configuration) throws Exception {
+    return configuration.getAuthenticationManager();
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -26,7 +35,8 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
   @Override
   public @NotNull SecurityFilterChain securityFilterChain(
     @NotNull final AuthenticationProvider provider,
-    @NotNull final IWebFilter webFilter,
+    @NotNull @Qualifier("auth") final IWebFilter authFilter,
+    @NotNull @Qualifier("jwt") final IWebFilter jwtFilter,
     @NotNull final HttpSecurity http
   ) throws Exception {
 
@@ -34,31 +44,18 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
 
     return http
       .authenticationProvider(provider)
-
-      .formLogin(form -> form
-        .loginProcessingUrl(LOGIN_URL)
-        .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
-        .failureHandler((req, res, ex) -> {
-          System.out.println(ex.getMessage());
-          res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        })
-        .permitAll())
-
-      .exceptionHandling(e -> e
-        .authenticationEntryPoint((req, res, ex) ->
-          res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
-
-      .logout(logout -> logout
-        .logoutUrl(LOGOUT_URL)
-        .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK)))
-
+      .sessionManagement(s ->
+        s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .exceptionHandling(e ->
+        e.authenticationEntryPoint(
+          (req, res, ex) ->
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers(LOGIN_URL, LOGOUT_URL).permitAll()
+        .requestMatchers("/api/login", "/api/refresh").permitAll()
         .anyRequest().authenticated())
-
-      .addFilterAfter(webFilter, UsernamePasswordAuthenticationFilter.class)
+      .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+      .addFilterAfter(authFilter, JwtAuthenticationFilter.class)
       .csrf(AbstractHttpConfigurer::disable)
-
       .build();
   }
 

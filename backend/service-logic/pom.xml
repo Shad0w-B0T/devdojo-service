@@ -6,7 +6,7 @@
   <parent>
     <groupId>devdojo</groupId>
     <artifactId>service</artifactId>
-    <version>2.0.0</version>
+    <version>2.2.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -120,6 +120,29 @@
       <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
       <artifactId>owasp-java-html-sanitizer</artifactId>
       <version>${dependency.version.owasp.sanitizer}</version>
+    </dependency>
+
+    <!-- JJWT API -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>${dependency.version.jjwt}</version>
+    </dependency>
+
+    <!-- JJWT Runtime Implementation -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>${dependency.version.jjwt}</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- JSON Serializer (Jackson) -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>${dependency.version.jjwt}</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.springframework.ldap/spring-ldap-core -->
