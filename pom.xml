@@ -11,12 +11,12 @@
   <modules>
     <module>service-schema</module>
     <module>backend/service-logic</module>
-    <module>backend/service-rest</module>
-    <module>backend/service-graphql</module>
+    <module>backend/service-api</module>
     <module>compiler/service-compiler</module>
     <module>compiler/service-compiler-java</module>
     <module>compiler/service-compiler-javascript</module>
     <module>compiler/service-compiler-python</module>
+
   </modules>
 
   <properties>

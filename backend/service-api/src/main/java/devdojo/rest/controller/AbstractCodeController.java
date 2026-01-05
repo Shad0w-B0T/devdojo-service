@@ -1,10 +1,10 @@
 package devdojo.rest.controller;
 
 import devdojo.logic.cache.bucket4j.annotation.RateLimited;
-import devdojo.logic.database.task.TaskEntity;
-import devdojo.logic.database.task.TestArgumentEntity;
 import devdojo.logic.code.ICodeService;
 import devdojo.logic.compiler.ICompilerService;
+import devdojo.logic.database.task.TaskEntity;
+import devdojo.logic.database.task.TestArgumentEntity;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
 import devdojo.schema.task.ArgumentType;
@@ -39,9 +39,8 @@ public abstract class AbstractCodeController implements ICodeController {
     this.compilerService = compilerService;
   }
 
-
   @RateLimited(
-    bucket = "#{'rate-code-' + T(devdojo.logic.security.SecurityUtils).localThreadClient().userId()}",
+    bucket = "#{'rate-code-' + T(devdojo.logic.security.SecurityUtils).currentTokenDetails().userId()}",
     refillDurationMillis = CODE_RATE_LIMIT_REFILL,
     totalTokens = 1)
   @PostMapping("/exercises")
