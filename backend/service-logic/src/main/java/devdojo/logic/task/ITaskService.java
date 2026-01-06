@@ -3,6 +3,7 @@ package devdojo.logic.task;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.schema.task.ArgumentType;
 import devdojo.schema.task.Difficulty;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -84,7 +85,7 @@ public interface ITaskService {
     @NotNull(message = "Active must not be null")
     boolean active();
 
-    @NotNull(message = "Tags must not be null")
+    @Nullable
     List<String> tags();
   }
 
@@ -114,7 +115,7 @@ public interface ITaskService {
     @NotNull(message = "Active must not be null")
     boolean active();
 
-    @NotNull(message = "Tags must not be null")
+    @Nullable
     List<String> tags();
   }
 
