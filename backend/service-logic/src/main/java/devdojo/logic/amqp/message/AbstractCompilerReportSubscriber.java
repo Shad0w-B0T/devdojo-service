@@ -17,7 +17,6 @@ public abstract class AbstractCompilerReportSubscriber {
 
   @RabbitListener(queues = RabbitConst.QUEUE_COMPILER_REPORT)
   public void handleHeartbeatMessage(final CompileResponsePayload payload) {
-    System.out.println("Received payload: " + payload);
     this.compilerService.completeCompilerTask(
       new ICompilerService.CompleteCompilerTask(payload.requestId(), payload.testRunResults()));
   }

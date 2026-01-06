@@ -1,5 +1,7 @@
 package devdojo.logic.compiler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import devdojo.logic.cache.compiler.CompilerTask;
 import devdojo.logic.cache.compiler.CompilerTaskRepository;
 import devdojo.logic.cache.compiler.CompilerTaskResult;
@@ -39,6 +41,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public abstract class AbstractCompilerService implements ICompilerService {
 
+  private final ObjectMapper objectMapper;
   private final LanguageRepository languageRepository;
   private final ITaskService taskService;
   private final ITasksProgressService tasksProgressService;
@@ -48,6 +51,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
   private final CompilerTaskResultRepository compilerTaskResultRepository;
 
   protected AbstractCompilerService(
+    final ObjectMapper objectMapper,
     @NotNull(message = "LanguageRepository must not be null") final LanguageRepository languageRepository,
     final ITaskService taskService,
     final ITasksProgressService tasksProgressService,
@@ -55,6 +59,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
     final CompilerHeartbeatRepository compilerHeartbeatRepository,
     final CompilerTaskRepository compilerTaskRepository,
     final CompilerTaskResultRepository compilerTaskResultRepository) {
+    this.objectMapper = objectMapper;
     this.languageRepository = languageRepository;
     this.taskService = taskService;
     this.tasksProgressService = tasksProgressService;
@@ -127,9 +132,6 @@ public abstract class AbstractCompilerService implements ICompilerService {
       score = taskEntity.difficulty().score();
     }
 
-    System.out.println("state: " + state);
-    System.out.println("Score: " + score);
-
     int finalScore = score;
     TaskProgressState finalState = state;
 
@@ -161,16 +163,19 @@ public abstract class AbstractCompilerService implements ICompilerService {
         }
       });
 
-    System.out.println(taskProgressEntity);
-
     final TestRun run = new TestRun(
       compilerTask.id(),
       resultUnits,
       taskProgressEntity.state() == TaskProgressState.FINISHED,
       taskProgressEntity.score());
 
-    final CompilerTaskResult result =
-      this.compilerTaskResultRepository.save(new CompilerTaskResult(compilerTask.id(), run, compilerTask.userId()));
+    final CompilerTaskResult result;
+    try {
+      result = this.compilerTaskResultRepository.save(
+        new CompilerTaskResult(compilerTask.id(), compilerTask.userId(), this.objectMapper.writeValueAsString(run)));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
 
     compilerTask.processed(true);
     this.compilerTaskRepository.save(compilerTask);
@@ -257,7 +262,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
                                             final TaskEntity taskEntity) {
     return taskEntity.testEntities().stream()
       .filter(testEntity -> Objects.equals(
-        testEntity.input().stream().map(ITestArgument::value).toList(),
+        result.input(),
         testEntity.input().stream().map(ITestArgument::value).toList()
       ))
       .findFirst()
