@@ -77,7 +77,7 @@ public abstract class AbstractTaskService implements ITaskService {
   @Transactional
   public TaskEntity createTask(final CreateTask createTask) {
     log.info("Creating new task with name '{}'", createTask.name());
-    final LanguageEntity languageEntity = this.languageService.getLanguage(() -> createTask.languageId());
+    final LanguageEntity languageEntity = this.languageService.getLanguage(createTask::languageId);
 
     final TaskEntity task = new TaskEntity(
       languageEntity,
@@ -188,6 +188,7 @@ public abstract class AbstractTaskService implements ITaskService {
    * @return true if the tag was successfully removed from the task, false if the tag was not found.
    * @throws NullPointerException If the input object or any of the IDs is null.
    */
+  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public boolean removeTagFromTask(final RemoveTagFromTask removeTagFromTask) {
