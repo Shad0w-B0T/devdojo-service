@@ -169,8 +169,6 @@ public abstract class AbstractCompilerService implements ICompilerService {
       taskProgressEntity.state() == TaskProgressState.FINISHED,
       taskProgressEntity.score());
 
-    System.out.println("Complete rund " + run);
-
     final CompilerTaskResult result;
     try {
       result = this.compilerTaskResultRepository.save(
@@ -182,7 +180,6 @@ public abstract class AbstractCompilerService implements ICompilerService {
     compilerTask.processed(true);
     this.compilerTaskRepository.save(compilerTask);
 
-    System.out.println("After return " + result);
     return result;
   }
 
@@ -238,7 +235,6 @@ public abstract class AbstractCompilerService implements ICompilerService {
 
   private TestRunResultChecked mapToResultUnit(final TestRunResult result,
                                                final TaskEntity taskEntity) {
-    System.out.println("Restult " + result);
     final TestEntity matchedTest = findMatchingTestEntity(result, taskEntity);
 
     boolean pass = false;
@@ -251,7 +247,6 @@ public abstract class AbstractCompilerService implements ICompilerService {
       }
     }
 
-    System.out.println(result.input());
     return new TestRunResultChecked(
       result.input(),
       result.output(),
