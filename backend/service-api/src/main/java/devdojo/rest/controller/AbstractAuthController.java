@@ -1,7 +1,10 @@
-package devdojo.logic.security.move;
+package devdojo.rest.controller;
 
 import devdojo.logic.database.user.UserEntity;
-import devdojo.logic.security.jwt.*;
+import devdojo.logic.security.jwt.IJwtBlacklistService;
+import devdojo.logic.security.jwt.IJwtService;
+import devdojo.logic.security.jwt.IRefreshTokenService;
+import devdojo.logic.security.jwt.RefreshCookie;
 import devdojo.logic.security.ldap.ILdapService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,12 +16,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-
-@RestController
 @RequestMapping("/api")
-public class AuthController {
+public abstract class AbstractAuthController implements IAuthController {
 
   private static final Duration REFRESH_TTL = Duration.ofDays(14);
 
@@ -30,12 +34,12 @@ public class AuthController {
   private final IRefreshTokenService refreshTokenService;
   private final RefreshCookie refreshCookie;
 
-  public AuthController(final AuthenticationManager authenticationManager,
-                        final ILdapService ldapService,
-                        final IJwtService jwtService,
-                        final IJwtBlacklistService jwtBlacklistService,
-                        final IRefreshTokenService refreshTokenService,
-                        final RefreshCookie refreshCookie) {
+  public AbstractAuthController(final AuthenticationManager authenticationManager,
+                                final ILdapService ldapService,
+                                final IJwtService jwtService,
+                                final IJwtBlacklistService jwtBlacklistService,
+                                final IRefreshTokenService refreshTokenService,
+                                final RefreshCookie refreshCookie) {
     this.authenticationManager = authenticationManager;
     this.ldapService = ldapService;
     this.jwtService = jwtService;
@@ -45,8 +49,9 @@ public class AuthController {
   }
 
   @PostMapping("/login")
+  @Override
   public ResponseEntity<JwtResponse> login(@RequestBody final LoginRequest request,
-                                           final HttpServletResponse response) {
+                                                          final HttpServletResponse response) {
     final Authentication auth = authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
@@ -60,6 +65,7 @@ public class AuthController {
   }
 
   @PostMapping("/refresh")
+  @Override
   public ResponseEntity<JwtResponse> refresh(final HttpServletRequest request,
                                              final HttpServletResponse response) {
     final String rt = readCookie(request, this.refreshCookie.name()).orElse(null);
@@ -81,11 +87,13 @@ public class AuthController {
     return ResponseEntity.ok(new JwtResponse(newAccess));
   }
 
+
   @PostMapping("/logout")
+  @Override
   public ResponseEntity<Void> logout(final HttpServletRequest request,
                                      final HttpServletResponse response,
                                      @RequestHeader(value = "Authorization", required = false)
-                                     final String authHeader) {
+                                       final String authHeader) {
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       final String accessToken = authHeader.substring(7);
       this.jwtBlacklistService.blacklist(accessToken);
@@ -106,11 +114,5 @@ public class AuthController {
       .filter(c -> name.equals(c.getName()))
       .map(Cookie::getValue)
       .findFirst();
-  }
-
-  public record LoginRequest(String username, String password) {
-  }
-
-  public record JwtResponse(String token) {
   }
 }
