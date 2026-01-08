@@ -1,5 +1,6 @@
 package devdojo.logic.compiler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import devdojo.logic.cache.compiler.CompilerTaskRepository;
 import devdojo.logic.cache.compiler.CompilerTaskResultRepository;
 import devdojo.logic.database.compiler.CompilerHeartbeatRepository;
@@ -18,6 +19,8 @@ import org.mockito.MockitoAnnotations;
 @DisplayName("CompilerService tests")
 class CompilerServiceTest {
 
+  @Mock
+  private ObjectMapper objectMapper;
   @Mock
   private LanguageRepository languageRepository;
   @Mock
@@ -45,7 +48,8 @@ class CompilerServiceTest {
   @DisplayName("should initialize AbstractCompilerService with HeartbeatRepository")
   void shouldInitializeWithHeartbeatRepository() {
     assertDoesNotThrow(
-      () -> new CompilerService(this.languageRepository,
+      () -> new CompilerService(this.objectMapper,
+        this.languageRepository,
         this.taskService,
         this.tasksProgressService,
         this.compilerRepository,

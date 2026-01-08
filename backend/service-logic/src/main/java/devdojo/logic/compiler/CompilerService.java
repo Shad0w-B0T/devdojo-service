@@ -1,5 +1,6 @@
 package devdojo.logic.compiler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import devdojo.logic.cache.compiler.CompilerTaskRepository;
 import devdojo.logic.cache.compiler.CompilerTaskResultRepository;
 import devdojo.logic.database.compiler.CompilerHeartbeatRepository;
@@ -13,14 +14,15 @@ import org.springframework.stereotype.Service;
 public class CompilerService extends AbstractCompilerService {
 
 
-  protected CompilerService(final LanguageRepository languageRepository,
+  protected CompilerService(final ObjectMapper objectMapper,
+                            final LanguageRepository languageRepository,
                             final ITaskService taskService,
                             final ITasksProgressService tasksProgressService,
                             final CompilerRepository compilerRepository,
                             final CompilerHeartbeatRepository compilerHeartbeatRepository,
                             final CompilerTaskRepository compilerTaskRepository,
                             final CompilerTaskResultRepository compilerTaskResultRepository) {
-    super(languageRepository, taskService, tasksProgressService, compilerRepository, compilerHeartbeatRepository,
-      compilerTaskRepository, compilerTaskResultRepository);
+    super(objectMapper, languageRepository, taskService, tasksProgressService, compilerRepository,
+      compilerHeartbeatRepository, compilerTaskRepository, compilerTaskResultRepository);
   }
 }
