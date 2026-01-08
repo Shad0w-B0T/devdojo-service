@@ -23,16 +23,17 @@ public class CompilerTaskResult implements Serializable {
   @Id
   private UUID id;
 
-  private TestRun testRun;
+  private String testRunJson;
   private UUID userId;
 
   @TimeToLive
   private Long ttl = TTL;
 
   public CompilerTaskResult(final UUID id,
-                            final TestRun testRun,
-                            final UUID userId) {
+                            final UUID userId,
+                            final String testRunJson) {
+    this.userId = userId;
     this.id = id;
-    this.testRun = testRun;
+    this.testRunJson = testRunJson;
   }
 }

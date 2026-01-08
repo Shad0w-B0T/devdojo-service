@@ -39,6 +39,7 @@ type Task {
     unitTests: [Test!]!
     active: Boolean!
     userProgress(userId: ID): TaskUserProgress!
+    tags: [String!]
 }
 
 type TaskUserProgress {
@@ -74,6 +75,7 @@ input CreateTaskInput {
     complete: String!
     unitTests: [TaskUnitTestInput!]!
     active: Boolean!
+    tags: [String!]
 }
 
 input UpdateTaskInput {
@@ -85,6 +87,7 @@ input UpdateTaskInput {
     complete: String!
     unitTests: [TaskUnitTestInput!]!
     active: Boolean!
+    tags: [String!]
 }
 
 input AppendTestInput {
@@ -104,6 +107,12 @@ input GetTask {
 
 input GetTasks {
     languageId: ID
+    tagId: ID
+}
+
+input RemoveTagFromTaskInput {
+    taskId: ID!
+    tagId: ID!
 }
 
 input GetNextTask {
@@ -138,6 +147,7 @@ extend type Mutation {
     updateTask(input: UpdateTaskInput!): Task!
     appendUnitTest(input: AppendTestInput!): Test!
     deleteTask(taskId: ID!): Boolean!     # optional
+    removeTagFromTask(input: RemoveTagFromTaskInput!): Boolean!
 
     updateTaskUserInput(input: UpdateTaskUserInput!): Boolean!
 }
