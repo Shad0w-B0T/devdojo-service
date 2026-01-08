@@ -98,7 +98,8 @@ public class TestData {
     String template,
     String complete,
     List<? extends ITaskService.TestData> unitTests,
-    boolean active
+    boolean active,
+    List<String> tags
   ) implements ITaskService.CreateTask {
   }
 
@@ -110,7 +111,8 @@ public class TestData {
     "print()",
     "print(1 + 1)",
     LANGUAGE_UNIT_TESTS,
-    true
+    true,
+    List.of("python", "java")
   );
 
   private record UpdateTask(
@@ -121,7 +123,8 @@ public class TestData {
     String template,
     String complete,
     List<? extends ITaskService.TestData> unitTests,
-    boolean active
+    boolean active,
+    List<String> tags
   ) implements ITaskService.UpdateTask {
   }
 
@@ -133,7 +136,8 @@ public class TestData {
     "print()",
     "print('Updated!')",
     LANGUAGE_UNIT_TESTS,
-    true
+    true,
+    List.of("javascript")
   );
 
   public static final ITaskService.UpdateTask UPDATE_TASK_ID_NULL = new UpdateTask(
@@ -144,7 +148,8 @@ public class TestData {
     "print()",
     "print('Updated!')",
     LANGUAGE_UNIT_TESTS,
-    true
+    true,
+    List.of("javascript")
   );
 
   private record DeleteTask(UUID taskId) implements ITaskService.DeleteTask {

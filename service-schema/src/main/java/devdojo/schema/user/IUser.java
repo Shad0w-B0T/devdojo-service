@@ -10,17 +10,12 @@ import java.util.UUID;
  * Interface representing a user with identifiable properties and audit information.
  */
 public interface IUser extends Identifiable<UUID>, DateAuditable {
-  /**
-   * Returns the unique Supabase ID used to identify this object
-   * in the Supabase database.
-   *
-   * @return a non-null {@link UUID} representing the object's ID in Supabase
-   */
+
   @NotNull(message = "ID cannot be null.")
-  UUID supabaseId();
+  String authId();
 
   @NotNull(message = "Email cannot be null.")
-  String supabaseEmail();
+  String email();
 
   /**
    * @return the display name of the user.
@@ -38,8 +33,6 @@ public interface IUser extends Identifiable<UUID>, DateAuditable {
    * @return whether the user is active.
    */
   boolean active();
-
-  boolean emailVerified();
 
   /**
    * @return the last login timestamp of the user.

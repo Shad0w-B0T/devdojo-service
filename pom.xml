@@ -6,17 +6,17 @@
 
   <groupId>devdojo</groupId>
   <artifactId>service</artifactId>
-  <version>1.5.4</version>
+  <version>2.2.0</version>
   <packaging>pom</packaging>
   <modules>
     <module>service-schema</module>
     <module>backend/service-logic</module>
-    <module>backend/service-rest</module>
-    <module>backend/service-graphql</module>
+    <module>backend/service-api</module>
     <module>compiler/service-compiler</module>
     <module>compiler/service-compiler-java</module>
     <module>compiler/service-compiler-javascript</module>
     <module>compiler/service-compiler-python</module>
+
   </modules>
 
   <properties>
@@ -36,25 +36,22 @@
 
     <dependency.version.log4j>2.25.2</dependency.version.log4j>
 
-    <dependency.version.logback>1.5.21</dependency.version.logback>
+    <dependency.version.logback>1.5.24</dependency.version.logback>
 
     <!-- ### DB -->
     <dependency.version.postgresql>42.7.8</dependency.version.postgresql>
 
     <dependency.version.flyway.core>11.17.0</dependency.version.flyway.core>
 
-    <dependency.version.hibernate>7.1.8.Final</dependency.version.hibernate>
+    <dependency.version.hibernate>6.6.34.Final</dependency.version.hibernate>
 
 
-    <dependency.version.shedlock>7.1.0</dependency.version.shedlock>
+    <dependency.version.shedlock>6.10.0</dependency.version.shedlock>
 
     <!-- ### Security -->
-    <dependency.version.jjwt>0.13.0</dependency.version.jjwt>
-
     <dependency.version.owasp.sanitizer>20240325.1</dependency.version.owasp.sanitizer>
 
-    <!-- ### Annotations -->
-    <dependency.version.annoations>26.0.2</dependency.version.annoations>
+    <dependency.version.jjwt>0.12.5</dependency.version.jjwt>
 
     <!-- ### API -->
     <dependency.version.graphql>2023-01-24T02-11-56-babda5f</dependency.version.graphql>

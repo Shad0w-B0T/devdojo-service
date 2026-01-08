@@ -58,29 +58,26 @@ final class TaskProgressRepositoryTest extends BaseJpaTest {
   @BeforeEach
   void setUp() {
     this.user1 = new UserEntity(
-      UUID.fromString("4624cae4-69bc-450e-8fc4-df5864aca748"),
+      "4624cae4-69bc-450e-8fc4-df5864aca748",
       "rick@hdm-stuttgart.de",
       "Rick",
       UserRole.ADMIN,
       true,
-      true,
       this.DATE
     );
     this.user2 = new UserEntity(
-      UUID.fromString("14997803-9298-471b-87ca-403520169ede"),
+      "14997803-9298-471b-87ca-403520169ede",
       "morty@hdm-stuttgart.de",
       "Morty",
       UserRole.STUDENT,
       true,
-      true,
       this.DATE
     );
     this.user3 = new UserEntity(
-      UUID.fromString("e25a0f7f-6f46-412c-ac86-4f50bc5faed4"),
+      "e25a0f7f-6f46-412c-ac86-4f50bc5faed4",
       "summer@hdm-stuttgart.de",
       "Summer",
       UserRole.GUEST,
-      true,
       true,
       this.DATE
     );
