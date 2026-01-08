@@ -1,5 +1,8 @@
 package devdojo.graphql.controller.compiler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import devdojo.graphql.input.compiler.GetTestRun;
 import devdojo.logic.compiler.ICompilerService;
 import devdojo.logic.database.compiler.CompilerEntity;
@@ -21,10 +24,13 @@ import org.springframework.graphql.data.method.annotation.SchemaMapping;
 public abstract class AbstractCompilerController implements ICompilerController {
 
   private final ICompilerService compilerService;
+  private final ObjectMapper objectMapper;
 
   protected AbstractCompilerController(
-    @NotNull(message = "CompilerService must not be null") final ICompilerService compilerService) {
+    @NotNull(message = "CompilerService must not be null") final ICompilerService compilerService,
+    final ObjectMapper objectMapper) {
     this.compilerService = compilerService;
+    this.objectMapper = objectMapper;
   }
 
   @QueryMapping("compilers")
@@ -43,9 +49,15 @@ public abstract class AbstractCompilerController implements ICompilerController 
   @Override
   public TestRun testRun(@Argument("input") final GetTestRun input) {
     try {
-      return this.compilerService.getCompilerTask(new ICompilerService.GetCompilerTask(input.runId())).testRun();
+      return this.objectMapper.readValue(
+        this.compilerService.getCompilerTask(new ICompilerService.GetCompilerTask(input.runId())).testRunJson(),
+        TestRun.class);
     } catch (final NotFoundException exception) {
       return null;
+    } catch (JsonMappingException e) {
+      throw new RuntimeException(e);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -139,6 +151,7 @@ public abstract class AbstractCompilerController implements ICompilerController 
   @SchemaMapping(typeName = "TestRunResult")
   @Override
   public List<Object> input(final TestRunResultChecked result) {
+    System.out.println("___" + result);
     return Optional.ofNullable(result.input()).orElse(Collections.emptyList());
   }
 
