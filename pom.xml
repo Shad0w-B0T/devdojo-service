@@ -58,6 +58,8 @@
 
     <dependency.jackson.version>2.20.1</dependency.jackson.version>
 
+    <dependency.jackson.annotations.version>2.20</dependency.jackson.annotations.version>
+
     <dependency.version.bucket4j>8.15.0</dependency.version.bucket4j>
 
     <!-- ### Code style -->
@@ -261,7 +263,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>${dependency.jackson.version}</version>
+      <version>${dependency.jackson.annotations.version}</version>
     </dependency>
   </dependencies>
 
