@@ -35,6 +35,16 @@ CREATE TABLE language
     CONSTRAINT pk_language PRIMARY KEY (id)
 );
 
+CREATE TABLE tag
+(
+    id         UUID         NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE,
+    updated_at TIMESTAMP WITHOUT TIME ZONE,
+    task_id    UUID         NOT NULL,
+    name       VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_tag PRIMARY KEY (id)
+);
+
 CREATE TABLE task
 (
     id          UUID         NOT NULL,
@@ -43,7 +53,7 @@ CREATE TABLE task
     language_id UUID         NOT NULL,
     name        VARCHAR(255) NOT NULL,
     description TEXT         NOT NULL,
-    difficulty  SMALLINT,
+    difficulty  SMALLINT     NOT NULL,
     template    TEXT         NOT NULL,
     complete    TEXT         NOT NULL,
     active      BOOLEAN      NOT NULL,
@@ -133,6 +143,9 @@ ALTER TABLE compiler_heartbeat
 
 ALTER TABLE compiler
     ADD CONSTRAINT FK_COMPILER_ON_LANGUAGE FOREIGN KEY (language_id) REFERENCES language (id);
+
+ALTER TABLE tag
+    ADD CONSTRAINT FK_TAG_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);
 
 ALTER TABLE task
     ADD CONSTRAINT FK_TASK_ON_LANGUAGE FOREIGN KEY (language_id) REFERENCES language (id);
