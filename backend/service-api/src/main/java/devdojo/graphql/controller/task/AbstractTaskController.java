@@ -48,6 +48,12 @@ public abstract class AbstractTaskController implements ITaskController {
     return this.taskService.getTask(getTask);
   }
 
+  @QueryMapping("taskRating")
+  @Override
+  public double taskRating(@Argument("input") @NotNull GetTask getTask) {
+    return this.taskService.getTaskRating(getTask);
+  }
+
   @QueryMapping("nextTask")
   @Override
   public TaskEntity nextTask(@Argument("input") @NotNull final GetNextTask getNextTask) {
@@ -89,10 +95,15 @@ public abstract class AbstractTaskController implements ITaskController {
     return true;
   }
 
-
   @MutationMapping("removeTagFromTask")
   public boolean removeTagFromTask(@Argument("input") @NotNull final RemoveTagFromTask input) {
     return this.taskService.removeTagFromTask(input);
+  }
+
+  @MutationMapping("setTaskRating")
+  @Override
+  public boolean setTaskRating(@Argument("input") @NotNull final SetTaskRating setTaskRating) {
+    return this.taskService.setTaskRating(setTaskRating) != null;
   }
 
   @SchemaMapping(typeName = "Task", value = "tags")
@@ -168,6 +179,12 @@ public abstract class AbstractTaskController implements ITaskController {
     } catch (final NotFoundException exception) {
       return new TaskUserProgress("", TaskProgressState.NOT_STARTED, 0);
     }
+  }
+
+  @SchemaMapping(typeName = "Task", value = "rating")
+  @Override
+  public double rating(@NotNull final TaskEntity task) {
+    return this.taskService.getTaskRating(task::id);
   }
 
   @SchemaMapping(typeName = "TaskUserProgress", value = "input")

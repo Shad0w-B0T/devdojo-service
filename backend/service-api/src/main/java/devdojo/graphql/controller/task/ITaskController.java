@@ -20,6 +20,9 @@ public interface ITaskController {
   TaskEntity task(@NotNull final GetTask getTask);
 
   @NotNull
+  double taskRating(@NotNull final GetTask getTask);
+
+  @NotNull
   TaskEntity nextTask(@NotNull final GetNextTask getNextTask);
 
   int userRank(@NotNull final GetUserRank getUserRank);
@@ -39,6 +42,8 @@ public interface ITaskController {
   TaskEntity appendUnitTest(@NotNull AppendTest input);
 
   boolean updateTaskUserInput(@NotNull UpdateTaskUserInput input);
+
+  boolean setTaskRating(@NotNull final SetTaskRating setTaskRating);
 
   // ────── Schema ──────
 
@@ -74,6 +79,8 @@ public interface ITaskController {
   @NotNull
   ITaskUserProgress userProgress(@NotNull final TaskEntity task,
                                  final UUID userId);
+
+  double rating(@NotNull final TaskEntity task);
 
   //TaskUserProgress
   @NotNull
