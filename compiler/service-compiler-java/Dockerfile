@@ -1,4 +1,4 @@
-FROM docker.io/eclipse-temurin:21-jdk-alpine AS application
+FROM docker.io/eclipse-temurin:25-jdk-alpine AS application
 
 LABEL authors="DevDojo Team" \
       project="DevDojo" \
