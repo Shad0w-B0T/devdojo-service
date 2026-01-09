@@ -17,7 +17,8 @@ public final class ForbiddenCommands {
   private final static String UNICODE = "\\u";
   private final static String RELATIVE_PATH = "./";
   private final static String RELATIVE_PATH_2 = "../";
-  private final static String PATH_TRAVERSAL = "..";
+  private final static String PATH_TRAVERSAL_1 = "/../";
+  private final static String PATH_TRAVERSAL_2 = "\\..\\";
   private final static String SLASHES = "\\";
 
   private final static String WGET = "wget";
@@ -37,7 +38,8 @@ public final class ForbiddenCommands {
       UNICODE,
       RELATIVE_PATH,
       RELATIVE_PATH_2,
-      PATH_TRAVERSAL,
+      PATH_TRAVERSAL_1,
+      PATH_TRAVERSAL_2,
       SLASHES,
       WGET,
       CURL,

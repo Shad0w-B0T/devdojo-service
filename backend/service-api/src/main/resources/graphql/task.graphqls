@@ -39,7 +39,10 @@ type Task {
     unitTests: [Test!]!
     active: Boolean!
     userProgress(userId: ID): TaskUserProgress!
+    rating: Float!
     tags: [String!]
+    createdBy: User
+    updatedBy: User
 }
 
 type TaskUserProgress {
@@ -128,13 +131,20 @@ input GetUserRank {
 
 input GetLeaderboard {
     languageId: ID!
-    start: Long!,
+    start: Long!
     end: Long!
+}
+
+input SetTaskRating {
+    taskId: ID!
+    userId: ID!
+    rating: Int!
 }
 
 extend type Query {
     tasks(input: GetTasks): [Task!]!
     task(input: GetTask!): Task!
+    taskRating(input: GetTask!): Float!
 
     nextTask(input: GetNextTask): Task!
 
@@ -150,4 +160,5 @@ extend type Mutation {
     removeTagFromTask(input: RemoveTagFromTaskInput!): Boolean!
 
     updateTaskUserInput(input: UpdateTaskUserInput!): Boolean!
+    setTaskRating(input: SetTaskRating!): Boolean!
 }

@@ -1,6 +1,7 @@
 package devdojo.logic.task;
 
 import devdojo.logic.database.task.TaskEntity;
+import devdojo.logic.database.task.TaskRatingEntity;
 import devdojo.schema.task.ArgumentType;
 import devdojo.schema.task.Difficulty;
 import jakarta.annotation.Nullable;
@@ -47,6 +48,14 @@ public interface ITaskService {
   TaskEntity appendUnitTest(
     @NotNull(message = "AppendTest data must not be null")
     @Valid final AppendTest append);
+
+  @NotNull(message = "TaskRating must not be null")
+  TaskRatingEntity setTaskRating(
+    @NotNull(message = "SetTaskRating data must not be null") final SetTaskRating setTaskRating);
+
+  @NotNull
+  Double getTaskRating(@NotNull(message = "GetTask data must not be null")
+                       @Valid final GetTask getTask);
 
   // ———— DTOs ————
 
@@ -160,4 +169,15 @@ public interface ITaskService {
     @NotNull(message = "Argument value must not be null")
     Object value();
   }
+
+  interface SetTaskRating {
+    @NotNull(message = "Task ID must not be null")
+    UUID taskId();
+
+    @NotNull(message = "User ID must not be null")
+    UUID userId();
+
+    int rating();
+  }
+
 }
