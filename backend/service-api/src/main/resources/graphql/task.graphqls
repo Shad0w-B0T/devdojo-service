@@ -41,6 +41,8 @@ type Task {
     userProgress(userId: ID): TaskUserProgress!
     rating: Float!
     tags: [String!]
+    createdBy: User
+    updatedBy: User
 }
 
 type TaskUserProgress {

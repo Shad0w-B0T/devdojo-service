@@ -6,6 +6,7 @@ import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
@@ -95,6 +96,7 @@ public abstract class AbstractTaskController implements ITaskController {
     return true;
   }
 
+
   @MutationMapping("removeTagFromTask")
   public boolean removeTagFromTask(@Argument("input") @NotNull final RemoveTagFromTask input) {
     return this.taskService.removeTagFromTask(input);
@@ -179,6 +181,18 @@ public abstract class AbstractTaskController implements ITaskController {
     } catch (final NotFoundException exception) {
       return new TaskUserProgress("", TaskProgressState.NOT_STARTED, 0);
     }
+  }
+
+  @SchemaMapping(typeName = "Task", value = "createdBy")
+  @Override
+  public UserEntity createdBy(final TaskEntity task) {
+    return task.createdByUserEntity();
+  }
+
+  @SchemaMapping(typeName = "Task", value = "updatedBy")
+  @Override
+  public UserEntity updatedBy(final TaskEntity task) {
+    return task.updatedByUserEntity();
   }
 
   @SchemaMapping(typeName = "Task", value = "rating")

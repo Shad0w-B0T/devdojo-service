@@ -47,16 +47,18 @@ CREATE TABLE tag
 
 CREATE TABLE task
 (
-    id          UUID         NOT NULL,
-    created_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE,
-    language_id UUID         NOT NULL,
-    name        VARCHAR(255) NOT NULL,
-    description TEXT         NOT NULL,
-    difficulty  SMALLINT     NOT NULL,
-    template    TEXT         NOT NULL,
-    complete    TEXT         NOT NULL,
-    active      BOOLEAN      NOT NULL,
+    id              UUID         NOT NULL,
+    created_at      TIMESTAMP WITHOUT TIME ZONE,
+    updated_at      TIMESTAMP WITHOUT TIME ZONE,
+    language_id     UUID         NOT NULL,
+    user_created_id UUID,
+    user_updated_id UUID,
+    name            VARCHAR(255) NOT NULL,
+    description     TEXT         NOT NULL,
+    difficulty      SMALLINT     NOT NULL,
+    template        TEXT         NOT NULL,
+    complete        TEXT         NOT NULL,
+    active          BOOLEAN      NOT NULL,
     CONSTRAINT pk_task PRIMARY KEY (id)
 );
 
@@ -129,9 +131,6 @@ CREATE TABLE users
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
-ALTER TABLE task_rating
-    ADD CONSTRAINT uc_29fd3c079ac73a12c775d8a65 UNIQUE (task_id, user_id);
-
 ALTER TABLE task_user_progress
     ADD CONSTRAINT uc_7fe69ee6d550cd3315887c1f9 UNIQUE (user_id, task_id);
 
@@ -165,6 +164,12 @@ ALTER TABLE tag
 
 ALTER TABLE task
     ADD CONSTRAINT FK_TASK_ON_LANGUAGE FOREIGN KEY (language_id) REFERENCES language (id);
+
+ALTER TABLE task
+    ADD CONSTRAINT FK_TASK_ON_USER_CREATED FOREIGN KEY (user_created_id) REFERENCES users (id);
+
+ALTER TABLE task
+    ADD CONSTRAINT FK_TASK_ON_USER_UPDATED FOREIGN KEY (user_updated_id) REFERENCES users (id);
 
 ALTER TABLE task_rating
     ADD CONSTRAINT FK_TASK_RATING_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);
