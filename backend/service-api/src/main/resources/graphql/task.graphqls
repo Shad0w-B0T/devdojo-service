@@ -40,6 +40,8 @@ type Task {
     active: Boolean!
     userProgress(userId: ID): TaskUserProgress!
     tags: [String!]
+    createdBy: User
+    updatedBy: User
 }
 
 type TaskUserProgress {
