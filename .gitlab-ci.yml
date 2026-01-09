@@ -1,4 +1,5 @@
 variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
   MAVEN_CLI_OPTS: "-B -s $CI_PROJECT_DIR/.m2/settings.xml"
   BASE_IMAGE: "maven:3.8.8-eclipse-temurin-21"
   PROJECT_VERSION: "1.0-SNAPSHOT"
@@ -8,8 +9,13 @@ variables:
   RUNTIME_PATH: "core-runtime"
 
 cache:
+  key:
+    files:
+      - pom.xml
+      - **/pom.xml
   paths:
     - .m2/repository
+
 
 stages:
   - renovate
