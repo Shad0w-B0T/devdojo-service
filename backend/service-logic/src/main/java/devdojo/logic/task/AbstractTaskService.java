@@ -2,11 +2,11 @@ package devdojo.logic.task;
 
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.tag.TagEntity;
-import devdojo.logic.database.task.TaskEntity;
-import devdojo.logic.database.task.TaskRepository;
-import devdojo.logic.database.task.TestArgumentEntity;
-import devdojo.logic.database.task.TestEntity;
+import devdojo.logic.database.task.*;
+import devdojo.logic.database.user.UserEntity;
+import devdojo.logic.database.user.UserRepository;
 import devdojo.logic.language.ILanguageService;
+import devdojo.logic.user.IUserService;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.user.IUserService;
 import devdojo.schema.annotation.RoleRequired;
@@ -17,12 +17,15 @@ import devdojo.schema.task.ArgumentType;
 import devdojo.schema.user.UserRole;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,17 +33,22 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 public abstract class AbstractTaskService implements ITaskService {
 
+  private final static int DIGITS_IN_DECIMAL = 2;
+
   private final @NotNull ILanguageService languageService;
   private final @NotNull IUserService userService;
   private final @NotNull TaskRepository taskRepository;
+  private final @NotNull TaskRatingRepository ratingRepository;
 
   protected AbstractTaskService(
     @NotNull(message = "LanguageService must not be null") final ILanguageService languageService,
     @NotNull(message = "UserService must not be null") final IUserService userService,
-    @NotNull(message = "TaskRepository must not be null") final TaskRepository taskRepository) {
+    @NotNull(message = "TaskRepository must not be null") final TaskRepository taskRepository,
+    @NotNull(message = "TaskRatingRepository must not be null") final TaskRatingRepository ratingRepository) {
     this.languageService = languageService;
     this.userService = userService;
     this.taskRepository = taskRepository;
+    this.ratingRepository = ratingRepository;
     log.info("AbstractTaskService initialized with TaskRepository");
   }
 
@@ -264,6 +272,111 @@ public abstract class AbstractTaskService implements ITaskService {
     }
 
     return task;
+  }
+
+  @Transactional
+  @Override
+  public TaskRatingEntity setTaskRating(final SetTaskRating setTaskRating) {
+    final UUID userId = setTaskRating.userId();
+    final UUID taskId = setTaskRating.taskId();
+    final int rating = setTaskRating.rating();
+
+    log.debug(
+      "Set task rating requested [taskId={}, userId={}, rating={}]",
+      taskId, userId, rating
+    );
+
+    final TaskRatingEntity taskRating = this.ratingRepository
+      .findByTaskEntity_IdAndUserEntity_Id(taskId, userId)
+      .orElse(null);
+
+    if (taskRating == null) {
+      log.debug(
+        "Creating new task rating [taskId={}, userId={}, rating={}]",
+        taskId, userId, rating
+      );
+
+      final UserEntity userEntity = this.userService.getUser(userId);
+      final TaskEntity taskEntity = this.task(taskId);
+
+      try {
+        final TaskRatingEntity saved = this.ratingRepository.save(
+          new TaskRatingEntity(taskEntity, userEntity, rating)
+        );
+
+        log.info(
+          "Task rating created successfully [taskId={}, userId={}, ratingId={}]",
+          taskId, userId, saved.id()
+        );
+
+        return saved;
+      } catch (final DataAccessException exception) {
+        log.error(
+          "Database error while creating task rating [taskId={}, userId={}, rating={}]",
+          taskId, userId, rating, exception
+        );
+        throw new DatabaseException("Failed to create task rating", exception);
+      }
+    }
+
+    log.debug(
+      "Updating existing task rating [taskId={}, userId={}, oldRating={}, newRating={}]",
+      taskId, userId, taskRating.rating(), rating
+    );
+
+    taskRating.rating(rating);
+
+    try {
+      final TaskRatingEntity saved = this.ratingRepository.save(taskRating);
+
+      log.info(
+        "Task rating updated successfully [taskId={}, userId={}, ratingId={}]",
+        taskId, userId, saved.id()
+      );
+
+      return saved;
+    } catch (final DataAccessException exception) {
+      log.error(
+        "Database error while updating task rating [taskId={}, userId={}, ratingId={}]",
+        taskId, userId, taskRating.id(), exception
+      );
+      throw new DatabaseException("Failed to update task rating", exception);
+    }
+  }
+
+  @Cacheable(
+    cacheNames = "taskRating",
+    key = "#getTask.taskId()",
+    unless = "#result == null"
+  )
+  @Override
+  public Double getTaskRating(final GetTask getTask) {
+    final UUID taskId = getTask.taskId();
+
+    log.debug("Fetching average rating for task [taskId={}]", taskId);
+
+    final Double average = this.ratingRepository.findAverageRatingByTaskId(taskId);
+
+    final double rounded = Optional.ofNullable(average)
+      .map(a -> BigDecimal
+        .valueOf(a)
+        .setScale(DIGITS_IN_DECIMAL, RoundingMode.HALF_UP)
+        .doubleValue())
+      .orElse(0.0);
+
+    if (average == null) {
+      log.debug(
+        "No ratings found for task [taskId={}], returning default rating 0.0",
+        taskId
+      );
+    } else {
+      log.debug(
+        "Average rating calculated for task [taskId={}, raw={}, rounded={}]",
+        taskId, average, rounded
+      );
+    }
+
+    return rounded;
   }
 
   /**

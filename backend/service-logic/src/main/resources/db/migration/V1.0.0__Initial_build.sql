@@ -62,6 +62,17 @@ CREATE TABLE task
     CONSTRAINT pk_task PRIMARY KEY (id)
 );
 
+CREATE TABLE task_rating
+(
+    id         UUID    NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE,
+    updated_at TIMESTAMP WITHOUT TIME ZONE,
+    task_id    UUID    NOT NULL,
+    user_id    UUID    NOT NULL,
+    rating     INTEGER NOT NULL,
+    CONSTRAINT pk_task_rating PRIMARY KEY (id)
+);
+
 CREATE TABLE task_user_progress
 (
     id         UUID     NOT NULL,
@@ -140,6 +151,8 @@ ALTER TABLE users
 
 CREATE INDEX contactEmailContactIdAndName ON task_user_progress (user_id, task_id);
 
+CREATE INDEX idx_task_rating_task_user ON task_rating (task_id, user_id);
+
 ALTER TABLE compiler_heartbeat
     ADD CONSTRAINT FK_COMPILERHEARTBEAT_ON_COMPILER FOREIGN KEY (compiler_id) REFERENCES compiler (id);
 
@@ -157,6 +170,14 @@ ALTER TABLE task
 
 ALTER TABLE task
     ADD CONSTRAINT FK_TASK_ON_USER_UPDATED FOREIGN KEY (user_updated_id) REFERENCES users (id);
+
+ALTER TABLE task_rating
+    ADD CONSTRAINT FK_TASK_RATING_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);
+
+CREATE INDEX idx_task_rating_task ON task_rating (task_id);
+
+ALTER TABLE task_rating
+    ADD CONSTRAINT FK_TASK_RATING_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE task_user_progress
     ADD CONSTRAINT FK_TASK_USER_PROGRESS_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);
