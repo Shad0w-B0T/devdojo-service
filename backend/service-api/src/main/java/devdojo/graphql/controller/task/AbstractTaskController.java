@@ -50,7 +50,7 @@ public abstract class AbstractTaskController implements ITaskController {
 
   @QueryMapping("taskRating")
   @Override
-  public double taskRating(@Argument("input") @NotNull GetTask getTask) {
+  public double taskRating(@Argument("input") @NotNull final GetTask getTask) {
     return this.taskService.getTaskRating(getTask);
   }
 

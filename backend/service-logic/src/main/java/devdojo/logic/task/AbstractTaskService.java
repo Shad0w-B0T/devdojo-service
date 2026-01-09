@@ -30,6 +30,8 @@ import org.springframework.validation.annotation.Validated;
 @Slf4j
 public abstract class AbstractTaskService implements ITaskService {
 
+  private final static int DIGITS_IN_DECIMAL = 2;
+
   private final @NotNull ILanguageService languageService;
   private final @NotNull IUserService userService;
   private final @NotNull TaskRepository taskRepository;
@@ -348,7 +350,7 @@ public abstract class AbstractTaskService implements ITaskService {
     final double rounded = Optional.ofNullable(average)
       .map(a -> BigDecimal
         .valueOf(a)
-        .setScale(2, RoundingMode.HALF_UP)
+        .setScale(DIGITS_IN_DECIMAL, RoundingMode.HALF_UP)
         .doubleValue())
       .orElse(0.0);
 
