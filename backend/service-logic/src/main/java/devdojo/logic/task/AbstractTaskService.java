@@ -89,9 +89,15 @@ public abstract class AbstractTaskService implements ITaskService {
       createTask.active()
     );
 
-    Optional.ofNullable(createTask.tags())
-      .map(strings -> strings.stream().map(s -> new TagEntity(task, s)).toList())
-      .ifPresent(task::tagEntities);
+    final List<TagEntity> tags =
+      Optional.ofNullable(createTask.tags())
+        .orElse(List.of())
+        .stream()
+        .distinct()
+        .map(name -> new TagEntity(task, name))
+        .toList();
+
+    task.setTagEntities(tags);
 
     createTask.unitTests()
       .stream().map(this::testEntity)
@@ -129,32 +135,15 @@ public abstract class AbstractTaskService implements ITaskService {
     task.complete(updateTask.complete());
     task.active(updateTask.active());
 
-    final List<TagEntity> oldTags = task.tagEntities();
-    final List<TagEntity> newTags = updateTask.tags()
-      .stream()
-      .map(t -> new TagEntity(task, t))
-      .toList();
+    final List<TagEntity> tags =
+      Optional.ofNullable(updateTask.tags())
+        .orElse(List.of())
+        .stream()
+        .distinct()
+        .map(name -> new TagEntity(task, name))
+        .toList();
 
-    final List<TagEntity> tagsToRemove = oldTags.stream()
-      .filter(existingTag -> newTags.stream().noneMatch(newTag -> newTag.name().equals(existingTag.name())))
-      .toList();
-
-    final List<TagEntity> updatedTags = oldTags.stream()
-      .map(existingTag -> newTags.stream()
-        .filter(newTag -> newTag.name().equals(existingTag.name()))
-        .findFirst()
-        .map(newTag -> {
-          existingTag.name(newTag.name());
-          return existingTag;
-        })
-        .orElse(existingTag))
-      .collect(Collectors.toList());
-
-    newTags.stream()
-      .filter(newTag -> updatedTags.stream().noneMatch(existingTag -> existingTag.name().equals(newTag.name())))
-      .forEach(updatedTags::add);
-
-    task.setTagEntities(updatedTags);
+    task.setTagEntities(tags);
 
     task.testEntities().clear();
     updateTask.unitTests()
