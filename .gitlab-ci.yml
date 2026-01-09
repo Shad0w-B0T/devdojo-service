@@ -12,7 +12,7 @@ cache:
   key:
     files:
       - pom.xml
-      - **/pom.xml
+      - "**/pom.xml"
   paths:
     - .m2/repository
 
