@@ -4,6 +4,7 @@ import devdojo.graphql.input.task.*;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.schema.task.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -70,6 +71,10 @@ public interface ITaskController {
   List<String> tags(@NotNull final TaskEntity task);
 
   boolean active(@NotNull final TaskEntity task);
+
+  UserEntity createdBy(@NotNull final TaskEntity task);
+
+  UserEntity updatedBy(@NotNull final TaskEntity task);
 
   @NotNull
   ITaskUserProgress userProgress(@NotNull final TaskEntity task,

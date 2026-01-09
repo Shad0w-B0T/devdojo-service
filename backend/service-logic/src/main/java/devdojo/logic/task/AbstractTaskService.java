@@ -7,9 +7,12 @@ import devdojo.logic.database.task.TaskRepository;
 import devdojo.logic.database.task.TestArgumentEntity;
 import devdojo.logic.database.task.TestEntity;
 import devdojo.logic.language.ILanguageService;
+import devdojo.logic.security.SecurityUtils;
+import devdojo.logic.user.IUserService;
 import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.NotFoundException;
+import devdojo.schema.exception.permissions.UnauthorizedException;
 import devdojo.schema.task.ArgumentType;
 import devdojo.schema.user.UserRole;
 import jakarta.transaction.Transactional;
@@ -28,12 +31,15 @@ import org.springframework.validation.annotation.Validated;
 public abstract class AbstractTaskService implements ITaskService {
 
   private final @NotNull ILanguageService languageService;
+  private final @NotNull IUserService userService;
   private final @NotNull TaskRepository taskRepository;
 
   protected AbstractTaskService(
     @NotNull(message = "LanguageService must not be null") final ILanguageService languageService,
+    @NotNull(message = "UserService must not be null") final IUserService userService,
     @NotNull(message = "TaskRepository must not be null") final TaskRepository taskRepository) {
     this.languageService = languageService;
+    this.userService = userService;
     this.taskRepository = taskRepository;
     log.info("AbstractTaskService initialized with TaskRepository");
   }
@@ -102,6 +108,15 @@ public abstract class AbstractTaskService implements ITaskService {
       });
 
     try {
+      task.createdByUserEntity(Optional
+        .ofNullable(SecurityUtils.currentTokenDetails().userId())
+        .map(this.userService::getUser)
+        .orElse(null));
+    } catch (final UnauthorizedException | NotFoundException exception) {
+      log.info("No created user found for task.");
+    }
+
+    try {
       final TaskEntity savedTask = this.taskRepository.save(task);
       log.info("Task '{}' created with ID {}", createTask.name(), savedTask.id());
       return savedTask;
@@ -164,6 +179,15 @@ public abstract class AbstractTaskService implements ITaskService {
         task.testEntities().add(finalTest);
         log.debug("Added unit test during update to task with ID {}", updateTask.taskId());
       });
+
+    try {
+      task.updatedByUserEntity(Optional
+        .ofNullable(SecurityUtils.currentTokenDetails().userId())
+        .map(this.userService::getUser)
+        .orElse(null));
+    } catch (final UnauthorizedException | NotFoundException exception) {
+      log.info("No updated user found for task.");
+    }
 
     try {
       final TaskEntity savedTask = taskRepository.save(task);
