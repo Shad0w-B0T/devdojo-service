@@ -3,6 +3,7 @@ package devdojo.logic.database.task;
 import devdojo.logic.database.AbstractEntity;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.tag.TagEntity;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.schema.Constants;
 import devdojo.schema.task.Difficulty;
 import devdojo.schema.task.ITask;
@@ -29,6 +30,14 @@ public final class TaskEntity extends AbstractEntity implements ITask {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "language_id", nullable = false)
   private LanguageEntity languageEntity;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_created_id")
+  private UserEntity createdByUserEntity;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_updated_id")
+  private UserEntity updatedByUserEntity;
 
   @NotNull(message = "Task name must not be null")
   @Size(max = Constants.STRING_DEFAULT_LENGTH, message = "Task name must not exceed {max} characters")
