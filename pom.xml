@@ -41,7 +41,7 @@
     <!-- ### DB -->
     <dependency.version.postgresql>42.7.8</dependency.version.postgresql>
 
-    <dependency.version.flyway.core>11.17.0</dependency.version.flyway.core>
+    <dependency.version.flyway.core>11.20.0</dependency.version.flyway.core>
 
     <dependency.version.hibernate>6.6.34.Final</dependency.version.hibernate>
 
