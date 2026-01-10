@@ -4,6 +4,7 @@ import devdojo.graphql.input.task.*;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.schema.task.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -18,6 +19,9 @@ public interface ITaskController {
 
   @NotNull
   TaskEntity task(@NotNull final GetTask getTask);
+
+  @NotNull
+  double taskRating(@NotNull final GetTask getTask);
 
   @NotNull
   TaskEntity nextTask(@NotNull final GetNextTask getNextTask);
@@ -39,6 +43,8 @@ public interface ITaskController {
   TaskEntity appendUnitTest(@NotNull AppendTest input);
 
   boolean updateTaskUserInput(@NotNull UpdateTaskUserInput input);
+
+  boolean setTaskRating(@NotNull final SetTaskRating setTaskRating);
 
   // ────── Schema ──────
 
@@ -71,9 +77,15 @@ public interface ITaskController {
 
   boolean active(@NotNull final TaskEntity task);
 
+  UserEntity createdBy(@NotNull final TaskEntity task);
+
+  UserEntity updatedBy(@NotNull final TaskEntity task);
+
   @NotNull
   ITaskUserProgress userProgress(@NotNull final TaskEntity task,
                                  final UUID userId);
+
+  double rating(@NotNull final TaskEntity task);
 
   //TaskUserProgress
   @NotNull
