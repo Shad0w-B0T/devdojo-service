@@ -41,9 +41,9 @@
     <!-- ### DB -->
     <dependency.version.postgresql>42.7.8</dependency.version.postgresql>
 
-    <dependency.version.flyway.core>11.17.0</dependency.version.flyway.core>
+    <dependency.version.flyway.core>11.20.0</dependency.version.flyway.core>
 
-    <dependency.version.hibernate>6.6.34.Final</dependency.version.hibernate>
+    <dependency.version.hibernate>6.6.40.Final</dependency.version.hibernate>
 
 
     <dependency.version.shedlock>6.10.0</dependency.version.shedlock>
@@ -69,12 +69,12 @@
     <dependency.version.mockito.junit>5.20.0</dependency.version.mockito.junit>
 
 
-    <dependency.version.junit>6.0.1</dependency.version.junit>
+    <dependency.version.junit>6.0.2</dependency.version.junit>
 
-    <dependency.version.junit.jupiter>6.0.1</dependency.version.junit.jupiter>
+    <dependency.version.junit.jupiter>6.0.2</dependency.version.junit.jupiter>
 
 
-    <dependency.version.testcontainers>1.21.3</dependency.version.testcontainers>
+    <dependency.version.testcontainers>1.21.4</dependency.version.testcontainers>
 
     <!-- ### Plugins -->
     <plugin.version.shade>3.6.1</plugin.version.shade>
