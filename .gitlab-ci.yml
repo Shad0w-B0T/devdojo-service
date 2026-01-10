@@ -7,9 +7,6 @@ variables:
   PROJECT_REGISTRY: "registry.mi.hdm-stuttgart.de"
   RUNTIME_PATH: "core-runtime"
 
-cache:
-  paths:
-    - .m2/repository
 
 stages:
   - renovate
@@ -33,6 +30,13 @@ renovate:
 build-core:
   stage: build
   image: $BASE_IMAGE
+  cache:
+    key:
+      files:
+        - pom.xml
+        - "**/pom.xml"
+    paths:
+      - .m2/repository
   services:
     - name: docker:dind
       alias: docker
@@ -46,6 +50,13 @@ build-core:
 test-core:
   stage: test
   image: $BASE_IMAGE
+  cache:
+    key:
+      files:
+        - pom.xml
+        - "**/pom.xml"
+    paths:
+      - .m2/repository
   services:
     - name: docker:dind
       alias: docker
