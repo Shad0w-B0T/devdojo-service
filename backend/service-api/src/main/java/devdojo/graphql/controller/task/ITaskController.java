@@ -114,7 +114,7 @@ public interface ITaskController {
 
   //User Ranking
   @NotNull
-  UUID userId(@NotNull final TaskProgressRepository.UserRankingProjection userRankingProjection);
+  UserEntity user(@NotNull final TaskProgressRepository.UserRankingProjection userRankingProjection);
 
   long totalScore(@NotNull final TaskProgressRepository.UserRankingProjection userRankingProjection);
 

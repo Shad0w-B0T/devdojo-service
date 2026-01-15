@@ -25,6 +25,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.validation.annotation.Validated;
@@ -274,6 +275,10 @@ public abstract class AbstractTaskService implements ITaskService {
     return task;
   }
 
+  @CacheEvict(
+    cacheNames = "taskRating",
+    key = "#p0.taskId()"
+  )
   @Transactional
   @Override
   public TaskRatingEntity setTaskRating(final SetTaskRating setTaskRating) {
@@ -346,7 +351,7 @@ public abstract class AbstractTaskService implements ITaskService {
 
   @Cacheable(
     cacheNames = "taskRating",
-    key = "#getTask.taskId()",
+    key = "#p0.taskId()",
     unless = "#result == null"
   )
   @Override
