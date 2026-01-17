@@ -47,7 +47,7 @@ public final class UserEntity extends AbstractEntity implements IUser {
   @Column(name = "ldapRole", nullable = false)
   private UserRole ldapRole;
 
-  @Nullable
+  @NotNull
   @Column(name = "applicationRole")
   private UserRole applicationRole;
 

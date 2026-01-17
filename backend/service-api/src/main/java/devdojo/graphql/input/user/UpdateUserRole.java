@@ -7,6 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record UpdateUserRole(@NotNull UUID userId,
-                             @Nullable UserRole applicationRole) implements IUserService.UserRoleUpdate {
+                             @Nullable UserRole role) implements IUserService.UserRoleUpdate {
 
 }

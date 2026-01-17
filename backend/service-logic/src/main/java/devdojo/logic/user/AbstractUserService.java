@@ -93,7 +93,7 @@ public abstract class AbstractUserService implements IUserService {
         userCreate.email(),
         userCreate.displayName(),
         userCreate.ldapRole(),
-        null,
+        userCreate.ldapRole(), // the initial role is the same as ldap role
         userCreate.active(),
         new Date()
       ));
@@ -138,7 +138,7 @@ public abstract class AbstractUserService implements IUserService {
 
     userEntity.email(userUpdate.email());
     userEntity.displayName(userUpdate.displayName());
-    userEntity.applicationRole(userUpdate.applicationRole() != null ? userUpdate.applicationRole() : userEntity.ldapRole());
+    userEntity.applicationRole(userUpdate.applicationRole());
     userEntity.active(userUpdate.active());
     userEntity.lastLogin(userUpdate.lastLogin());
 
@@ -214,7 +214,7 @@ public abstract class AbstractUserService implements IUserService {
 
       @Override
       public UserRole applicationRole() {
-        return userRoleUpdate.applicationRole();
+        return userRoleUpdate.role();
       }
 
       @Override

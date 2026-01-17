@@ -10,7 +10,7 @@ type User implements DateAuditable{
     id: ID!
     email: String!
     name: String!
-    applicationRole: UserRole!
+    role: UserRole!
     active: Boolean!
     lastLogin: Long!
     createdAt: Long!
@@ -24,7 +24,7 @@ input UpdateUserName {
 
 input UpdateUserRole {
     userId: ID!
-    applicationRole: UserRole!
+    role: UserRole!
 }
 
 extend type Query {

@@ -61,6 +61,11 @@ public abstract class AbstractLdapService implements ILdapService {
         }
 
         @Override
+        public UserRole applicationRole() {
+          return ldapUserRole;
+        }
+
+        @Override
         public boolean active() {
           return true;
         }

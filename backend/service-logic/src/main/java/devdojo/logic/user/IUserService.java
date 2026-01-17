@@ -102,6 +102,9 @@ public interface IUserService {
     @NotNull(message = "LDAP role must not be null")
     UserRole ldapRole();
 
+    @NotNull(message = "Application role must not be null")
+    UserRole applicationRole();
+
     boolean active();
   }
 
@@ -137,7 +140,7 @@ public interface IUserService {
     UUID userId();
 
     @Nullable
-    UserRole applicationRole();
+    UserRole role();
   }
 
   interface UserDelete {
