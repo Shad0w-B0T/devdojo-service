@@ -4,13 +4,15 @@ import devdojo.logic.database.AbstractEntity;
 import devdojo.schema.Constants;
 import devdojo.schema.user.IUser;
 import devdojo.schema.user.UserRole;
-import jakarta.persistence.*;
+import jakarta.annotation.Nullable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import java.util.Date;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,8 +44,12 @@ public final class UserEntity extends AbstractEntity implements IUser {
   private String displayName;
 
   @NotNull(message = "User role must not be null")
-  @Column(name = "role", nullable = false)
-  private UserRole role;
+  @Column(name = "ldapRole", nullable = false)
+  private UserRole ldapRole;
+
+  @Nullable
+  @Column(name = "applicationRole")
+  private UserRole applicationRole;
 
   @NotNull(message = "Active flag must not be null")
   @Column(name = "active", nullable = false)
@@ -66,23 +72,26 @@ public final class UserEntity extends AbstractEntity implements IUser {
   /**
    * Creates a new UserEntity.
    *
-   * @param authId      the supabase id.
-   * @param email
-   * @param displayName the name displayed in the leaderboard.
-   * @param role        the role of the user.
-   * @param active      whether the user is active or not.
-   * @param lastLogin   the last login timestamp.
+   * @param authId          the supabase id.
+   * @param email           the email address.
+   * @param displayName     the name displayed in the leaderboard.
+   * @param ldapRole        the role passed by LDAP.
+   * @param applicationRole the internal application role.
+   * @param active          whether the user is active or not.
+   * @param lastLogin       the last login timestamp.
    */
   public UserEntity(@NotNull final String authId,
                     @NotNull final String email,
                     @NotNull final String displayName,
-                    @NotNull final UserRole role,
+                    @NotNull final UserRole ldapRole,
+                    @NotNull final UserRole applicationRole,
                     @NotNull final Boolean active,
                     @NotNull final Date lastLogin) {
     this.authId = authId;
     this.email = email;
     this.displayName = displayName;
-    this.role = role;
+    this.ldapRole = ldapRole;
+    this.applicationRole = applicationRole;
     this.active = Boolean.TRUE.equals(active);
     this.lastLogin = lastLogin;
   }
