@@ -32,7 +32,7 @@ final class UserRepositoryTest extends BaseJpaTest {
       "rick@hdm-stuttgart.de",
       "Rick",
       UserRole.ADMIN,
-      null,
+      UserRole.ADMIN,
       true,
       this.DATE
     );
