@@ -39,7 +39,7 @@ public final class SecurityUtils {
 
     if (!(authentication instanceof AbstractAuthenticationToken token &&
       token.getDetails() instanceof ITokenDetails tokenDetails)) {
-      throw new UnauthorizedException("No token detials present.");
+      throw new UnauthorizedException("No token details present.");
     }
 
     return tokenDetails;
