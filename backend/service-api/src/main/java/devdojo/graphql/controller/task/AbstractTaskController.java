@@ -10,6 +10,7 @@ import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.task.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,13 +28,16 @@ import org.springframework.validation.annotation.Validated;
 public abstract class AbstractTaskController implements ITaskController {
 
   private final @NotNull ITaskService taskService;
+  private final @NotNull IUserService userService;
   private final @NotNull ITasksProgressService tasksProgressService;
 
   protected AbstractTaskController(final ITaskService taskService,
+                                   @NotNull final IUserService userService,
                                    @NotNull final ITasksProgressService tasksProgressService) {
     Objects.requireNonNull(taskService, "taskService cannot be null");
 
     this.taskService = taskService;
+    this.userService = userService;
     this.tasksProgressService = tasksProgressService;
   }
 
@@ -249,10 +253,11 @@ public abstract class AbstractTaskController implements ITaskController {
     return argument.value();
   }
 
-  @SchemaMapping(typeName = "UserRanking", value = "userId")
+  @SchemaMapping(typeName = "UserRanking", value = "user")
   @Override
-  public UUID userId(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
-    return userRankingProjection.userId();
+  public @NotNull UserEntity user(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
+    System.out.println(userRankingProjection.userId());
+    return this.userService.getUser(userRankingProjection.userId());
   }
 
   @SchemaMapping(typeName = "UserRanking", value = "totalScore")

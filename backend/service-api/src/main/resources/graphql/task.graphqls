@@ -52,7 +52,7 @@ type TaskUserProgress {
 }
 
 type UserRanking {
-    userId: ID!
+    user: User!
     totalScore: Long!
     rank: Long!
 }

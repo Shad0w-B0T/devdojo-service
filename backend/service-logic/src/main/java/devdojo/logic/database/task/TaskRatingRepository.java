@@ -5,6 +5,7 @@ import devdojo.logic.database.user.UserEntity;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TaskRatingRepository
   extends EntityRepository<TaskRatingEntity> {
@@ -22,9 +23,10 @@ public interface TaskRatingRepository
   Optional<TaskRatingEntity> findByTaskEntityAndUserEntity(final TaskEntity taskEntity, final UserEntity userEntity);
 
   @Query("""
-      SELECT AVG(tr.rating)
-      FROM TaskRatingEntity tr
-      WHERE tr.taskEntity.id = :taskId
+      SELECT AVG(r.rating)
+      FROM TaskRatingEntity r
+      WHERE r.taskEntity.id = :taskId
     """)
-  Double findAverageRatingByTaskId(UUID taskId);
+  Double findAverageRatingByTaskId(@Param("taskId") UUID taskId);
+
 }
