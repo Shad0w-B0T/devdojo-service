@@ -36,7 +36,7 @@ public abstract class AbstractLdapService implements ILdapService {
     } catch (NotFoundException e) {
       Map<String, Object> attrs = this.ldapAttributeService.loadUserAttributes(authId);
 
-      UserRole role =
+      UserRole ldapUserRole =
         mapLdapUserRole(attrs.get("eduPersonAffiliation"));
 
       return userService.createUser(new IUserService.UserCreate() {
@@ -56,8 +56,8 @@ public abstract class AbstractLdapService implements ILdapService {
         }
 
         @Override
-        public UserRole role() {
-          return role;
+        public UserRole ldapRole() {
+          return ldapUserRole;
         }
 
         @Override

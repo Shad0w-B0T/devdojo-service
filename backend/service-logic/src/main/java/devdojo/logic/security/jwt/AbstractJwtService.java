@@ -26,7 +26,7 @@ public abstract class AbstractJwtService implements IJwtService {
     return Jwts.builder()
       .id(UUID.randomUUID().toString())
       .subject(userEntity.authId())
-      .claim("role", userEntity.role().name())
+      .claim("role", userEntity.ldapRole().name())
       .issuedAt(new Date())
       .expiration(Date.from(Instant.now().plus(EXPIRE_MINUTES, ChronoUnit.MINUTES)))
       .signWith(key)
