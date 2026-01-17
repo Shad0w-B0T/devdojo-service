@@ -2,6 +2,7 @@ package devdojo.schema.user;
 
 import devdojo.schema.entity.DateAuditable;
 import devdojo.schema.entity.Identifiable;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.UUID;
@@ -24,10 +25,16 @@ public interface IUser extends Identifiable<UUID>, DateAuditable {
   String displayName();
 
   /**
-   * @return the role assigned to the user.
+   * @return the default ldap role assigned to the user.
    */
-  @NotNull(message = "Role cannot be null.")
-  UserRole role();
+  @NotNull(message = "LDAP role cannot be null.")
+  UserRole ldapRole();
+
+  /**
+   * @return the internal application assigned user role.
+   */
+  @Nullable
+  UserRole applicationRole();
 
   /**
    * @return whether the user is active.
