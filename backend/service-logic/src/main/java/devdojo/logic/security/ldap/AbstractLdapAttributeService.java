@@ -1,7 +1,5 @@
 package devdojo.logic.security.ldap;
 
-import devdojo.logic.user.IUserService;
-import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +38,7 @@ public abstract class AbstractLdapAttributeService implements ILdapAttributeServ
       .findFirst()
       .orElseThrow(() ->
         new IllegalStateException(
-          "Kein LDAP-User mit uid=" + uid + " gefunden"
+          "No LDAP-User with uid=" + uid + " found."
         )
       );
   }
