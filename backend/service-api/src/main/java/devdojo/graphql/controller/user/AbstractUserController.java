@@ -69,7 +69,7 @@ public abstract class AbstractUserController implements IUserController {
   @SchemaMapping(typeName = "User")
   @Override
   public @NotNull UserRole role(@NotNull final UserEntity userEntity) {
-    return userEntity.role();
+    return userEntity.applicationRole() != null ? userEntity.applicationRole() : userEntity.ldapRole();
   }
 
   @SchemaMapping(typeName = "User")

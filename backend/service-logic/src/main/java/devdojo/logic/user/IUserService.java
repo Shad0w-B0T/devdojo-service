@@ -2,6 +2,7 @@ package devdojo.logic.user;
 
 import devdojo.logic.database.user.UserEntity;
 import devdojo.schema.user.UserRole;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
@@ -98,8 +99,11 @@ public interface IUserService {
     @NotNull(message = "Display name must not be null")
     String displayName();
 
-    @NotNull(message = "User role must not be null")
-    UserRole role();
+    @NotNull(message = "LDAP role must not be null")
+    UserRole ldapRole();
+
+    @NotNull(message = "Application role must not be null")
+    UserRole applicationRole();
 
     boolean active();
   }
@@ -114,8 +118,8 @@ public interface IUserService {
     @NotNull(message = "Display name must not be null")
     String displayName();
 
-    @NotNull(message = "User role must not be null")
-    UserRole role();
+    @Nullable
+    UserRole applicationRole();
 
     boolean active();
 
@@ -135,7 +139,7 @@ public interface IUserService {
     @NotNull(message = "User ID must not be null")
     UUID userId();
 
-    @NotNull(message = "User role must not be null")
+    @Nullable
     UserRole role();
   }
 

@@ -41,7 +41,7 @@ public abstract class AbstractAuthWebFilter extends OncePerRequestFilter impleme
         user.authId(),
         user.email(),
         user.displayName(),
-        user.role()
+        user.applicationRole()
       );
 
       token.setDetails(details);

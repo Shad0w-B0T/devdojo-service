@@ -1,4 +1,3 @@
-
 CREATE TABLE compiler
 (
     id           UUID             NOT NULL,
@@ -119,15 +118,16 @@ CREATE TABLE user_settings
 
 CREATE TABLE users
 (
-    id           UUID                        NOT NULL,
-    created_at   TIMESTAMP WITHOUT TIME ZONE,
-    updated_at   TIMESTAMP WITHOUT TIME ZONE,
-    auth_id      VARCHAR(255)                NOT NULL,
-    email        VARCHAR(300)                NOT NULL,
-    display_name VARCHAR(255)                NOT NULL,
-    role         SMALLINT                    NOT NULL,
-    active       BOOLEAN                     NOT NULL,
-    last_login   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    id               UUID         NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    updated_at       TIMESTAMP WITHOUT TIME ZONE,
+    auth_id          VARCHAR(255) NOT NULL,
+    email            VARCHAR(300) NOT NULL,
+    display_name     VARCHAR(255) NOT NULL,
+    ldap_role        SMALLINT     NOT NULL,
+    application_role SMALLINT NULL,
+    active           BOOLEAN      NOT NULL,
+    last_login       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
