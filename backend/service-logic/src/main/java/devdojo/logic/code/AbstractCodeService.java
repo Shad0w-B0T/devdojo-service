@@ -36,7 +36,6 @@ public abstract class AbstractCodeService implements ICodeService {
                                    @NotNull final String methodCode,
                                    @NotNull final List<List<Object>> argumentSets) {
     final String compilerKey = taskEntity.languageEntity().token();
-    System.out.println("Get -> compiler key: " + taskEntity.languageEntity().token());
     this.ensureCompilerQueueExists(compilerKey);
 
     final UUID uuid = UUID.randomUUID();

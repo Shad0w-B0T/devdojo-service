@@ -15,9 +15,12 @@ import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TestEntity;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
+import devdojo.logic.websocket.ISocketPublisher;
 import devdojo.schema.code.TestRun;
 import devdojo.schema.code.TestRunResult;
 import devdojo.schema.code.TestRunResultChecked;
@@ -49,6 +52,8 @@ public abstract class AbstractCompilerService implements ICompilerService {
   private final CompilerHeartbeatRepository compilerHeartbeatRepository;
   private final CompilerTaskRepository compilerTaskRepository;
   private final CompilerTaskResultRepository compilerTaskResultRepository;
+  private final ISocketPublisher socketPublisher;
+  private final IUserService userService;
 
   protected AbstractCompilerService(
     final ObjectMapper objectMapper,
@@ -58,7 +63,9 @@ public abstract class AbstractCompilerService implements ICompilerService {
     final CompilerRepository compilerRepository,
     final CompilerHeartbeatRepository compilerHeartbeatRepository,
     final CompilerTaskRepository compilerTaskRepository,
-    final CompilerTaskResultRepository compilerTaskResultRepository) {
+    final CompilerTaskResultRepository compilerTaskResultRepository,
+    final ISocketPublisher socketPublisher,
+    final IUserService userService) {
     this.objectMapper = objectMapper;
     this.languageRepository = languageRepository;
     this.taskService = taskService;
@@ -67,6 +74,8 @@ public abstract class AbstractCompilerService implements ICompilerService {
     this.compilerHeartbeatRepository = compilerHeartbeatRepository;
     this.compilerTaskRepository = compilerTaskRepository;
     this.compilerTaskResultRepository = compilerTaskResultRepository;
+    this.socketPublisher = socketPublisher;
+    this.userService = userService;
   }
 
   @Override
@@ -111,9 +120,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
       .orElseThrow(() -> new NotFoundException("No compiler task found for id=" + completeCompilerTask.id()));
 
     final TaskEntity taskEntity = this.taskService.getTask(compilerTask::taskId);
-
     final List<TestRunResult> results = completeCompilerTask.results();
-
     final List<TestRunResultChecked> resultUnits = results.stream()
       .map(result -> mapToResultUnit(result, taskEntity))
       .toList();
@@ -179,8 +186,19 @@ public abstract class AbstractCompilerService implements ICompilerService {
 
     compilerTask.processed(true);
     this.compilerTaskRepository.save(compilerTask);
+    this.sendWebsocket(compilerTask, run);
 
     return result;
+  }
+
+  private void sendWebsocket(final CompilerTask compilerTask,
+                             final TestRun testRun) {
+    try {
+      final UserEntity userEntity = this.userService.getUser(compilerTask.userId());
+      this.socketPublisher.notifyTaskUpdate(userEntity.authId(), testRun);
+    } catch (final NotFoundException exception) {
+      log.error("No user found to send task compile response={}, ignoring. ", compilerTask.id());
+    }
   }
 
   @Transactional
