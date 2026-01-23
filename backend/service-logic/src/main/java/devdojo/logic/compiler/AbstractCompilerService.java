@@ -15,9 +15,11 @@ import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TestEntity;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
 import devdojo.logic.websocket.ISocketPublisher;
 import devdojo.schema.code.TestRun;
 import devdojo.schema.code.TestRunResult;
@@ -51,6 +53,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
   private final CompilerTaskRepository compilerTaskRepository;
   private final CompilerTaskResultRepository compilerTaskResultRepository;
   private final ISocketPublisher socketPublisher;
+  private final IUserService userService;
 
   protected AbstractCompilerService(
     final ObjectMapper objectMapper,
@@ -61,7 +64,8 @@ public abstract class AbstractCompilerService implements ICompilerService {
     final CompilerHeartbeatRepository compilerHeartbeatRepository,
     final CompilerTaskRepository compilerTaskRepository,
     final CompilerTaskResultRepository compilerTaskResultRepository,
-    final ISocketPublisher socketPublisher) {
+    final ISocketPublisher socketPublisher,
+    final IUserService userService) {
     this.objectMapper = objectMapper;
     this.languageRepository = languageRepository;
     this.taskService = taskService;
@@ -71,6 +75,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
     this.compilerTaskRepository = compilerTaskRepository;
     this.compilerTaskResultRepository = compilerTaskResultRepository;
     this.socketPublisher = socketPublisher;
+    this.userService = userService;
   }
 
   @Override
@@ -179,12 +184,21 @@ public abstract class AbstractCompilerService implements ICompilerService {
       throw new RuntimeException(e);
     }
 
-    this.socketPublisher.notifyTaskUpdate("dr092", run);
-
     compilerTask.processed(true);
     this.compilerTaskRepository.save(compilerTask);
+    this.sendWebsocket(compilerTask, run);
 
     return result;
+  }
+
+  private void sendWebsocket(final CompilerTask compilerTask,
+                             final TestRun testRun) {
+    try {
+      final UserEntity userEntity = this.userService.getUser(compilerTask.userId());
+      this.socketPublisher.notifyTaskUpdate(userEntity.authId(), testRun);
+    } catch (final NotFoundException exception) {
+
+    }
   }
 
   @Transactional

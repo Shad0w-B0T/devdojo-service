@@ -8,6 +8,7 @@ import devdojo.logic.database.compiler.CompilerRepository;
 import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
 import devdojo.logic.websocket.ISocketPublisher;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,8 @@ class CompilerServiceTest {
   private CompilerTaskResultRepository compilerTaskResultRepository;
   @Mock
   private ISocketPublisher socketPublisher;
+  @Mock
+  private IUserService userService;
 
   @InjectMocks
   private CompilerService compilerService;
@@ -59,7 +62,8 @@ class CompilerServiceTest {
         this.compilerHeartbeatRepository,
         this.compilerTaskRepository,
         this.compilerTaskResultRepository,
-        this.socketPublisher));
+        this.socketPublisher,
+        this.userService));
   }
 
   /*

@@ -8,6 +8,7 @@ import devdojo.logic.database.compiler.CompilerRepository;
 import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
 import devdojo.logic.websocket.ISocketPublisher;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +24,10 @@ public class CompilerService extends AbstractCompilerService {
                             final CompilerHeartbeatRepository compilerHeartbeatRepository,
                             final CompilerTaskRepository compilerTaskRepository,
                             final CompilerTaskResultRepository compilerTaskResultRepository,
-                            final ISocketPublisher socketPublisher) {
+                            final ISocketPublisher socketPublisher,
+                            final IUserService userService) {
     super(objectMapper, languageRepository, taskService, tasksProgressService, compilerRepository,
       compilerHeartbeatRepository, compilerTaskRepository, compilerTaskResultRepository,
-      socketPublisher);
+      socketPublisher, userService);
   }
 }
