@@ -197,7 +197,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
       final UserEntity userEntity = this.userService.getUser(compilerTask.userId());
       this.socketPublisher.notifyTaskUpdate(userEntity.authId(), testRun);
     } catch (final NotFoundException exception) {
-
+      log.error("No user found to send task compile response={}, ignoring. ", compilerTask.id());
     }
   }
 
