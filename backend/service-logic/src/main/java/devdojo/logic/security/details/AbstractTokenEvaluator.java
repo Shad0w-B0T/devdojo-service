@@ -22,7 +22,7 @@ public abstract class AbstractTokenEvaluator implements ITokenEvaluator {
     if (!(token.getDetails() instanceof ITokenDetails tokenDetails)) {
       return false;
     }
-    return tokenDetails.userRole().id() >= role.id();
+    return tokenDetails.applicationRole().id() >= role.id();
   }
 
   @Override

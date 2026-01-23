@@ -3,7 +3,6 @@ package devdojo.logic.user;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.database.user.UserRepository;
 import devdojo.logic.security.SecurityUtils;
-import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.AlreadyExistsException;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.DeletionException;
@@ -14,6 +13,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -92,7 +92,8 @@ public abstract class AbstractUserService implements IUserService {
         userCreate.authId(),
         userCreate.email(),
         userCreate.displayName(),
-        userCreate.role(),
+        userCreate.ldapRole(),
+        userCreate.ldapRole(), // the initial role is the same as ldap role
         userCreate.active(),
         new Date()
       ));
@@ -128,15 +129,16 @@ public abstract class AbstractUserService implements IUserService {
       throw new AlreadyExistsException(userUpdate.displayName());
     }
 
-    if (userEntity.role() != userUpdate.role()) {
-      if (SecurityUtils.currentTokenDetails().userRole().id() < userUpdate.role().id()) {
+    if (userEntity.applicationRole() != userUpdate.applicationRole()) {
+      if (SecurityUtils.currentTokenDetails().applicationRole().id() <
+        Objects.requireNonNull(userUpdate.applicationRole()).id()) {
         throw new UnauthenticatedException("You do not have enough permissions to set the role.");
       }
     }
 
     userEntity.email(userUpdate.email());
     userEntity.displayName(userUpdate.displayName());
-    userEntity.role(userUpdate.role());
+    userEntity.applicationRole(userUpdate.applicationRole());
     userEntity.active(userUpdate.active());
     userEntity.lastLogin(userUpdate.lastLogin());
 
@@ -174,8 +176,8 @@ public abstract class AbstractUserService implements IUserService {
       }
 
       @Override
-      public UserRole role() {
-        return userEntity.role();
+      public UserRole applicationRole() {
+        return userEntity.applicationRole();
       }
 
       @Override
@@ -211,7 +213,7 @@ public abstract class AbstractUserService implements IUserService {
       }
 
       @Override
-      public UserRole role() {
+      public UserRole applicationRole() {
         return userRoleUpdate.role();
       }
 

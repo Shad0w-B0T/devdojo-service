@@ -19,6 +19,6 @@ public interface ITokenDetails {
   String displayName();
 
   @NotNull
-  UserRole userRole();
+  UserRole applicationRole();
 
 }

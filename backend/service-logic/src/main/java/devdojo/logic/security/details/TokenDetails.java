@@ -9,6 +9,6 @@ public record TokenDetails(
   @NotNull String authId,
   @NotNull String email,
   @NotNull String displayName,
-  @NotNull UserRole userRole
+  @NotNull UserRole applicationRole
 ) implements ITokenDetails {
 }
