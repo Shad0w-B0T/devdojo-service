@@ -95,12 +95,10 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
     List<TaskEntity> tasks;
 
     if (state == TaskProgressState.NOT_STARTED) {
-      System.out.println("Task not started");
       tasks = (languageId == null)
         ? this.taskProgressRepository.findTasksWithoutProgress(userId)
         : this.taskProgressRepository.findTasksWithoutProgress(userId, languageId);
     } else {
-      System.out.println("Task already started");
       tasks = (languageId == null)
         ? this.taskProgressRepository.findTasksWithProgressByState(userId, state)
         : this.taskProgressRepository.findTasksWithProgressByState(userId, languageId, state);

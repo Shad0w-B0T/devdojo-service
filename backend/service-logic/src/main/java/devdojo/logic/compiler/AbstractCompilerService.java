@@ -18,6 +18,7 @@ import devdojo.logic.database.task.TestEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.websocket.ISocketPublisher;
 import devdojo.schema.code.TestRun;
 import devdojo.schema.code.TestRunResult;
 import devdojo.schema.code.TestRunResultChecked;
@@ -49,6 +50,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
   private final CompilerHeartbeatRepository compilerHeartbeatRepository;
   private final CompilerTaskRepository compilerTaskRepository;
   private final CompilerTaskResultRepository compilerTaskResultRepository;
+  private final ISocketPublisher socketPublisher;
 
   protected AbstractCompilerService(
     final ObjectMapper objectMapper,
@@ -58,7 +60,8 @@ public abstract class AbstractCompilerService implements ICompilerService {
     final CompilerRepository compilerRepository,
     final CompilerHeartbeatRepository compilerHeartbeatRepository,
     final CompilerTaskRepository compilerTaskRepository,
-    final CompilerTaskResultRepository compilerTaskResultRepository) {
+    final CompilerTaskResultRepository compilerTaskResultRepository,
+    final ISocketPublisher socketPublisher) {
     this.objectMapper = objectMapper;
     this.languageRepository = languageRepository;
     this.taskService = taskService;
@@ -67,6 +70,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
     this.compilerHeartbeatRepository = compilerHeartbeatRepository;
     this.compilerTaskRepository = compilerTaskRepository;
     this.compilerTaskResultRepository = compilerTaskResultRepository;
+    this.socketPublisher = socketPublisher;
   }
 
   @Override
@@ -111,9 +115,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
       .orElseThrow(() -> new NotFoundException("No compiler task found for id=" + completeCompilerTask.id()));
 
     final TaskEntity taskEntity = this.taskService.getTask(compilerTask::taskId);
-
     final List<TestRunResult> results = completeCompilerTask.results();
-
     final List<TestRunResultChecked> resultUnits = results.stream()
       .map(result -> mapToResultUnit(result, taskEntity))
       .toList();
@@ -176,6 +178,8 @@ public abstract class AbstractCompilerService implements ICompilerService {
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+
+    this.socketPublisher.notifyTaskUpdate("dr092", run);
 
     compilerTask.processed(true);
     this.compilerTaskRepository.save(compilerTask);

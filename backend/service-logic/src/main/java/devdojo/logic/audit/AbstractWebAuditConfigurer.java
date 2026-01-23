@@ -16,6 +16,6 @@ public abstract class AbstractWebAuditConfigurer implements IWebAuditConfigurer 
 
   @Override
   public void addInterceptors(@NotNull final InterceptorRegistry registry) {
-    registry.addInterceptor(this.webAudit);
+    registry.addInterceptor(this.webAudit).excludePathPatterns("/ws/**");
   }
 }

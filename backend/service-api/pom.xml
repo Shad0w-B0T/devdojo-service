@@ -42,6 +42,11 @@
       <artifactId>spring-boot-starter-web</artifactId>
       <version>${dependency.version.spring}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-websocket</artifactId>
+      <version>${dependency.version.spring}</version>
+    </dependency>
 
     <!-- ### DB -->
     <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
