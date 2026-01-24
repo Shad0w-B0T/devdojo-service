@@ -57,7 +57,8 @@ public abstract class AbstractTaskService implements ITaskService {
       return this.taskRepository.findAll();
     }
 
-    final LanguageEntity languageEntity = this.languageService.getLanguage(getTasksByLangauge::languageId);
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(getTasksByLangauge.languageId()));
 
     return this.taskRepository.findAllByLanguageEntity(languageEntity);
   }
@@ -89,7 +90,8 @@ public abstract class AbstractTaskService implements ITaskService {
   @Transactional
   public TaskEntity createTask(final CreateTask createTask) {
     log.info("Creating new task with name '{}'", createTask.name());
-    final LanguageEntity languageEntity = this.languageService.getLanguage(createTask::languageId);
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(createTask.languageId()));
 
     final TaskEntity task = new TaskEntity(
       languageEntity,

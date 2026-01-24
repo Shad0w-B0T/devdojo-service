@@ -12,7 +12,6 @@ import devdojo.schema.user.UserRole;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.validation.annotation.Validated;
@@ -30,7 +29,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
   }
 
   /**
-   * Creates a new {@link LanguageEntity} based on the provided {@link LanguageCreate} data.
+   * Creates a new {@link LanguageEntity} based on the provided {@link CreateLanguage} data.
    * <p>
    * This method validates that the language name and description are not {@code null},
    * checks for duplicate language names, and attempts to persist the new language entity
@@ -39,7 +38,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
    * a {@link DatabaseException} is thrown.
    * </p>
    *
-   * @param languageCreate the data used to create the new language; must not be {@code null}
+   * @param createLanguage the data used to create the new language; must not be {@code null}
    * @return the newly created {@link LanguageEntity}
    * @throws NullPointerException   if the language name or description is {@code null}
    * @throws AlreadyExistsException if a language with the same name already exists
@@ -48,20 +47,20 @@ public abstract class AbstractLanguageService implements ILanguageService {
   @RoleRequired(role = UserRole.ADMIN)
   @Override
   @Transactional
-  public LanguageEntity createLanguage(final LanguageCreate languageCreate) {
-    log.info("Trying to create a new language: '" + languageCreate.languageName() + "'.");
+  public LanguageEntity createLanguage(final CreateLanguage createLanguage) {
+    log.info("Trying to create a new language: '" + createLanguage.languageName() + "'.");
 
-    if (this.languageRepository.existsByLanguageName(languageCreate.languageName())) {
-      throw new AlreadyExistsException(languageCreate.languageName());
+    if (this.languageRepository.existsByLanguageName(createLanguage.languageName())) {
+      throw new AlreadyExistsException(createLanguage.languageName());
     }
 
-    log.info("Created new language with name: '" + languageCreate.languageName() + "'.");
+    log.info("Created new language with name: '" + createLanguage.languageName() + "'.");
 
     final LanguageEntity languageEntity;
     try {
       final String token = RandomStringGenerator.generateRandomString(128);
-      languageEntity = this.languageRepository.save(new LanguageEntity(token, languageCreate.languageName(),
-        languageCreate.description(), languageCreate.active()));
+      languageEntity = this.languageRepository.save(new LanguageEntity(token, createLanguage.languageName(),
+        createLanguage.description(), createLanguage.active()));
     } catch (final DataAccessException exception) {
       throw new DatabaseException("Error while creating language in database.", exception);
     }
@@ -70,22 +69,22 @@ public abstract class AbstractLanguageService implements ILanguageService {
 
 
   /**
-   * Retrieves a {@link LanguageEntity} based on the provided {@link LanguageGet} request.
+   * Retrieves a {@link LanguageEntity} based on the provided {@link GetLanguage} request.
    * <p>
    * This method checks that the {@code languageGet} parameter is not {@code null},
    * logs the attempt to retrieve the language, and then returns the corresponding
    * {@link LanguageEntity}. If the language cannot be found, it throws an appropriate exception.
    * </p>
    *
-   * @param languageGet an object containing the UUID of the language to retrieve; must not be {@code null}
+   * @param getLanguage an object containing the UUID of the language to retrieve; must not be {@code null}
    * @return the {@link LanguageEntity} associated with the provided UUID
    * @throws NullPointerException if {@code languageGet} is {@code null}
    * @throws NotFoundException    if no language entity with the given ID exists
    */
   @Override
   @Transactional
-  public LanguageEntity getLanguage(final LanguageGet languageGet) {
-    return this.languageElseThrow(languageGet.languageId());
+  public LanguageEntity getLanguage(final GetLanguage getLanguage) {
+    return this.languageElseThrow(getLanguage.languageId());
   }
 
 
@@ -105,7 +104,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
   }
 
   /**
-   * Updates an existing {@link LanguageEntity} based on the provided {@link LanguageUpdate} data.
+   * Updates an existing {@link LanguageEntity} based on the provided {@link UpdateLanguage} data.
    * <p>
    * This method compares the incoming values with the current ones and applies only the changes.
    * If no fields are different, the entity is not updated in the database.
@@ -115,7 +114,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
    * error during saving, a {@link DatabaseException} is thrown.
    * </p>
    *
-   * @param languageUpdate the update data containing the ID and new values for the language; must not be {@code null}
+   * @param updateLanguage the update data containing the ID and new values for the language; must not be {@code null}
    * @return the updated {@link LanguageEntity}, or the existing one if no changes were made
    * @throws NullPointerException if {@code languageUpdate} is {@code null}
    * @throws NotFoundException    if the language with the given ID does not exist
@@ -124,12 +123,12 @@ public abstract class AbstractLanguageService implements ILanguageService {
   @RoleRequired(role = UserRole.ADMIN)
   @Override
   @Transactional
-  public LanguageEntity updateLanguage(final LanguageUpdate languageUpdate) {
-    final LanguageEntity languageEntity = this.languageElseThrow(languageUpdate.languageId());
+  public LanguageEntity updateLanguage(final UpdateLanguage updateLanguage) {
+    final LanguageEntity languageEntity = this.languageElseThrow(updateLanguage.languageId());
 
-    languageEntity.languageName(languageUpdate.languageName());
-    languageEntity.description(languageUpdate.description());
-    languageEntity.active(languageUpdate.active());
+    languageEntity.languageName(updateLanguage.languageName());
+    languageEntity.description(updateLanguage.description());
+    languageEntity.active(updateLanguage.active());
 
     final LanguageEntity updatedLanguageEntity;
     try {
@@ -143,7 +142,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
   }
 
   /**
-   * Deletes an existing {@link LanguageEntity} based on the provided {@link LanguageDelete} data.
+   * Deletes an existing {@link LanguageEntity} based on the provided {@link DeleteLanguage} data.
    * <p>
    * This method verifies the existence of the language entity and deletes it from the database.
    * After deletion, it performs a verification to ensure the entity was actually removed.
@@ -152,7 +151,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
    * If the entity is not successfully deleted or if a database error occurs, an appropriate exception is thrown.
    * </p>
    *
-   * @param languageDelete the data containing the ID of the language to delete; must not be {@code null}
+   * @param deleteLanguage the data containing the ID of the language to delete; must not be {@code null}
    * @return {@code true} if the language was successfully deleted
    * @throws NullPointerException if {@code languageDelete} is {@code null}
    * @throws NotFoundException    if the language with the given ID does not exist
@@ -162,8 +161,8 @@ public abstract class AbstractLanguageService implements ILanguageService {
   @RoleRequired(role = UserRole.ADMIN)
   @Transactional
   @Override
-  public LanguageEntity deleteLanguage(final LanguageDelete languageDelete) {
-    final String id = languageDelete.languageId();
+  public LanguageEntity deleteLanguage(final DeleteLanguage deleteLanguage) {
+    final String id = deleteLanguage.languageId();
     final LanguageEntity languageEntity = this.languageElseThrow(id);
 
     try {
@@ -175,7 +174,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
 
     // check if language was successfully deleted from db
     if (this.languageRepository.existsByExternalId(id)) {
-      throw new DeletionException(languageDelete.languageId());
+      throw new DeletionException(deleteLanguage.languageId());
     }
 
     log.info("Language {} is now permanently removed.", languageEntity.id());

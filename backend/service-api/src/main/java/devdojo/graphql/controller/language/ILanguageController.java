@@ -2,7 +2,6 @@ package devdojo.graphql.controller.language;
 
 import devdojo.logic.database.language.LanguageEntity;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 
 public interface ILanguageController {
 

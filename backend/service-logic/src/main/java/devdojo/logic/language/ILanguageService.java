@@ -4,29 +4,28 @@ import devdojo.logic.database.language.LanguageEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 public interface ILanguageService {
 
   /**
    * Creates a new language entry in the system.
    *
-   * @param languageCreate contains the data to create a language.
+   * @param createLanguage contains the data to create a language.
    * @return the created LanguageEntity.
    */
   @NotNull(message = "Created language must not be null")
   LanguageEntity createLanguage(@NotNull(message = "Language create data must not be null")
-                                @Valid final LanguageCreate languageCreate);
+                                @Valid final ILanguageService.CreateLanguage createLanguage);
 
   /**
    * Retrieves a language entity based on its unique identifier.
    *
-   * @param languageGet contains the language id.
+   * @param getLanguage contains the language id.
    * @return the found LanguageEntity, or {@code null} if no such entity exists.
    */
   @NotNull(message = "Returned language must not be null")
   LanguageEntity getLanguage(@NotNull(message = "Language get data must not be null")
-                             @Valid final LanguageGet languageGet);
+                             @Valid final ILanguageService.GetLanguage getLanguage);
 
   /**
    * Retrieves all language entities from the repository.
@@ -40,60 +39,71 @@ public interface ILanguageService {
   /**
    * Updates an existing language entry in the system.
    *
-   * @param languageUpdate contains the update data.
+   * @param updateLanguage contains the update data.
    * @return the updated LanguageEntity.
    */
   @NotNull(message = "Updated language must not be null")
   LanguageEntity updateLanguage(@NotNull(message = "Language update data must not be null")
-                                @Valid final LanguageUpdate languageUpdate);
+                                @Valid final ILanguageService.UpdateLanguage updateLanguage);
 
   /**
    * Deletes a language entity from the system using its unique identifier.
    *
-   * @param languageDelete contains the language id.
+   * @param deleteLanguage contains the language id.
    * @return the deleted LanguageEntity, or {@code null} if no entity was found.
    */
   @NotNull(message = "Deleted language must not be null")
   LanguageEntity deleteLanguage(@NotNull(message = "Language delete data must not be null")
-                                @Valid final LanguageDelete languageDelete);
+                                @Valid final ILanguageService.DeleteLanguage deleteLanguage);
 
-  interface GetLanguages {
-    boolean onlyActive();
+  record GetLanguages(
+    boolean onlyActive
+  ) {
   }
 
-  interface LanguageGet {
+  record GetLanguage(
+
     @NotNull(message = "Language ID must not be null")
-    String languageId();
+    String languageId
+
+  ) {
   }
 
-  interface LanguageCreate {
-    @NotNull(message = "Language name must not be null")
-    String languageName();
-
-    @NotNull(message = "Description must not be null")
-    String description();
-
-    @NotNull(message = "Active must not be null")
-    boolean active();
-  }
-
-  interface LanguageUpdate {
-    @NotNull(message = "Language ID must not be null")
-    String languageId();
+  record CreateLanguage(
 
     @NotNull(message = "Language name must not be null")
-    String languageName();
+    String languageName,
 
     @NotNull(message = "Description must not be null")
-    String description();
+    String description,
 
-    @NotNull(message = "Active must not be null")
-    boolean active();
+    boolean active
+
+  ) {
   }
 
-  interface LanguageDelete {
+  record UpdateLanguage(
+
     @NotNull(message = "Language ID must not be null")
-    String languageId();
+    String languageId,
+
+    @NotNull(message = "Language name must not be null")
+    String languageName,
+
+    @NotNull(message = "Description must not be null")
+    String description,
+
+    boolean active
+
+  ) {
+  }
+
+  record DeleteLanguage(
+
+    @NotNull(message = "Language ID must not be null")
+    String languageId
+
+  ) {
   }
 }
 

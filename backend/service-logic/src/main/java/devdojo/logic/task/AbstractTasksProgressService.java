@@ -74,7 +74,8 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
   @Override
   public int getUserRank(@P("q") final GetUserRank getUserRank) {
     final UserEntity userEntity = this.userService.getUser(getUserRank.userId());
-    final LanguageEntity languageEntity = this.languageService.getLanguage(getUserRank::languageId);
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(getUserRank.languageId()));
 
     return this.taskProgressRepository.getUserRankForLanguage(userEntity.id(), languageEntity.id());
   }
@@ -91,7 +92,8 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
       throw new NotFoundException("No language id provied to get next.");
     }
 
-    final LanguageEntity languageEntity = this.languageService.getLanguage(() -> languageId);
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(languageId));
 
     List<TaskEntity> tasks;
 
@@ -124,7 +126,8 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
   @RoleRequired(role = UserRole.USER)
   @Override
   public List<TaskProgressRepository.UserRankingProjection> getLeaderboard(final GetLeaderboard getLeaderboard) {
-    final LanguageEntity languageEntity = this.languageService.getLanguage(getLeaderboard::languageId);
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(getLeaderboard.languageId()));
 
     return this.taskProgressRepository.findUsersWithRankByLanguage(languageEntity.id(), getLeaderboard.start(),
       getLeaderboard.end());
