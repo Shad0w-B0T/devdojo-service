@@ -1,5 +1,6 @@
 package devdojo.graphql.controller.user;
 
+import devdojo.graphql.input.user.GetUser;
 import devdojo.graphql.input.user.UpdateUserName;
 import devdojo.graphql.input.user.UpdateUserRole;
 import devdojo.logic.database.user.UserEntity;
@@ -17,6 +18,9 @@ public interface IUserController {
 
   @NotNull
   UserEntity userSelf();
+
+  @NotNull
+  UserEntity user(@NotNull final GetUser input);
 
   // ────── Mutations ──────
 

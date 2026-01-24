@@ -82,10 +82,9 @@ public interface IUserService {
                         @Valid final UserDelete userDelete);
 
   interface UserGet {
-    @NotNull(message = "User ID must not be null")
+
     UUID userId();
 
-    @NotNull(message = "Auth ID must not be null")
     String authId();
   }
 
