@@ -66,17 +66,7 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
   @Override
   public TaskProgressEntity getTaskProgress(@P("#userId") final String userId,
                                             final String taskId) {
-    return this.getTaskProgress(new GetTaskProgress() {
-      @Override
-      public String userId() {
-        return userId;
-      }
-
-      @Override
-      public String taskId() {
-        return taskId;
-      }
-    });
+    return this.getTaskProgress(new GetTaskProgress(userId, taskId));
   }
 
   @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
@@ -142,7 +132,8 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
 
   @Override
   public TaskProgressEntity updateTaskProgress(final UpdateTaskProgress updateTaskProgress) {
-    final TaskProgressTrio trio = this.taskProgress(updateTaskProgress);
+    final TaskProgressTrio trio =
+      this.taskProgress(new GetTaskProgress(updateTaskProgress.userId(), updateTaskProgress.taskId()));
     TaskProgressEntity taskProgressEntity = trio.taskProgressEntity();
 
     if (!trio.taskEntity().active()) {
@@ -174,37 +165,18 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
 
   @Override
   public TaskProgressEntity updateTaskProgress(final UpdateTaskProgressInput updateTaskProgressInput) {
-    return this.updateTaskProgress(new UpdateTaskProgress() {
-      @Override
-      public TaskProgressState state() {
-        return TaskProgressState.RUNNING;
-      }
-
-      @Override
-      public int score() {
-        return 0;
-      }
-
-      @Override
-      public String userId() {
-        return updateTaskProgressInput.userId();
-      }
-
-      @Override
-      public String taskId() {
-        return updateTaskProgressInput.taskId();
-      }
-
-      @Override
-      public String input() {
-        return updateTaskProgressInput.input();
-      }
-    });
+    return this.updateTaskProgress(new UpdateTaskProgress(
+      updateTaskProgressInput.userId(),
+      updateTaskProgressInput.taskId(),
+      updateTaskProgressInput.input(),
+      TaskProgressState.RUNNING,
+      0
+    ));
   }
 
   private TaskProgressTrio taskProgress(final GetTaskProgress getTaskProgress) {
     final UserEntity userEntity = this.userService.getUser(getTaskProgress.userId());
-    final TaskEntity taskEntity = this.taskService.getTask(() -> getTaskProgress.taskId());
+    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(getTaskProgress.taskId()));
 
     return new TaskProgressTrio(userEntity,
       taskEntity,

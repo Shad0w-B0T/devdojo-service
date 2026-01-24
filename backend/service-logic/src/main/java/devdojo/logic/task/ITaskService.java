@@ -6,6 +6,8 @@ import devdojo.schema.task.ArgumentType;
 import devdojo.schema.task.Difficulty;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +18,7 @@ import java.util.UUID;
 public interface ITaskService {
 
   @NotNull(message = "Returned tasks must not be null")
-  List<TaskEntity> getTasks(final GetTasks getTasks);
+  List<TaskEntity> getTasks(final GetTasksByLangauge getTasksByLangauge);
 
   @NotNull(message = "Returned task must not be null")
   TaskEntity getTask(
@@ -59,125 +61,151 @@ public interface ITaskService {
 
   // ———— DTOs ————
 
-  interface GetTasks {
-    String languageId();
+  record GetTasksByLangauge(
+    @NotNull(message = "Language ID must not be null")
+    String languageId
+  ) {
   }
 
-  interface GetTask {
+  record GetTask(
     @NotNull(message = "Task ID must not be null")
-    String taskId();
+    String taskId
+  ) {
   }
 
-  interface CreateTask {
+  record CreateTask(
+
     @NotNull(message = "LanguageId must not be null")
-    String languageId();
+    String languageId,
 
     @NotNull(message = "Task name must not be null")
-    String name();
+    String name,
 
     @NotNull(message = "Task description must not be null")
-    String description();
+    String description,
 
     @NotNull(message = "Task difficulty must not be null")
-    Difficulty difficulty();
+    Difficulty difficulty,
 
     @NotNull(message = "Task template must not be null")
-    String template();
+    String template,
 
     @NotNull(message = "Task complete field must not be null")
-    String complete();
+    String complete,
 
     @NotNull(message = "Unit tests list must not be null")
     @Valid
-    List<? extends TestData> unitTests();
+    List<? extends TestData> unitTests,
 
-    @NotNull(message = "Active must not be null")
-    boolean active();
+    boolean active,
 
     @Nullable
-    List<String> tags();
+    List<String> tags
+  ) {
   }
 
-  interface UpdateTask {
+  record UpdateTask(
+
     @NotNull(message = "Task ID must not be null")
-    String taskId();
+    String taskId,
 
     @NotNull(message = "Task name must not be null")
-    String name();
+    String name,
 
     @NotNull(message = "Task description must not be null")
-    String description();
+    String description,
 
-    @NotNull(message = "Task description must not be null")
-    Difficulty difficulty();
+    @NotNull(message = "Task difficulty must not be null")
+    Difficulty difficulty,
 
     @NotNull(message = "Task template must not be null")
-    String template();
+    String template,
 
     @NotNull(message = "Task complete field must not be null")
-    String complete();
+    String complete,
 
     @NotNull(message = "Unit tests list must not be null")
     @Valid
-    List<? extends TestData> unitTests();
+    List<? extends TestData> unitTests,
 
-    @NotNull(message = "Active must not be null")
-    boolean active();
+    boolean active,
 
     @Nullable
-    List<String> tags();
+    List<String> tags
+  ) {
   }
 
-  interface DeleteTask {
+  record DeleteTask(
+
     @NotNull(message = "Task ID must not be null")
-    String taskId();
+    String taskId
+
+  ) {
   }
 
-  interface AppendTest {
+  record AppendTest(
+
     @NotNull(message = "Task ID must not be null")
-    String taskId();
+    String taskId,
 
     @NotNull(message = "Unit test must not be null")
     @Valid
-    TestData unitTest();
+    TestData unitTest
+
+  ) {
   }
 
-  interface TestData {
+  record TestData(
+
     @NotNull(message = "Input arguments list must not be null")
     @Valid
-    List<? extends TestArgumentData> input();
+    List<? extends TestArgumentData> input,
 
     @NotNull(message = "Output argument must not be null")
     @Valid
-    TestArgumentData output();
+    TestArgumentData output
+
+  ) {
   }
 
-  interface RemoveTagFromTask {
-    @NotNull(message = "Task ID must not be null")
-    String taskId();
+  record TestArgumentData(
 
-    @NotNull(message = "Tag ID must not be null")
-    UUID tagId();
-  }
-
-  interface TestArgumentData {
     @NotNull(message = "Argument type must not be null")
-    ArgumentType type();
+    ArgumentType type,
 
-    String variant(); // optional, no @NotNull
+    String variant, // optional
 
     @NotNull(message = "Argument value must not be null")
-    Object value();
+    Object value
+
+  ) {
   }
 
-  interface SetTaskRating {
+  record RemoveTagFromTask(
+
     @NotNull(message = "Task ID must not be null")
-    String taskId();
+    String taskId,
+
+    @NotNull(message = "Tag ID must not be null")
+    UUID tagId
+
+  ) {
+  }
+
+  record SetTaskRating(
+
+    @NotNull(message = "Task ID must not be null")
+    String taskId,
 
     @NotNull(message = "User ID must not be null")
-    String userId();
+    String userId,
 
-    int rating();
+
+    @Min(1)
+    @Max(5)
+    int rating
+
+  ) {
   }
 
 }

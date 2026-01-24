@@ -1,12 +1,10 @@
 package devdojo.graphql.controller.user;
 
-import devdojo.graphql.input.user.UpdateUserName;
-import devdojo.graphql.input.user.UpdateUserRole;
 import devdojo.logic.database.user.UserEntity;
+import devdojo.logic.user.IUserService;
 import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 public interface IUserController {
 
@@ -18,13 +16,13 @@ public interface IUserController {
   @NotNull
   UserEntity userSelf();
 
+  @NotNull
+  UserEntity user(@NotNull final IUserService.GetUserByAuthId input);
+
   // ────── Mutations ──────
 
   @NotNull
-  UserEntity updateUserName(@NotNull final UpdateUserName input);
-
-  @NotNull
-  UserEntity updateUserRole(@NotNull final UpdateUserRole input);
+  UserEntity updateUserRole(@NotNull final IUserService.UpdateUserRole input);
 
   // ────── Schema ──────
 

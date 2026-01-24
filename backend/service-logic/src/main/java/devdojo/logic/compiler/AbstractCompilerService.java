@@ -119,7 +119,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
       .findById(completeCompilerTask.id())
       .orElseThrow(() -> new NotFoundException("No compiler task found for id=" + completeCompilerTask.id()));
 
-    final TaskEntity taskEntity = this.taskService.getTask(compilerTask::taskId);
+    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(compilerTask.taskId()));
     final List<TestRunResult> results = completeCompilerTask.results();
     final List<TestRunResultChecked> resultUnits = results.stream()
       .map(result -> mapToResultUnit(result, taskEntity))
@@ -142,33 +142,14 @@ public abstract class AbstractCompilerService implements ICompilerService {
     int finalScore = score;
     TaskProgressState finalState = state;
 
-    final TaskProgressEntity taskProgressEntity =
-      this.tasksProgressService.updateTaskProgress(new ITasksProgressService.UpdateTaskProgress() {
-        @Override
-        public String input() {
-          return compilerTask.methodCode().trim();
-        }
-
-        @Override
-        public TaskProgressState state() {
-          return finalState;
-        }
-
-        @Override
-        public int score() {
-          return finalScore;
-        }
-
-        @Override
-        public String userId() {
-          return compilerTask.userId();
-        }
-
-        @Override
-        public String taskId() {
-          return taskEntity.externalId();
-        }
-      });
+    final TaskProgressEntity taskProgressEntity = this.tasksProgressService
+      .updateTaskProgress(new ITasksProgressService.UpdateTaskProgress(
+        compilerTask.userId(),
+        taskEntity.externalId(),
+        compilerTask.methodCode().trim(),
+        finalState,
+        finalScore
+      ));
 
     final TestRun run = new TestRun(
       compilerTask.id(),

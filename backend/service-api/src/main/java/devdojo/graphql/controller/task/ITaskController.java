@@ -1,10 +1,11 @@
 package devdojo.graphql.controller.task;
 
-import devdojo.graphql.input.task.*;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
 import devdojo.logic.database.user.UserEntity;
+import devdojo.logic.task.ITaskService;
+import devdojo.logic.task.ITasksProgressService;
 import devdojo.schema.task.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -14,36 +15,37 @@ public interface ITaskController {
   // ────── Queries ──────
 
   @NotNull
-  List<TaskEntity> tasks(final GetTasks getTasks);
+  List<TaskEntity> tasks(final ITaskService.GetTasksByLangauge getTasks);
 
   @NotNull
-  TaskEntity task(@NotNull final GetTask getTask);
+  TaskEntity task(@NotNull final ITaskService.GetTask getTask);
 
   @NotNull
-  double taskRating(@NotNull final GetTask getTask);
+  double taskRating(@NotNull final ITaskService.GetTask getTask);
 
   @NotNull
-  TaskEntity nextTask(@NotNull final GetNextTask getNextTask);
+  TaskEntity nextTask(@NotNull final ITasksProgressService.GetNextTask getNextTask);
 
-  int userRank(@NotNull final GetUserRank getUserRank);
+  int userRank(@NotNull final ITasksProgressService.GetUserRank getUserRank);
 
   @NotNull
-  List<TaskProgressRepository.UserRankingProjection> leaderboard(@NotNull final GetLeaderboard getLeaderboard);
+  List<TaskProgressRepository.UserRankingProjection> leaderboard(
+    @NotNull final ITasksProgressService.GetLeaderboard getLeaderboard);
 
   // ────── Mutations ──────
 
   @NotNull
-  TaskEntity createTask(@NotNull CreateTask input);
+  TaskEntity createTask(@NotNull ITaskService.CreateTask input);
 
   @NotNull
-  TaskEntity updateTask(@NotNull UpdateTask input);
+  TaskEntity updateTask(@NotNull ITaskService.UpdateTask input);
 
   @NotNull
-  TaskEntity appendUnitTest(@NotNull AppendTest input);
+  TaskEntity appendUnitTest(@NotNull ITaskService.AppendTest input);
 
-  boolean updateTaskUserInput(@NotNull UpdateTaskUserInput input);
+  boolean updateTaskUserInput(@NotNull ITasksProgressService.UpdateTaskProgressInput input);
 
-  boolean setTaskRating(@NotNull final SetTaskRating setTaskRating);
+  boolean setTaskRating(@NotNull final ITaskService.SetTaskRating setTaskRating);
 
   // ────── Schema ──────
 

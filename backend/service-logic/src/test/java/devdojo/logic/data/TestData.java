@@ -79,10 +79,10 @@ public class TestData {
     TASK_ENTITY_PYTHON_1
   );
 
-  private record GetTasks(UUID languageId) implements ITaskService.GetTasks {
+  private record GetTasks(UUID languageId) implements ITaskService.GetTasksByLangauge {
   }
 
-  public static final ITaskService.GetTasks GET_TASKS = new GetTasks(LANGUAGE_ID);
+  public static final ITaskService.GetTasksByLangauge GET_TASKS = new GetTasks(LANGUAGE_ID);
 
   private record GetTask(UUID taskId) implements ITaskService.GetTask {
   }

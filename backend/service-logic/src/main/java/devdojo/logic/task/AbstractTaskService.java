@@ -4,11 +4,9 @@ import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.*;
 import devdojo.logic.database.user.UserEntity;
-import devdojo.logic.database.user.UserRepository;
 import devdojo.logic.language.ILanguageService;
 import devdojo.logic.user.IUserService;
 import devdojo.logic.security.SecurityUtils;
-import devdojo.logic.user.IUserService;
 import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.NotFoundException;
@@ -21,7 +19,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
@@ -55,12 +52,12 @@ public abstract class AbstractTaskService implements ITaskService {
 
   @Transactional
   @Override
-  public List<TaskEntity> getTasks(final GetTasks getTasks) {
-    if (getTasks == null || getTasks.languageId() == null) {
+  public List<TaskEntity> getTasks(final GetTasksByLangauge getTasksByLangauge) {
+    if (getTasksByLangauge == null || getTasksByLangauge.languageId() == null) {
       return this.taskRepository.findAll();
     }
 
-    final LanguageEntity languageEntity = this.languageService.getLanguage(getTasks::languageId);
+    final LanguageEntity languageEntity = this.languageService.getLanguage(getTasksByLangauge::languageId);
 
     return this.taskRepository.findAllByLanguageEntity(languageEntity);
   }

@@ -1,6 +1,5 @@
 package devdojo.graphql.controller.task;
 
-import devdojo.graphql.input.task.*;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.TaskEntity;
@@ -42,72 +41,73 @@ public abstract class AbstractTaskController implements ITaskController {
 
   @QueryMapping("tasks")
   @Override
-  public @NotNull List<TaskEntity> tasks(@Argument("input") final GetTasks getTasks) {
+  public @NotNull List<TaskEntity> tasks(@Argument("input") final ITaskService.GetTasksByLangauge getTasks) {
     return this.taskService.getTasks(getTasks);
   }
 
   @QueryMapping("task")
   @Override
-  public @NotNull TaskEntity task(@Argument("input") @NotNull final GetTask getTask) {
+  public @NotNull TaskEntity task(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
     return this.taskService.getTask(getTask);
   }
 
   @QueryMapping("taskRating")
   @Override
-  public double taskRating(@Argument("input") @NotNull final GetTask getTask) {
+  public double taskRating(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
     return this.taskService.getTaskRating(getTask);
   }
 
   @QueryMapping("nextTask")
   @Override
-  public TaskEntity nextTask(@Argument("input") @NotNull final GetNextTask getNextTask) {
+  public TaskEntity nextTask(@Argument("input") @NotNull final ITasksProgressService.GetNextTask getNextTask) {
     return this.tasksProgressService.getNextTask(getNextTask);
   }
 
   @QueryMapping("userRank")
   @Override
-  public int userRank(@Argument("input") final GetUserRank getUserRank) {
+  public int userRank(@Argument("input") final ITasksProgressService.GetUserRank getUserRank) {
     return this.tasksProgressService.getUserRank(getUserRank);
   }
 
   @QueryMapping("leaderboard")
   @Override
   public List<TaskProgressRepository.UserRankingProjection> leaderboard(
-    @Argument("input") final GetLeaderboard getLeaderboard) {
+    @Argument("input") final ITasksProgressService.GetLeaderboard getLeaderboard) {
     return this.tasksProgressService.getLeaderboard(getLeaderboard);
   }
 
   @MutationMapping("createTask")
-  public @NotNull TaskEntity createTask(@Argument("input") @NotNull final CreateTask input) {
+  public @NotNull TaskEntity createTask(@Argument("input") @NotNull final ITaskService.CreateTask input) {
     return this.taskService.createTask(input);
   }
 
   @MutationMapping("updateTask")
-  public @NotNull TaskEntity updateTask(@Argument("input") @NotNull final UpdateTask input) {
+  public @NotNull TaskEntity updateTask(@Argument("input") @NotNull final ITaskService.UpdateTask input) {
     return this.taskService.updateTask(input);
   }
 
   @MutationMapping("appendUnitTest")
-  public @NotNull TaskEntity appendUnitTest(@Argument("input") @NotNull final AppendTest input) {
+  public @NotNull TaskEntity appendUnitTest(@Argument("input") @NotNull final ITaskService.AppendTest input) {
     return this.taskService.appendUnitTest(input);
   }
 
   @MutationMapping("updateTaskUserInput")
   @Override
-  public boolean updateTaskUserInput(@Argument("input") @NotNull final UpdateTaskUserInput input) {
+  public boolean updateTaskUserInput(
+    @Argument("input") @NotNull final ITasksProgressService.UpdateTaskProgressInput input) {
     this.tasksProgressService.updateTaskProgress(input);
     return true;
   }
 
 
   @MutationMapping("removeTagFromTask")
-  public boolean removeTagFromTask(@Argument("input") @NotNull final RemoveTagFromTask input) {
+  public boolean removeTagFromTask(@Argument("input") @NotNull final ITaskService.RemoveTagFromTask input) {
     return this.taskService.removeTagFromTask(input);
   }
 
   @MutationMapping("setTaskRating")
   @Override
-  public boolean setTaskRating(@Argument("input") @NotNull final SetTaskRating setTaskRating) {
+  public boolean setTaskRating(@Argument("input") @NotNull final ITaskService.SetTaskRating setTaskRating) {
     return this.taskService.setTaskRating(setTaskRating) != null;
   }
 
@@ -201,7 +201,7 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "Task", value = "rating")
   @Override
   public double rating(@NotNull final TaskEntity task) {
-    return this.taskService.getTaskRating(task::externalId);
+    return this.taskService.getTaskRating(new ITaskService.GetTask(task.externalId()));
   }
 
   @SchemaMapping(typeName = "TaskUserProgress", value = "input")

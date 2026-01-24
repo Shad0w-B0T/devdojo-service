@@ -27,13 +27,17 @@ input UpdateUserRole {
     role: UserRole!
 }
 
+input GetUser {
+    userId: ID!
+}
+
 extend type Query {
     users: [User!]!
+    user(input: GetUser!): User!
     userSelf: User!
 }
 
 extend type Mutation {
-    updateUserName(input: UpdateUserName!): User!
     updateUserRole(input: UpdateUserRole!): User!
 }
 
