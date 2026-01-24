@@ -17,6 +17,8 @@ import java.util.UUID;
  */
 public interface ITaskService {
 
+  int RATING_MAX = 5;
+
   @NotNull(message = "Returned tasks must not be null")
   List<TaskEntity> getTasks(final GetTasksByLangauge getTasksByLangauge);
 
@@ -202,7 +204,7 @@ public interface ITaskService {
 
 
     @Min(1)
-    @Max(5)
+    @Max(RATING_MAX)
     int rating
 
   ) {
