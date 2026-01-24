@@ -11,9 +11,24 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 public abstract class AbstractWebSocketConfig implements IWebSocketConfig {
 
   private final @NotNull JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final String rabbitHost;
+  private final int rabbitPort;
+  private final String rabbitUsername;
+  private final String rabbitPassword;
+  private final String rabbitVirtualHost;
 
-  public AbstractWebSocketConfig(final JwtAuthenticationFilter jwtAuthenticationFilter) {
+  public AbstractWebSocketConfig(final JwtAuthenticationFilter jwtAuthenticationFilter,
+                                 final String rabbitHost,
+                                 final int rabbitPort,
+                                 final String rabbitUsername,
+                                 final String rabbitPassword,
+                                 final String rabbitVirtualHost) {
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    this.rabbitHost = rabbitHost;
+    this.rabbitPort = rabbitPort;
+    this.rabbitUsername = rabbitUsername;
+    this.rabbitPassword = rabbitPassword;
+    this.rabbitVirtualHost = rabbitVirtualHost;
   }
 
   @Override
@@ -28,7 +43,15 @@ public abstract class AbstractWebSocketConfig implements IWebSocketConfig {
 
   @Override
   public void configureMessageBroker(final MessageBrokerRegistry registry) {
-    registry.enableSimpleBroker("/topic", "/queue");
+    registry
+      .enableStompBrokerRelay("/topic", "/queue")
+      .setRelayHost(this.rabbitHost)
+      .setRelayPort(this.rabbitPort)
+      .setClientLogin(this.rabbitUsername)
+      .setClientPasscode(this.rabbitPassword)
+      .setSystemLogin(this.rabbitUsername)
+      .setSystemPasscode(this.rabbitPassword)
+      .setVirtualHost(this.rabbitVirtualHost);
     registry.setApplicationDestinationPrefixes("/app");
     registry.setUserDestinationPrefix("/user");
   }

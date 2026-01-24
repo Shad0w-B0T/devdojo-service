@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.parameters.P;
@@ -50,6 +51,11 @@ public abstract class AbstractUserService implements IUserService {
   public UserEntity getUser(final GetUserByAuthId getUserByAuthId) {
     return this.userRepository.findByAuthId(getUserByAuthId.authId())
       .orElseThrow(() -> new NotFoundException("No user found with authId: " + getUserByAuthId.authId()));
+  }
+
+  @Override
+  public UserEntity getInternalUser(final UUID id) {
+    return this.userRepository.findById(id).orElseThrow(() -> new NotFoundException("No user found with id: " + id));
   }
 
   /**
@@ -202,7 +208,6 @@ public abstract class AbstractUserService implements IUserService {
    * @throws NotFoundException    if no user is found with the specified ID
    */
   private @NotNull UserEntity userElseThrow(final String id) {
-    log.info("Trying to get user with id: '{}'.", id);
     return this.userRepository.findByExternalId(id).orElseThrow(() -> new NotFoundException(id));
   }
 }

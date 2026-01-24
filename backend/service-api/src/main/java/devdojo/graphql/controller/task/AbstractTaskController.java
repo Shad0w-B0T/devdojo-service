@@ -255,8 +255,7 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "UserRanking", value = "user")
   @Override
   public @NotNull UserEntity user(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
-    System.out.println(userRankingProjection.externalUserId());
-    return this.userService.getUser(userRankingProjection.externalUserId());
+    return this.userService.getInternalUser(userRankingProjection.userId());
   }
 
   @SchemaMapping(typeName = "UserRanking", value = "totalScore")

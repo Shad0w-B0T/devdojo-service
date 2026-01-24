@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * User service interface for basic CRUD operations.
@@ -21,6 +22,8 @@ public interface IUserService {
   @NotNull(message = "Returned user must not be null")
   UserEntity getUser(@NotNull(message = "User get data must not be null")
                      @Valid final GetUser getUser);
+
+  UserEntity getInternalUser(@NotNull final UUID id);
 
   @NotNull(message = "Returned user must not be null")
   UserEntity getUser(@NotNull(message = "User get data must not be null")
