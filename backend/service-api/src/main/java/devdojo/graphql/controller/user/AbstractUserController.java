@@ -1,5 +1,6 @@
 package devdojo.graphql.controller.user;
 
+import devdojo.graphql.input.user.GetUser;
 import devdojo.graphql.input.user.UpdateUserName;
 import devdojo.graphql.input.user.UpdateUserRole;
 import devdojo.logic.database.user.UserEntity;
@@ -33,6 +34,13 @@ public abstract class AbstractUserController implements IUserController {
   @Override
   public @NotNull UserEntity userSelf() {
     return this.userService.getUser(SecurityUtils.currentTokenDetails().userId());
+  }
+
+  @QueryMapping("user")
+  public @NotNull UserEntity user(
+    @Argument("input") final GetUser input
+  ) {
+    return this.userService.getUser(input);
   }
 
   @MutationMapping("updateUserName")
