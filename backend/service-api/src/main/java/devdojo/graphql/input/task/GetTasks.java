@@ -5,5 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 
-public record GetTasks(@NotNull(message = "LanguageId cannot be null.") UUID languageId) implements ITaskService.GetTasks {
+public record GetTasks(@NotNull(message = "LanguageId cannot be null.") String languageId)
+  implements ITaskService.GetTasks {
 }

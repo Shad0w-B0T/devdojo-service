@@ -4,7 +4,7 @@ import devdojo.logic.user.IUserService;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
-public record UpdateUserName(@NotNull UUID userId,
+public record UpdateUserName(@NotNull String userId,
                              @NotNull String name) implements IUserService.UserDisplayNameUpdate {
   @Override
   public String displayName() {

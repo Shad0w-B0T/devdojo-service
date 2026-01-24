@@ -63,7 +63,7 @@ public interface ILanguageService {
 
   interface LanguageGet {
     @NotNull(message = "Language ID must not be null")
-    UUID languageId();
+    String languageId();
   }
 
   interface LanguageCreate {
@@ -79,7 +79,7 @@ public interface ILanguageService {
 
   interface LanguageUpdate {
     @NotNull(message = "Language ID must not be null")
-    UUID languageId();
+    String languageId();
 
     @NotNull(message = "Language name must not be null")
     String languageName();
@@ -93,7 +93,7 @@ public interface ILanguageService {
 
   interface LanguageDelete {
     @NotNull(message = "Language ID must not be null")
-    UUID languageId();
+    String languageId();
   }
 }
 

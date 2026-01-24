@@ -81,8 +81,11 @@ public abstract class AbstractEntity implements Identifiable<UUID>, DateAuditabl
       this.updatedAt = new Date();
     }
 
+    this.handlePrePersist();
     log.debug("Created entity={} with id={}", this.getClass().getSimpleName(), this.id);
   }
+
+  protected void handlePrePersist() {}
 
   /**
    * Method invoked before updating the entity.

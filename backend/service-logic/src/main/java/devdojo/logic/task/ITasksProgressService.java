@@ -18,8 +18,8 @@ public interface ITasksProgressService {
   TaskProgressEntity getTaskProgress(@NotNull final GetTaskProgress getTaskProgress);
 
   @NotNull
-  TaskProgressEntity getTaskProgress(@NotNull(message = "userId must not be null") final UUID userId,
-                                     @NotNull(message = "taskId must not be null") final UUID taskId);
+  TaskProgressEntity getTaskProgress(@NotNull(message = "userId must not be null") final String userId,
+                                     @NotNull(message = "taskId must not be null") final String taskId);
 
   @NotNull
   TaskEntity getNextTask(@NotNull(message = "GetNextTask must not be null") final GetNextTask getNextTask);
@@ -40,28 +40,28 @@ public interface ITasksProgressService {
   // DTOs
   interface GetTaskProgresses {
     @NotNull(message = "completedTasksId must not be null")
-    UUID userId();
+    String userId();
   }
 
   interface GetTaskProgress {
     @NotNull(message = "userId must not be null")
-    UUID userId();
+    String userId();
 
     @NotNull(message = "taskId must not be null")
-    UUID taskId();
+    String taskId();
   }
 
   interface GetUserRank {
     @NotNull(message = "userId must not be null")
-    UUID userId();
+    String userId();
 
     @NotNull(message = "languageId must not be null")
-    UUID languageId();
+    String languageId();
   }
 
   interface GetLeaderboard {
     @NotNull(message = "languageId must not be null")
-    UUID languageId();
+    String languageId();
 
     @NotNull(message = "start must not be null")
     @Min(value = 0, message = "start must be greater than or equal to 0")
@@ -74,9 +74,9 @@ public interface ITasksProgressService {
 
   interface GetNextTask {
     @NotNull(message = "userId must not be null")
-    UUID userId();
+    String userId();
 
-    UUID languageId();
+    String languageId();
 
     @NotNull(message = "state must not be null")
     TaskProgressState state();

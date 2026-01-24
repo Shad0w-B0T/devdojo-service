@@ -8,7 +8,6 @@ import devdojo.schema.language.ILanguage;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -90,8 +89,8 @@ public abstract class AbstractLanguageController implements ILanguageController 
 
   @SchemaMapping(typeName = "Language", value = "id")
   @Override
-  public @NotNull UUID id(@NotNull final LanguageEntity languageEntity) {
-    return languageEntity.id();
+  public @NotNull String id(@NotNull final LanguageEntity languageEntity) {
+    return languageEntity.externalId();
   }
 
   @SchemaMapping(typeName = "Language", value = "token")

@@ -29,7 +29,7 @@ public abstract class AbstractLdapService implements ILdapService {
         }
 
         @Override
-        public java.util.UUID userId() {
+        public String userId() {
           return null;
         }
       });

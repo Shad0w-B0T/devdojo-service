@@ -1,6 +1,8 @@
+
 CREATE TABLE compiler
 (
     id           UUID             NOT NULL,
+    external_id  VARCHAR(255)     NOT NULL,
     created_at   TIMESTAMP WITHOUT TIME ZONE,
     updated_at   TIMESTAMP WITHOUT TIME ZONE,
     language_id  UUID             NOT NULL,
@@ -25,6 +27,7 @@ CREATE TABLE compiler_heartbeat
 CREATE TABLE language
 (
     id            UUID         NOT NULL,
+    external_id   VARCHAR(255) NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE,
     updated_at    TIMESTAMP WITHOUT TIME ZONE,
     token         VARCHAR(255) NOT NULL,
@@ -47,6 +50,7 @@ CREATE TABLE tag
 CREATE TABLE task
 (
     id              UUID         NOT NULL,
+    external_id     VARCHAR(255) NOT NULL,
     created_at      TIMESTAMP WITHOUT TIME ZONE,
     updated_at      TIMESTAMP WITHOUT TIME ZONE,
     language_id     UUID         NOT NULL,
@@ -118,18 +122,22 @@ CREATE TABLE user_settings
 
 CREATE TABLE users
 (
-    id               UUID         NOT NULL,
+    id               UUID                        NOT NULL,
+    external_id      VARCHAR(255)                NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE,
     updated_at       TIMESTAMP WITHOUT TIME ZONE,
-    auth_id          VARCHAR(255) NOT NULL,
-    email            VARCHAR(300) NOT NULL,
-    display_name     VARCHAR(255) NOT NULL,
-    ldap_role        SMALLINT     NOT NULL,
-    application_role SMALLINT NULL,
-    active           BOOLEAN      NOT NULL,
+    auth_id          VARCHAR(255)                NOT NULL,
+    email            VARCHAR(300)                NOT NULL,
+    display_name     VARCHAR(255)                NOT NULL,
+    ldap_role        SMALLINT                    NOT NULL,
+    application_role SMALLINT                    NOT NULL,
+    active           BOOLEAN                     NOT NULL,
     last_login       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
+
+ALTER TABLE task_rating
+    ADD CONSTRAINT uc_29fd3c079ac73a12c775d8a65 UNIQUE (task_id, user_id);
 
 ALTER TABLE task_user_progress
     ADD CONSTRAINT uc_7fe69ee6d550cd3315887c1f9 UNIQUE (user_id, task_id);
@@ -137,17 +145,29 @@ ALTER TABLE task_user_progress
 ALTER TABLE compiler
     ADD CONSTRAINT uc_compiler_compilerid UNIQUE (compiler_id);
 
+ALTER TABLE compiler
+    ADD CONSTRAINT uc_compiler_externalid UNIQUE (external_id);
+
+ALTER TABLE language
+    ADD CONSTRAINT uc_language_externalid UNIQUE (external_id);
+
 ALTER TABLE language
     ADD CONSTRAINT uc_language_languagename UNIQUE (language_name);
 
 ALTER TABLE language
     ADD CONSTRAINT uc_language_token UNIQUE (token);
 
+ALTER TABLE task
+    ADD CONSTRAINT uc_task_externalid UNIQUE (external_id);
+
 ALTER TABLE users
     ADD CONSTRAINT uc_users_authid UNIQUE (auth_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_displayname UNIQUE (display_name);
+
+ALTER TABLE users
+    ADD CONSTRAINT uc_users_externalid UNIQUE (external_id);
 
 CREATE INDEX contactEmailContactIdAndName ON task_user_progress (user_id, task_id);
 

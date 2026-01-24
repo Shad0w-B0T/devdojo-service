@@ -54,6 +54,7 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
   @Query(
     value = """
       SELECT ranked.user_id AS userId,
+             ranked.user_id AS externalUserId,      
              ranked.total_score AS totalScore,
              ranked.rank AS rank
       FROM (
@@ -144,6 +145,7 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
   }
 
   record UserRankingProjection(UUID userId,
+                               String externalUserId,
                                long totalScore,
                                long rank) {
   }

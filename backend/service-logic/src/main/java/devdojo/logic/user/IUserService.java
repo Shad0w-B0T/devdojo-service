@@ -29,10 +29,10 @@ public interface IUserService {
   UserEntity getUser(@NotNull(message = "User get data must not be null")
                      @Valid final UserGet userGet);
 
-  default @NotNull UserEntity getUser(@NotNull final UUID id) {
+  default @NotNull UserEntity getUser(@NotNull final String id) {
     return this.getUser(new UserGet() {
       @Override
-      public UUID userId() {
+      public String userId() {
         return id;
       }
 
@@ -83,7 +83,7 @@ public interface IUserService {
 
   interface UserGet {
     @NotNull(message = "User ID must not be null")
-    UUID userId();
+    String userId();
 
     @NotNull(message = "Auth ID must not be null")
     String authId();
@@ -110,7 +110,7 @@ public interface IUserService {
 
   interface UserUpdate {
     @NotNull(message = "User ID must not be null")
-    UUID userId();
+    String userId();
 
     @NotNull(message = "Email must not be null")
     String email();
@@ -129,7 +129,7 @@ public interface IUserService {
 
   interface UserDisplayNameUpdate {
     @NotNull(message = "User ID must not be null")
-    UUID userId();
+    String userId();
 
     @NotNull(message = "Display name must not be null")
     String displayName();
@@ -137,7 +137,7 @@ public interface IUserService {
 
   interface UserRoleUpdate {
     @NotNull(message = "User ID must not be null")
-    UUID userId();
+    String userId();
 
     @Nullable
     UserRole role();
@@ -145,7 +145,7 @@ public interface IUserService {
 
   interface UserDelete {
     @NotNull(message = "User ID must not be null")
-    UUID userId();
+    String userId();
   }
 }
 

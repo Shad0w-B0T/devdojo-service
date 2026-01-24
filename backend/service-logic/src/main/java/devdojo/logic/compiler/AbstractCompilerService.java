@@ -109,7 +109,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
   public CompilerTask createCompilerTask(final CreateCompilerTask createCompilerTask) {
     return this.compilerTaskRepository.save(
       new CompilerTask(createCompilerTask.id(), false, createCompilerTask.methodCode(),
-        UUID.fromString(createCompilerTask.taskId()), SecurityUtils.currentTokenDetails().userId()));
+        createCompilerTask.taskId(), SecurityUtils.currentTokenDetails().userId()));
   }
 
   @Transactional
@@ -160,13 +160,13 @@ public abstract class AbstractCompilerService implements ICompilerService {
         }
 
         @Override
-        public UUID userId() {
+        public String userId() {
           return compilerTask.userId();
         }
 
         @Override
-        public UUID taskId() {
-          return taskEntity.id();
+        public String taskId() {
+          return taskEntity.externalId();
         }
       });
 

@@ -6,7 +6,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
-public record UpdateUserRole(@NotNull UUID userId,
+public record UpdateUserRole(@NotNull String userId,
                              @Nullable UserRole role) implements IUserService.UserRoleUpdate {
 
 }

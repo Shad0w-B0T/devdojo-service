@@ -30,7 +30,7 @@ public interface IUserController {
 
   //User
   @NotNull(message = "ID cannot be null.")
-  UUID id(@NotNull final UserEntity userEntity);
+  String id(@NotNull final UserEntity userEntity);
 
   @NotNull(message = "Email cannot be null.")
   String email(@NotNull final UserEntity userEntity);

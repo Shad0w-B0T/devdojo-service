@@ -161,8 +161,8 @@ public abstract class AbstractUserService implements IUserService {
 
     return this.updateUser(new UserUpdate() {
       @Override
-      public UUID userId() {
-        return userEntity.id();
+      public String userId() {
+        return userEntity.externalId();
       }
 
       @Override
@@ -198,8 +198,8 @@ public abstract class AbstractUserService implements IUserService {
 
     return this.updateUser(new UserUpdate() {
       @Override
-      public UUID userId() {
-        return userEntity.id();
+      public String userId() {
+        return userEntity.externalId();
       }
 
       @Override
@@ -246,7 +246,7 @@ public abstract class AbstractUserService implements IUserService {
   @Transactional
   @Override
   public UserEntity deleteUser(@P("user") final UserDelete userDelete) {
-    final UUID id = userDelete.userId();
+    final String id = userDelete.userId();
     final UserEntity userEntity = this.userElseThrow(id);
 
     try {
@@ -257,7 +257,7 @@ public abstract class AbstractUserService implements IUserService {
     }
 
     // check if user was successfully deleted from db
-    if (this.userRepository.existsById(id)) {
+    if (this.userRepository.existsByExternalId(id)) {
       throw new DeletionException(id);
     }
 
@@ -277,8 +277,8 @@ public abstract class AbstractUserService implements IUserService {
    * @throws NullPointerException if the provided {@code id} is {@code null}
    * @throws NotFoundException    if no user is found with the specified ID
    */
-  private @NotNull UserEntity userElseThrow(final UUID id) {
-    log.info("Trying to get user with uuid: '{}'.", id);
-    return this.userRepository.findById(id).orElseThrow(() -> new NotFoundException(id));
+  private @NotNull UserEntity userElseThrow(final String id) {
+    log.info("Trying to get user with id: '{}'.", id);
+    return this.userRepository.findByExternalId(id).orElseThrow(() -> new NotFoundException(id));
   }
 }

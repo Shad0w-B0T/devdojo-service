@@ -8,7 +8,6 @@ import devdojo.logic.database.user.UserEntity;
 import devdojo.schema.task.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 public interface ITaskController {
 
@@ -50,7 +49,7 @@ public interface ITaskController {
 
   //Task
   @NotNull
-  UUID id(@NotNull final TaskEntity task);
+  String id(@NotNull final TaskEntity task);
 
   @NotNull
   LanguageEntity language(@NotNull final TaskEntity task);
@@ -83,7 +82,7 @@ public interface ITaskController {
 
   @NotNull
   ITaskUserProgress userProgress(@NotNull final TaskEntity task,
-                                 final UUID userId);
+                                 final String userId);
 
   double rating(@NotNull final TaskEntity task);
 

@@ -1,6 +1,7 @@
 package devdojo.logic.database.language;
 
 import devdojo.logic.database.AbstractEntity;
+import devdojo.logic.database.AbstractExternalEntity;
 import devdojo.schema.language.ILanguage;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,7 +33,7 @@ import lombok.experimental.Accessors;
 @Setter
 @NoArgsConstructor
 @Accessors(fluent = true)
-public final class LanguageEntity extends AbstractEntity implements ILanguage {
+public final class LanguageEntity extends AbstractExternalEntity implements ILanguage {
 
   @NotNull(message = "Token name must not be null")
   @Column(name = "token", nullable = false, unique = true, updatable = false)
@@ -57,5 +58,10 @@ public final class LanguageEntity extends AbstractEntity implements ILanguage {
     this.languageName = languageName;
     this.description = description;
     this.active = active;
+  }
+
+  @Override
+  protected String prefix() {
+    return "lng";
   }
 }

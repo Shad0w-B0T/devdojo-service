@@ -8,7 +8,6 @@ import devdojo.logic.user.IUserService;
 import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -50,8 +49,8 @@ public abstract class AbstractUserController implements IUserController {
 
   @SchemaMapping(typeName = "User")
   @Override
-  public @NotNull UUID id(@NotNull final UserEntity userEntity) {
-    return userEntity.id();
+  public @NotNull String id(@NotNull final UserEntity userEntity) {
+    return userEntity.externalId();
   }
 
   @SchemaMapping(typeName = "User")

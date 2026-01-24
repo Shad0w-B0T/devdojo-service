@@ -60,17 +60,17 @@ public interface ITaskService {
   // ———— DTOs ————
 
   interface GetTasks {
-    UUID languageId();
+    String languageId();
   }
 
   interface GetTask {
     @NotNull(message = "Task ID must not be null")
-    UUID taskId();
+    String taskId();
   }
 
   interface CreateTask {
     @NotNull(message = "LanguageId must not be null")
-    UUID languageId();
+    String languageId();
 
     @NotNull(message = "Task name must not be null")
     String name();
@@ -100,7 +100,7 @@ public interface ITaskService {
 
   interface UpdateTask {
     @NotNull(message = "Task ID must not be null")
-    UUID taskId();
+    String taskId();
 
     @NotNull(message = "Task name must not be null")
     String name();
@@ -130,12 +130,12 @@ public interface ITaskService {
 
   interface DeleteTask {
     @NotNull(message = "Task ID must not be null")
-    UUID taskId();
+    String taskId();
   }
 
   interface AppendTest {
     @NotNull(message = "Task ID must not be null")
-    UUID taskId();
+    String taskId();
 
     @NotNull(message = "Unit test must not be null")
     @Valid
@@ -154,7 +154,7 @@ public interface ITaskService {
 
   interface RemoveTagFromTask {
     @NotNull(message = "Task ID must not be null")
-    UUID taskId();
+    String taskId();
 
     @NotNull(message = "Tag ID must not be null")
     UUID tagId();
@@ -172,10 +172,10 @@ public interface ITaskService {
 
   interface SetTaskRating {
     @NotNull(message = "Task ID must not be null")
-    UUID taskId();
+    String taskId();
 
     @NotNull(message = "User ID must not be null")
-    UUID userId();
+    String userId();
 
     int rating();
   }

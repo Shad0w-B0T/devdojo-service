@@ -33,7 +33,7 @@ public abstract class AbstractTokenEvaluator implements ITokenEvaluator {
       return false;
     }
 
-    if (tokenDetails.userId().equals(UUID.fromString(userId))) {
+    if (tokenDetails.userId().equals(userId)) {
       return true;
     }
 

@@ -12,7 +12,7 @@ import java.util.UUID;
  * the deletion attempt.</p>
  */
 public class DeletionException extends AbstractException {
-  public DeletionException(@NotNull(message = "ID cannot be null.") final UUID uuid) {
+  public DeletionException(@NotNull(message = "ID cannot be null.") final String uuid) {
     super("User with UUID: '" + uuid + "' could not be deleted.");
   }
 }

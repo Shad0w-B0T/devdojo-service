@@ -16,7 +16,6 @@ import devdojo.schema.task.*;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -120,8 +119,8 @@ public abstract class AbstractTaskController implements ITaskController {
 
   @SchemaMapping(typeName = "Task", value = "id")
   @Override
-  public @NotNull UUID id(@NotNull final TaskEntity task) {
-    return task.id();
+  public @NotNull String id(@NotNull final TaskEntity task) {
+    return task.externalId();
   }
 
   @SchemaMapping(typeName = "Task", value = "language")
@@ -175,12 +174,12 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "Task", value = "userProgress")
   @Override
   public @NotNull ITaskUserProgress userProgress(@NotNull final TaskEntity task,
-                                                 @Argument("userId") final UUID userId) {
-    final UUID progressUserId = userId != null ? userId : SecurityUtils.currentTokenDetails().userId();
+                                                 @Argument("userId") final String userId) {
+    final String progressUserId = userId != null ? userId : SecurityUtils.currentTokenDetails().userId();
 
     try {
       final TaskProgressEntity taskProgressEntity =
-        this.tasksProgressService.getTaskProgress(progressUserId, task.id());
+        this.tasksProgressService.getTaskProgress(progressUserId, task.externalId());
       return new TaskUserProgress(taskProgressEntity.input(), taskProgressEntity.state(), taskProgressEntity.score());
     } catch (final NotFoundException exception) {
       return new TaskUserProgress("", TaskProgressState.NOT_STARTED, 0);
@@ -202,7 +201,7 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "Task", value = "rating")
   @Override
   public double rating(@NotNull final TaskEntity task) {
-    return this.taskService.getTaskRating(task::id);
+    return this.taskService.getTaskRating(task::externalId);
   }
 
   @SchemaMapping(typeName = "TaskUserProgress", value = "input")
@@ -256,8 +255,8 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "UserRanking", value = "user")
   @Override
   public @NotNull UserEntity user(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
-    System.out.println(userRankingProjection.userId());
-    return this.userService.getUser(userRankingProjection.userId());
+    System.out.println(userRankingProjection.externalUserId());
+    return this.userService.getUser(userRankingProjection.externalUserId());
   }
 
   @SchemaMapping(typeName = "UserRanking", value = "totalScore")

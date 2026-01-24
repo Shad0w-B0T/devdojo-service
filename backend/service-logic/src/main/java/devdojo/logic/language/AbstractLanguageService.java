@@ -134,7 +134,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
     final LanguageEntity updatedLanguageEntity;
     try {
       updatedLanguageEntity = this.languageRepository.save(languageEntity);
-      log.info("User {} successfully updated.", updatedLanguageEntity.id());
+      log.info("User {} successfully updated.", updatedLanguageEntity.externalId());
     } catch (final DataAccessException exception) {
       throw new DatabaseException("Error while updating language.", exception);
     }
@@ -163,7 +163,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
   @Transactional
   @Override
   public LanguageEntity deleteLanguage(final LanguageDelete languageDelete) {
-    final UUID id = languageDelete.languageId();
+    final String id = languageDelete.languageId();
     final LanguageEntity languageEntity = this.languageElseThrow(id);
 
     try {
@@ -174,7 +174,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
     }
 
     // check if language was successfully deleted from db
-    if (this.languageRepository.existsById(id)) {
+    if (this.languageRepository.existsByExternalId(id)) {
       throw new DeletionException(languageDelete.languageId());
     }
 
@@ -189,8 +189,8 @@ public abstract class AbstractLanguageService implements ILanguageService {
    * @return The {@link LanguageEntity} associated with the given UUID.
    * @throws NotFoundException If no language entity exists with the provided UUID.
    */
-  private LanguageEntity languageElseThrow(final UUID id) {
+  private LanguageEntity languageElseThrow(final String id) {
     log.info("Trying to get language with uuid: '" + id + "'.");
-    return this.languageRepository.findById(id).orElseThrow(() -> new NotFoundException(id));
+    return this.languageRepository.findByExternalId(id).orElseThrow(() -> new NotFoundException(id));
   }
 }

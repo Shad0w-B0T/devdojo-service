@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record UpdateTask(
-  @NotNull(message = "TaskId cannot be null.") UUID taskId,
+  @NotNull(message = "TaskId cannot be null.") String taskId,
   @NotNull(message = "Name cannot be null.") String name,
   @NotNull(message = "Description cannot be null.") String description,
   @NotNull(message = "Difficulty cannot be null.") Difficulty difficulty,

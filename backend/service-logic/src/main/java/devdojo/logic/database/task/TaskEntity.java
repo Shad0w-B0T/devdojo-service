@@ -1,6 +1,7 @@
 package devdojo.logic.database.task;
 
 import devdojo.logic.database.AbstractEntity;
+import devdojo.logic.database.AbstractExternalEntity;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.user.UserEntity;
@@ -24,7 +25,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(fluent = true)
-public final class TaskEntity extends AbstractEntity implements ITask {
+public final class TaskEntity extends AbstractExternalEntity implements ITask {
 
   @NotNull(message = "Language entity must not be null")
   @ManyToOne(fetch = FetchType.LAZY)
@@ -104,5 +105,10 @@ public final class TaskEntity extends AbstractEntity implements ITask {
   public void setTagEntities(final List<TagEntity> tagEntities) {
     this.tagEntities.clear();
     tagEntities.forEach(this::addTagEntity);
+  }
+
+  @Override
+  protected String prefix() {
+    return "tsk";
   }
 }

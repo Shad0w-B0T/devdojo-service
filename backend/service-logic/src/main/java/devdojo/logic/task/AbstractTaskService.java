@@ -60,7 +60,7 @@ public abstract class AbstractTaskService implements ITaskService {
       return this.taskRepository.findAll();
     }
 
-    final LanguageEntity languageEntity = this.languageService.getLanguage(() -> getTasks.languageId());
+    final LanguageEntity languageEntity = this.languageService.getLanguage(getTasks::languageId);
 
     return this.taskRepository.findAllByLanguageEntity(languageEntity);
   }
@@ -79,8 +79,8 @@ public abstract class AbstractTaskService implements ITaskService {
    * @return the found TaskEntity
    * @throws NotFoundException if no task with the given ID exists
    */
-  private @NotNull TaskEntity task(final @NotNull UUID taskId) {
-    return taskRepository.findById(taskId)
+  private @NotNull TaskEntity task(final @NotNull String taskId) {
+    return taskRepository.findByExternalId(taskId)
       .orElseThrow(() -> {
         log.warn("Task with ID {} not found", taskId);
         return new NotFoundException("Task not found");
@@ -146,7 +146,7 @@ public abstract class AbstractTaskService implements ITaskService {
   @Transactional
   public TaskEntity updateTask(final UpdateTask updateTask) {
     log.info("Updating task with ID {}", updateTask.taskId());
-    final TaskEntity task = this.taskRepository.findById(updateTask.taskId())
+    final TaskEntity task = this.taskRepository.findByExternalId(updateTask.taskId())
       .orElseThrow(() -> {
         log.warn("Task with ID {} not found for update", updateTask.taskId());
         return new NotFoundException("Task not found");
@@ -282,8 +282,8 @@ public abstract class AbstractTaskService implements ITaskService {
   @Transactional
   @Override
   public TaskRatingEntity setTaskRating(final SetTaskRating setTaskRating) {
-    final UUID userId = setTaskRating.userId();
-    final UUID taskId = setTaskRating.taskId();
+    final String userId = setTaskRating.userId();
+    final String taskId = setTaskRating.taskId();
     final int rating = setTaskRating.rating();
 
     log.debug(
@@ -291,8 +291,11 @@ public abstract class AbstractTaskService implements ITaskService {
       taskId, userId, rating
     );
 
+    final UserEntity userEntity = this.userService.getUser(userId);
+    final TaskEntity taskEntity = this.task(taskId);
+
     final TaskRatingEntity taskRating = this.ratingRepository
-      .findByTaskEntity_IdAndUserEntity_Id(taskId, userId)
+      .findByTaskEntityAndUserEntity(taskEntity, userEntity)
       .orElse(null);
 
     if (taskRating == null) {
@@ -300,9 +303,6 @@ public abstract class AbstractTaskService implements ITaskService {
         "Creating new task rating [taskId={}, userId={}, rating={}]",
         taskId, userId, rating
       );
-
-      final UserEntity userEntity = this.userService.getUser(userId);
-      final TaskEntity taskEntity = this.task(taskId);
 
       try {
         final TaskRatingEntity saved = this.ratingRepository.save(
@@ -356,7 +356,7 @@ public abstract class AbstractTaskService implements ITaskService {
   )
   @Override
   public Double getTaskRating(final GetTask getTask) {
-    final UUID taskId = getTask.taskId();
+    final String taskId = getTask.taskId();
 
     log.debug("Fetching average rating for task [taskId={}]", taskId);
 

@@ -1,11 +1,13 @@
 package devdojo.logic.database.user;
 
 import devdojo.logic.database.EntityRepository;
+import devdojo.logic.database.ExternalEntityRepository;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 
-public interface UserRepository extends EntityRepository<UserEntity> {
+public interface UserRepository extends ExternalEntityRepository<UserEntity> {
   boolean existsByDisplayName(final String displayName);
 
-  @NotNull Optional<UserEntity> findByAuthId(final String authId);
+  @NotNull
+  Optional<UserEntity> findByAuthId(final String authId);
 }

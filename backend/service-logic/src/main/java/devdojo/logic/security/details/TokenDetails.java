@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record TokenDetails(
-  @NotNull UUID userId,
+  @NotNull String userId,
   @NotNull String authId,
   @NotNull String email,
   @NotNull String displayName,

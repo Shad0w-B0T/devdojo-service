@@ -25,8 +25,8 @@ public interface TaskRatingRepository
   @Query("""
       SELECT AVG(r.rating)
       FROM TaskRatingEntity r
-      WHERE r.taskEntity.id = :taskId
+      WHERE r.taskEntity.externalId = :taskId
     """)
-  Double findAverageRatingByTaskId(@Param("taskId") UUID taskId);
+  Double findAverageRatingByTaskId(@Param("taskId") String taskId);
 
 }
