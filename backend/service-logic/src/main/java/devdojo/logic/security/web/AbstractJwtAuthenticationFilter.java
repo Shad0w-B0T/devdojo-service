@@ -91,5 +91,4 @@ public abstract class AbstractJwtAuthenticationFilter extends OncePerRequestFilt
 
     return message;
   }
-
 }

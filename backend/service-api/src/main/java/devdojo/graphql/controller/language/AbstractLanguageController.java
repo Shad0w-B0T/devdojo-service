@@ -1,6 +1,5 @@
 package devdojo.graphql.controller.language;
 
-import devdojo.graphql.input.language.*;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.language.ILanguageService;
@@ -8,7 +7,6 @@ import devdojo.schema.language.ILanguage;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -35,7 +33,7 @@ public abstract class AbstractLanguageController implements ILanguageController 
    * @return a list of {@link ILanguage} representing all languages stored in the database.
    */
   @QueryMapping("languages")
-  public List<ILanguage> languages(@Argument("input") final GetLanguages getLanguages) {
+  public List<ILanguage> languages(@Argument("input") final ILanguageService.GetLanguages getLanguages) {
     return this.languageService
       .getLanguages(getLanguages)
       .stream()
@@ -50,7 +48,7 @@ public abstract class AbstractLanguageController implements ILanguageController 
    * @return the {@link ILanguage} corresponding to the provided {@code id}.
    */
   @QueryMapping("language")
-  public ILanguage getLanguage(@Argument("input") final GetLanguage getLanguage) {
+  public ILanguage getLanguage(@Argument("input") final ILanguageService.GetLanguage getLanguage) {
     return this.languageService.getLanguage(getLanguage);
   }
 
@@ -61,7 +59,7 @@ public abstract class AbstractLanguageController implements ILanguageController 
    * @return the created {@link ILanguage} entity.
    */
   @MutationMapping("createLanguage")
-  public ILanguage createLanguage(@Argument("input") final CreateLanguage createLanguage) {
+  public ILanguage createLanguage(@Argument("input") final ILanguageService.CreateLanguage createLanguage) {
     return this.languageService.createLanguage(createLanguage);
   }
 
@@ -72,7 +70,7 @@ public abstract class AbstractLanguageController implements ILanguageController 
    * @return the updated {@link ILanguage} entity.
    */
   @MutationMapping("updateLanguage")
-  public ILanguage updateLanguage(@Argument("input") final UpdateLanguage updateLanguage) {
+  public ILanguage updateLanguage(@Argument("input") final ILanguageService.UpdateLanguage updateLanguage) {
     return this.languageService.updateLanguage(updateLanguage);
   }
 
@@ -83,15 +81,15 @@ public abstract class AbstractLanguageController implements ILanguageController 
    * @return {@code true} if the language was successfully deleted, {@code false} otherwise.
    */
   @MutationMapping("deleteLanguage")
-  public ILanguage deleteLanguage(@Argument("input") final DeleteLanguage deleteLanguage) {
+  public ILanguage deleteLanguage(@Argument("input") final ILanguageService.DeleteLanguage deleteLanguage) {
     return this.languageService.deleteLanguage(deleteLanguage);
   }
 
 
   @SchemaMapping(typeName = "Language", value = "id")
   @Override
-  public @NotNull UUID id(@NotNull final LanguageEntity languageEntity) {
-    return languageEntity.id();
+  public @NotNull String id(@NotNull final LanguageEntity languageEntity) {
+    return languageEntity.externalId();
   }
 
   @SchemaMapping(typeName = "Language", value = "token")

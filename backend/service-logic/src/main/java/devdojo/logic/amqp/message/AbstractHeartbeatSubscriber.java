@@ -18,7 +18,7 @@ public abstract class AbstractHeartbeatSubscriber {
 
   @RabbitListener(queues = RabbitConst.QUEUE_HEARTBEAT)
   public void handleHeartbeatMessage(final HeartbeatPayload payload) {
-    this.compilerService.updateHeartbeat(new ICompilerService.UpdateHeartbeatRecord(
+    this.compilerService.updateHeartbeat(new ICompilerService.UpdateHeartbeat(
       UUID.fromString(payload.compilerId()),
       payload.languageKey(),
       payload.cpuUsage(),

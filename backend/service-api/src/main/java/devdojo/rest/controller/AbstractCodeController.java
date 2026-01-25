@@ -47,8 +47,8 @@ public abstract class AbstractCodeController implements ICodeController {
   @ResponseBody
   @Override
   public ResponseEntity<IProcessCodeResponse> processCode(@RequestBody final String payload,
-                                                          @RequestParam(value = "taskId") final UUID taskId) {
-    final TaskEntity taskEntity = this.taskService.getTask(() -> taskId);
+                                                          @RequestParam(value = "taskId") final String taskId) {
+    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(taskId));
     final List<List<Object>> testInputs = extractTestInputs(taskEntity);
 
     final UUID results = this.codeService.executeCode(taskEntity, payload, testInputs);

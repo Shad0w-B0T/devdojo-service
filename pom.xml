@@ -60,7 +60,11 @@
 
     <dependency.jackson.annotations.version>2.20</dependency.jackson.annotations.version>
 
-    <dependency.version.bucket4j>8.15.0</dependency.version.bucket4j>
+    <dependency.version.bucket4j>8.16.0</dependency.version.bucket4j>
+
+    <dependency.version.netty.reactor>1.3.2</dependency.version.netty.reactor>
+
+    <dependency.version.netty.all>4.2.9.Final</dependency.version.netty.all>
 
     <!-- ### Code style -->
     <dependency.version.checkstyle.tools>12.3.1</dependency.version.checkstyle.tools>

@@ -1,15 +1,11 @@
 package devdojo.graphql.controller.user;
 
-import devdojo.graphql.input.user.GetUser;
-import devdojo.graphql.input.user.UpdateUserName;
-import devdojo.graphql.input.user.UpdateUserRole;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.user.IUserService;
 import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -37,29 +33,20 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @QueryMapping("user")
-  public @NotNull UserEntity user(
-    @Argument("input") final GetUser input
-  ) {
+  public @NotNull UserEntity user(@Argument("input") final IUserService.GetUserByAuthId input) {
     return this.userService.getUser(input);
-  }
-
-  @MutationMapping("updateUserName")
-  @Override
-  public @NotNull UserEntity updateUserName(
-    @Argument("input") @NotNull final UpdateUserName input) {
-    return this.userService.updateUser(input);
   }
 
   @MutationMapping("updateUserRole")
   @Override
-  public @NotNull UserEntity updateUserRole(@Argument("input") @NotNull final UpdateUserRole input) {
+  public @NotNull UserEntity updateUserRole(@Argument("input") @NotNull final IUserService.UpdateUserRole input) {
     return this.userService.updateUser(input);
   }
 
   @SchemaMapping(typeName = "User")
   @Override
-  public @NotNull UUID id(@NotNull final UserEntity userEntity) {
-    return userEntity.id();
+  public @NotNull String id(@NotNull final UserEntity userEntity) {
+    return userEntity.externalId();
   }
 
   @SchemaMapping(typeName = "User")

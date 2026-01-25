@@ -1,5 +1,6 @@
 package devdojo.logic.task;
 
+import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
@@ -63,51 +64,53 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
 
   // @SelfRequired(bypassRole = UserRole.PROFESSOR, field = "#userId")
   @Override
-  public TaskProgressEntity getTaskProgress(@P("#userId") final UUID userId,
-                                            final UUID taskId) {
-    return this.getTaskProgress(new GetTaskProgress() {
-      @Override
-      public UUID userId() {
-        return userId;
-      }
-
-      @Override
-      public UUID taskId() {
-        return taskId;
-      }
-    });
+  public TaskProgressEntity getTaskProgress(@P("#userId") final String userId,
+                                            final String taskId) {
+    return this.getTaskProgress(new GetTaskProgress(userId, taskId));
   }
 
   @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
   @Cacheable(value = "userRankCache", keyGenerator = "userRankKeyGenerator")
   @Override
   public int getUserRank(@P("q") final GetUserRank getUserRank) {
-    return this.taskProgressRepository.getUserRankForLanguage(getUserRank.userId(), getUserRank.languageId());
+    final UserEntity userEntity = this.userService.getUser(getUserRank.userId());
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(getUserRank.languageId()));
+
+    return this.taskProgressRepository.getUserRankForLanguage(userEntity.id(), languageEntity.id());
   }
 
   @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
   @Override
   public TaskEntity getNextTask(@P("q") final GetNextTask getNextTask) {
-    final UUID userId = getNextTask.userId();
+    final String userId = getNextTask.userId();
     final TaskProgressState state = getNextTask.state();
-    final UUID languageId = getNextTask.languageId();
+    final String languageId = getNextTask.languageId();
+    final UserEntity userEntity = this.userService.getUser(userId);
+
+    if (languageId == null) {
+      throw new NotFoundException("No language id provied to get next.");
+    }
+
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(languageId));
 
     List<TaskEntity> tasks;
 
     if (state == TaskProgressState.NOT_STARTED) {
       tasks = (languageId == null)
-        ? this.taskProgressRepository.findTasksWithoutProgress(userId)
-        : this.taskProgressRepository.findTasksWithoutProgress(userId, languageId);
+        ? this.taskProgressRepository.findTasksWithoutProgress(userEntity.id())
+        : this.taskProgressRepository.findTasksWithoutProgress(userEntity.id(), languageEntity.id());
     } else {
       tasks = (languageId == null)
-        ? this.taskProgressRepository.findTasksWithProgressByState(userId, state)
-        : this.taskProgressRepository.findTasksWithProgressByState(userId, languageId, state);
+        ? this.taskProgressRepository.findTasksWithProgressByState(userEntity.id(), state)
+        : this.taskProgressRepository.findTasksWithProgressByState(userEntity.id(), languageEntity.id(), state);
     }
 
     return tasks
       .stream()
       //Todo move into db query
-      .filter(taskEntity -> taskEntity.active())
+      .filter(TaskEntity::active)
       .findFirst()
       .orElseThrow(() -> new NotFoundException("No next task found."));
   }
@@ -123,13 +126,17 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
   @RoleRequired(role = UserRole.USER)
   @Override
   public List<TaskProgressRepository.UserRankingProjection> getLeaderboard(final GetLeaderboard getLeaderboard) {
-    return this.taskProgressRepository.findUsersWithRankByLanguage(getLeaderboard.languageId(), getLeaderboard.start(),
+    final LanguageEntity languageEntity =
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(getLeaderboard.languageId()));
+
+    return this.taskProgressRepository.findUsersWithRankByLanguage(languageEntity.id(), getLeaderboard.start(),
       getLeaderboard.end());
   }
 
   @Override
   public TaskProgressEntity updateTaskProgress(final UpdateTaskProgress updateTaskProgress) {
-    final TaskProgressTrio trio = this.taskProgress(updateTaskProgress);
+    final TaskProgressTrio trio =
+      this.taskProgress(new GetTaskProgress(updateTaskProgress.userId(), updateTaskProgress.taskId()));
     TaskProgressEntity taskProgressEntity = trio.taskProgressEntity();
 
     if (!trio.taskEntity().active()) {
@@ -161,37 +168,18 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
 
   @Override
   public TaskProgressEntity updateTaskProgress(final UpdateTaskProgressInput updateTaskProgressInput) {
-    return this.updateTaskProgress(new UpdateTaskProgress() {
-      @Override
-      public TaskProgressState state() {
-        return TaskProgressState.RUNNING;
-      }
-
-      @Override
-      public int score() {
-        return 0;
-      }
-
-      @Override
-      public UUID userId() {
-        return updateTaskProgressInput.userId();
-      }
-
-      @Override
-      public UUID taskId() {
-        return updateTaskProgressInput.taskId();
-      }
-
-      @Override
-      public String input() {
-        return updateTaskProgressInput.input();
-      }
-    });
+    return this.updateTaskProgress(new UpdateTaskProgress(
+      updateTaskProgressInput.userId(),
+      updateTaskProgressInput.taskId(),
+      updateTaskProgressInput.input(),
+      TaskProgressState.RUNNING,
+      0
+    ));
   }
 
   private TaskProgressTrio taskProgress(final GetTaskProgress getTaskProgress) {
     final UserEntity userEntity = this.userService.getUser(getTaskProgress.userId());
-    final TaskEntity taskEntity = this.taskService.getTask(() -> getTaskProgress.taskId());
+    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(getTaskProgress.taskId()));
 
     return new TaskProgressTrio(userEntity,
       taskEntity,

@@ -6,6 +6,7 @@ import devdojo.logic.database.compiler.CompilerEntity;
 import devdojo.logic.database.compiler.CompilerHeartbeatEntity;
 import devdojo.schema.code.TestRunResult;
 import devdojo.schema.compiler.CompilerResourceAnalytic;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -41,63 +42,78 @@ public interface ICompilerService {
   @NotNull
   List<CompilerResourceAnalytic> getCompilerResourceAnalytics(@NotNull final GetCompiler getCompiler);
 
-  interface GetHeartbeats {
+  record GetHeartbeats(
+
     @NotNull(message = "Token must not be null")
-    String token();
+    String token
+
+  ) {
   }
 
+  record UpdateHeartbeat(
 
-  record GetHeartbeatsRecord(String token) implements GetHeartbeats {
-  }
-
-  interface UpdateHeartbeat {
     @NotNull(message = "Id must not be null")
-    UUID id();
+    UUID id,
 
     @NotNull(message = "LanguageToken must not be null")
-    String languageToken();
+    String languageToken,
 
-    double cpuUsagePercent();
+    double cpuUsagePercent,
 
     @Positive(message = "CPU cores must be greater than 0")
-    int cpuCores();
+    int cpuCores,
 
     @PositiveOrZero(message = "Memory usage must be 0 or positive")
-    double memoryUsageMb();
+    double memoryUsageMb,
 
     @Positive(message = "Total memory must be greater than 0")
-    double memoryTotalMb();
+    double memoryTotalMb,
 
     @PositiveOrZero(message = "Total tasks processed must be 0 or positive")
-    long totalTasksProcessed();
-  }
-
-  record GetCompilerTask(UUID id) {
-
-  }
-
-  record CreateCompilerTask(UUID id,
-                            String methodCode,
-                            String taskId) {
-
-  }
-
-  record CompleteCompilerTask(UUID id,
-                              List<TestRunResult> results) {
-
-  }
-
-  record GetCompiler(UUID id) {
-  }
-
-  record UpdateHeartbeatRecord(
-    UUID id,
-    String languageToken,
-    double cpuUsagePercent,
-    int cpuCores,
-    double memoryUsageMb,
-    double memoryTotalMb,
     long totalTasksProcessed
-  ) implements UpdateHeartbeat {
+
+  ) {
+  }
+
+  record GetCompilerTask(
+
+    @NotNull(message = "Id must not be null")
+    UUID id
+
+  ) {
+  }
+
+  record CreateCompilerTask(
+
+    @NotNull(message = "Id must not be null")
+    UUID id,
+
+    @NotNull(message = "Method code must not be null")
+    String methodCode,
+
+    @NotNull(message = "Task ID must not be null")
+    String taskId
+
+  ) {
+  }
+
+  record CompleteCompilerTask(
+
+    @NotNull(message = "Id must not be null")
+    UUID id,
+
+    @NotNull(message = "Results must not be null")
+    @Valid
+    List<TestRunResult> results
+
+  ) {
+  }
+
+  record GetCompiler(
+
+    @NotNull(message = "Id must not be null")
+    UUID id
+
+  ) {
   }
 }

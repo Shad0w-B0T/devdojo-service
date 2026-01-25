@@ -1,6 +1,7 @@
 package devdojo.logic.database.user;
 
 import devdojo.logic.database.AbstractEntity;
+import devdojo.logic.database.AbstractExternalEntity;
 import devdojo.schema.Constants;
 import devdojo.schema.user.IUser;
 import devdojo.schema.user.UserRole;
@@ -27,7 +28,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(fluent = true)
-public final class UserEntity extends AbstractEntity implements IUser {
+public final class UserEntity extends AbstractExternalEntity implements IUser {
 
   @NotNull(message = "Auth ID must not be null")
   @Column(name = "authId", nullable = false, updatable = false, unique = true)
@@ -94,5 +95,10 @@ public final class UserEntity extends AbstractEntity implements IUser {
     this.applicationRole = applicationRole;
     this.active = Boolean.TRUE.equals(active);
     this.lastLogin = lastLogin;
+  }
+
+  @Override
+  protected String prefix() {
+    return "usr";
   }
 }

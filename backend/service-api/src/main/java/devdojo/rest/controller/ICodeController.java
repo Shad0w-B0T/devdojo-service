@@ -9,7 +9,7 @@ public interface ICodeController {
   @NotNull(message = "Response must not be null")
   ResponseEntity<IProcessCodeResponse> processCode(
     @NotNull(message = "Payload must not be null") String payload,
-    @NotNull(message = "Task ID must not be null") UUID taskId
+    @NotNull(message = "Task ID must not be null") String taskId
   );
 
   interface IProcessCodeResponse {

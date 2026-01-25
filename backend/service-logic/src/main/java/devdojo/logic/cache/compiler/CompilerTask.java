@@ -26,8 +26,8 @@ public final class CompilerTask implements Serializable {
 
   private boolean processed;
 
-  private UUID taskId;
-  private UUID userId;
+  private String taskId;
+  private String userId;
 
   @TimeToLive
   private Long ttl = TTL;
@@ -35,8 +35,8 @@ public final class CompilerTask implements Serializable {
   public CompilerTask(final UUID id,
                       final boolean processed,
                       final String methodCode,
-                      final UUID taskId,
-                      final UUID userId) {
+                      final String taskId,
+                      final String userId) {
     this.id = id;
     this.processed = processed;
     this.methodCode = methodCode;

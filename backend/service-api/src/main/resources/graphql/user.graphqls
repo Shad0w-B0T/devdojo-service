@@ -38,7 +38,6 @@ extend type Query {
 }
 
 extend type Mutation {
-    updateUserName(input: UpdateUserName!): User!
     updateUserRole(input: UpdateUserRole!): User!
 }
 

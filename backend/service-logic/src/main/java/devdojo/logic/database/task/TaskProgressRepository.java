@@ -53,7 +53,7 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
 
   @Query(
     value = """
-      SELECT ranked.user_id AS userId,
+      SELECT ranked.user_id AS userId,   
              ranked.total_score AS totalScore,
              ranked.rank AS rank
       FROM (
