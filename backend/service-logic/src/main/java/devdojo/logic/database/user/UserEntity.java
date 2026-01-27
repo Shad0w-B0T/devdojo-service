@@ -84,6 +84,7 @@ public final class UserEntity extends AbstractExternalEntity implements IUser, S
    * @param applicationRole the internal application role.
    * @param active          whether the user is active or not.
    * @param lastLogin       the last login timestamp.
+   * @param profilePublic   if the profile is public
    */
   public UserEntity(@NotNull final String authId,
                     @NotNull final String email,
