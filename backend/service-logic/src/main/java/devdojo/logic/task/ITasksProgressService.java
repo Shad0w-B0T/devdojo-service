@@ -25,7 +25,8 @@ public interface ITasksProgressService {
   TaskEntity getNextTask(@NotNull(message = "GetNextTask must not be null") final GetNextTask getNextTask);
 
   @NotNull(message = "Returned rank must not be null")
-  int getUserRank(@NotNull(message = "GetUserRank data must not be null") final GetUserRank getUserRank);
+  TaskProgressRepository.UserRankingProjection getUserRank(
+    @NotNull(message = "GetUserRank data must not be null") final GetUserRank getUserRank);
 
   @NotNull(message = "Returned leaderboard must not be null")
   List<TaskProgressRepository.UserRankingProjection> getLeaderboard(

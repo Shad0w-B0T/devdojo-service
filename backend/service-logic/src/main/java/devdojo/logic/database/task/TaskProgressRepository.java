@@ -4,6 +4,7 @@ import devdojo.logic.database.EntityRepository;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.schema.task.Difficulty;
 import devdojo.schema.task.TaskProgressState;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,22 +35,26 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
   );
 
   @Query(value = """
-    SELECT COUNT(*) + 1
-    FROM (
-      SELECT tp.user_id, SUM(tp.score) as total_score
-      FROM devdojo.task_user_progress tp
-      JOIN devdojo.task t ON tp.task_id = t.id
-      WHERE t.language_id = :languageId
-      GROUP BY tp.user_id
-    ) ranked
-    WHERE ranked.total_score > (
-      SELECT SUM(tp2.score)
-      FROM devdojo.task_user_progress tp2
-      JOIN devdojo.task t2 ON tp2.task_id = t2.id
-      WHERE tp2.user_id = :userId AND t2.language_id = :languageId
-    )
+      SELECT
+        ranked.user_id     AS userId,
+        ranked.total_score AS totalScore,
+        ranked.rank        AS rank
+      FROM (
+        SELECT
+          tp.user_id,
+          SUM(tp.score) AS total_score,
+          RANK() OVER (ORDER BY SUM(tp.score) DESC) AS rank
+        FROM devdojo.task_user_progress tp
+        JOIN devdojo.task t ON tp.task_id = t.id
+        WHERE t.language_id = :languageId
+        GROUP BY tp.user_id
+      ) ranked
+      WHERE ranked.user_id = :userId
     """, nativeQuery = true)
-  int getUserRankForLanguage(@Param("userId") final UUID userId, @Param("languageId") final UUID languageId);
+  UserRankingProjection getUserRankForLanguage(
+    @Param("userId") UUID userId,
+    @Param("languageId") UUID languageId
+  );
 
   @Query(
     value = """
@@ -145,6 +150,6 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
 
   record UserRankingProjection(UUID userId,
                                long totalScore,
-                               long rank) {
+                               long rank) implements Serializable {
   }
 }

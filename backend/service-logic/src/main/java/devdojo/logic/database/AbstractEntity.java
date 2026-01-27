@@ -3,6 +3,7 @@ package devdojo.logic.database;
 import devdojo.schema.entity.DateAuditable;
 import devdojo.schema.entity.Identifiable;
 import jakarta.persistence.*;
+import java.io.*;
 import java.util.Date;
 import java.util.UUID;
 import lombok.Data;
@@ -29,7 +30,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Accessors(fluent = true)
 @MappedSuperclass
 @Slf4j
-public abstract class AbstractEntity implements Identifiable<UUID>, DateAuditable {
+public abstract class AbstractEntity implements Identifiable<UUID>, DateAuditable, Serializable {
   /**
    * The unique identifier for the entity.
    * Automatically generated using the identity strategy.

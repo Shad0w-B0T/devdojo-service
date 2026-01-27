@@ -14,6 +14,7 @@ import devdojo.schema.exception.database.IllegalInputException;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.task.TaskProgressState;
 import devdojo.schema.user.UserRole;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -70,9 +71,13 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
   }
 
   @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
-  @Cacheable(value = "userRankCache", keyGenerator = "userRankKeyGenerator")
+  @Cacheable(
+    cacheNames = "ranking",
+    key = "#p0.userId()",
+    unless = "#result == null"
+  )
   @Override
-  public int getUserRank(@P("q") final GetUserRank getUserRank) {
+  public TaskProgressRepository.UserRankingProjection getUserRank(@P("q") final GetUserRank getUserRank) {
     final UserEntity userEntity = this.userService.getUser(getUserRank.userId());
     final LanguageEntity languageEntity =
       this.languageService.getLanguage(new ILanguageService.GetLanguage(getUserRank.languageId()));
@@ -80,29 +85,35 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
     return this.taskProgressRepository.getUserRankForLanguage(userEntity.id(), languageEntity.id());
   }
 
-  @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
+  @Transactional
   @Override
-  public TaskEntity getNextTask(@P("q") final GetNextTask getNextTask) {
+  public TaskEntity getNextTask(final GetNextTask getNextTask) {
     final String userId = getNextTask.userId();
     final TaskProgressState state = getNextTask.state();
     final String languageId = getNextTask.languageId();
     final UserEntity userEntity = this.userService.getUser(userId);
 
-    if (languageId == null) {
-      throw new NotFoundException("No language id provied to get next.");
-    }
+    LanguageEntity languageEntity;
 
-    final LanguageEntity languageEntity =
-      this.languageService.getLanguage(new ILanguageService.GetLanguage(languageId));
+    try {
+      if (languageId != null) {
+        languageEntity =
+          this.languageService.getLanguage(new ILanguageService.GetLanguage(languageId));
+      } else {
+        languageEntity = null;
+      }
+    } catch (final NotFoundException e) {
+      languageEntity = null;
+    }
 
     List<TaskEntity> tasks;
 
     if (state == TaskProgressState.NOT_STARTED) {
-      tasks = (languageId == null)
+      tasks = (languageEntity == null)
         ? this.taskProgressRepository.findTasksWithoutProgress(userEntity.id())
         : this.taskProgressRepository.findTasksWithoutProgress(userEntity.id(), languageEntity.id());
     } else {
-      tasks = (languageId == null)
+      tasks = (languageEntity == null)
         ? this.taskProgressRepository.findTasksWithProgressByState(userEntity.id(), state)
         : this.taskProgressRepository.findTasksWithProgressByState(userEntity.id(), languageEntity.id(), state);
     }
@@ -190,14 +201,6 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
                                   @NotNull TaskEntity taskEntity,
                                   TaskProgressEntity taskProgressEntity) {
 
-  }
-
-  @Bean("userRankKeyGenerator")
-  public KeyGenerator userRankKeyGenerator() {
-    return (target, method, params) -> {
-      final GetUserRank q = (GetUserRank) params[0];
-      return q.userId().toString() + "-" + q.languageId().toString();
-    };
   }
 
   @Bean("leaderboardKeyGenerator")

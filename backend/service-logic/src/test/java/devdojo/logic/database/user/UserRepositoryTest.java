@@ -34,7 +34,8 @@ final class UserRepositoryTest extends BaseJpaTest {
       UserRole.ADMIN,
       UserRole.ADMIN,
       true,
-      this.DATE
+      this.DATE,
+      false
     );
   }
 

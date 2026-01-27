@@ -133,6 +133,7 @@ CREATE TABLE users
     application_role SMALLINT                    NOT NULL,
     active           BOOLEAN                     NOT NULL,
     last_login       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    profile_public   BOOLEAN                     NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 

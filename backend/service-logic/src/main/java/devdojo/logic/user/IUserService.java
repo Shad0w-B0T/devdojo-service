@@ -57,6 +57,10 @@ public interface IUserService {
   UserEntity updateUser(@NotNull(message = "User role update data must not be null")
                         @Valid final IUserService.UpdateUserRole updateUserRole);
 
+  @NotNull(message = "Updated user must not be null")
+  UserEntity updateUser(@NotNull(message = "User role update data must not be null")
+                        @Valid final IUserService.UpdateUserProfileVisibility updateUserRole);
+
   /**
    * Deletes a user by ID.
    *
@@ -113,7 +117,9 @@ public interface IUserService {
     boolean active,
 
     @NotNull(message = "Last login date must not be null")
-    Date lastLogin
+    Date lastLogin,
+
+    boolean profilePublic
   ) {
   }
 
@@ -123,6 +129,14 @@ public interface IUserService {
 
     @Nullable
     UserRole role
+  ) {
+  }
+
+  record UpdateUserProfileVisibility(
+    @NotNull(message = "User ID must not be null")
+    String userId,
+
+    boolean profilePublic
   ) {
   }
 
