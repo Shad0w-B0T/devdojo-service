@@ -36,14 +36,13 @@ public abstract class AbstractCodeService implements ICodeService {
                                    @NotNull final String methodCode,
                                    @NotNull final List<List<Object>> argumentSets) {
     final String compilerKey = taskEntity.languageEntity().token();
-    System.out.println("Get -> compiler key: " + taskEntity.languageEntity().token());
     this.ensureCompilerQueueExists(compilerKey);
 
     final UUID uuid = UUID.randomUUID();
     final CompileRequestPayload payload = new CompileRequestPayload(uuid, methodCode, argumentSets);
 
     this.compilerService.createCompilerTask(
-      new ICompilerService.CreateCompilerTask(uuid, methodCode, taskEntity.id().toString()));
+      new ICompilerService.CreateCompilerTask(uuid, methodCode, taskEntity.externalId()));
 
     this.rabbitTemplate.convertAndSend(RabbitConst.EXCHANGE_COMPILER,
       RabbitConst.routingKeyForCompiler(compilerKey),
@@ -54,7 +53,7 @@ public abstract class AbstractCodeService implements ICodeService {
 
   private void ensureCompilerQueueExists(final String compilerKey) {
     final String queueName = RabbitConst.queueForCompiler(compilerKey);
-    String routingKey = RabbitConst.routingKeyForCompiler(compilerKey);
+    final String routingKey = RabbitConst.routingKeyForCompiler(compilerKey);
 
     final Queue queue = new Queue(queueName, true);
     final Binding binding = BindingBuilder.bind(queue).to(compilerExchange).with(routingKey);

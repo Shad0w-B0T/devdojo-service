@@ -39,6 +39,10 @@ type Task {
     unitTests: [Test!]!
     active: Boolean!
     userProgress(userId: ID): TaskUserProgress!
+    rating: Float!
+    tags: [String!]
+    createdBy: User
+    updatedBy: User
 }
 
 type TaskUserProgress {
@@ -48,7 +52,7 @@ type TaskUserProgress {
 }
 
 type UserRanking {
-    userId: ID!
+    user: User!
     totalScore: Long!
     rank: Long!
 }
@@ -74,6 +78,7 @@ input CreateTaskInput {
     complete: String!
     unitTests: [TaskUnitTestInput!]!
     active: Boolean!
+    tags: [String!]
 }
 
 input UpdateTaskInput {
@@ -85,6 +90,7 @@ input UpdateTaskInput {
     complete: String!
     unitTests: [TaskUnitTestInput!]!
     active: Boolean!
+    tags: [String!]
 }
 
 input AppendTestInput {
@@ -93,7 +99,7 @@ input AppendTestInput {
 }
 
 input UpdateTaskUserInput {
-    userId: ID
+    userId: ID!
     taskId: ID!
     input: String!
 }
@@ -104,6 +110,12 @@ input GetTask {
 
 input GetTasks {
     languageId: ID
+    tagId: ID
+}
+
+input RemoveTagFromTaskInput {
+    taskId: ID!
+    tagId: ID!
 }
 
 input GetNextTask {
@@ -119,17 +131,24 @@ input GetUserRank {
 
 input GetLeaderboard {
     languageId: ID!
-    start: Long!,
+    start: Long!
     end: Long!
+}
+
+input SetTaskRating {
+    taskId: ID!
+    userId: ID!
+    rating: Int!
 }
 
 extend type Query {
     tasks(input: GetTasks): [Task!]!
     task(input: GetTask!): Task!
+    taskRating(input: GetTask!): Float!
 
     nextTask(input: GetNextTask): Task!
 
-    userRank(input: GetUserRank!): Int
+    userRank(input: GetUserRank!): UserRanking!
     leaderboard(input: GetLeaderboard): [UserRanking!]!
 }
 
@@ -138,6 +157,8 @@ extend type Mutation {
     updateTask(input: UpdateTaskInput!): Task!
     appendUnitTest(input: AppendTestInput!): Test!
     deleteTask(taskId: ID!): Boolean!     # optional
+    removeTagFromTask(input: RemoveTagFromTaskInput!): Boolean!
 
     updateTaskUserInput(input: UpdateTaskUserInput!): Boolean!
+    setTaskRating(input: SetTaskRating!): Boolean!
 }

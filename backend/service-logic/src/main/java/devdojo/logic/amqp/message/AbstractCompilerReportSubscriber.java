@@ -3,6 +3,7 @@ package devdojo.logic.amqp.message;
 import devdojo.logic.compiler.ICompilerService;
 import devdojo.schema.amqp.CompileResponsePayload;
 import devdojo.schema.amqp.RabbitConst;
+import devdojo.schema.exception.database.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
@@ -17,8 +18,11 @@ public abstract class AbstractCompilerReportSubscriber {
 
   @RabbitListener(queues = RabbitConst.QUEUE_COMPILER_REPORT)
   public void handleHeartbeatMessage(final CompileResponsePayload payload) {
-    System.out.println("Received payload: " + payload);
-    this.compilerService.completeCompilerTask(
-      new ICompilerService.CompleteCompilerTask(payload.requestId(), payload.testRunResults()));
+    try {
+      this.compilerService.completeCompilerTask(
+        new ICompilerService.CompleteCompilerTask(payload.requestId(), payload.testRunResults()));
+    } catch (final NotFoundException exception) {
+      log.info("The compiler task={} not found, ignoring response.", payload.requestId());
+    }
   }
 }

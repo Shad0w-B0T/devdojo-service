@@ -5,7 +5,6 @@ import devdojo.schema.user.UserRole;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -33,8 +32,10 @@ final class UserRepositoryTest extends BaseJpaTest {
       "rick@hdm-stuttgart.de",
       "Rick",
       UserRole.ADMIN,
+      UserRole.ADMIN,
       true,
-      this.DATE
+      this.DATE,
+      false
     );
   }
 
@@ -82,7 +83,7 @@ final class UserRepositoryTest extends BaseJpaTest {
     assertEquals(user, result.get());
     assertEquals(user.email(), result.get().email());
     assertEquals(user.displayName(), result.get().displayName());
-    assertEquals(user.role(), result.get().role());
+    assertEquals(user.ldapRole(), result.get().ldapRole());
     assertEquals(user.active(), result.get().active());
     assertEquals(user.lastLogin(), result.get().lastLogin());
   }

@@ -39,7 +39,7 @@ public class TaskServiceTest {
 
   @Nested
   @DisplayName("GetTasks Unit Tests")
-  class GetTasks {
+  class GetTasksByLangauge {
 
     @Test
     @DisplayName("GetTasks - Returns every task without specifying language")

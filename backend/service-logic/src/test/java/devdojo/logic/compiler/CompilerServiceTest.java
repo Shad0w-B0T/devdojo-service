@@ -1,5 +1,6 @@
 package devdojo.logic.compiler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import devdojo.logic.cache.compiler.CompilerTaskRepository;
 import devdojo.logic.cache.compiler.CompilerTaskResultRepository;
 import devdojo.logic.database.compiler.CompilerHeartbeatRepository;
@@ -7,6 +8,8 @@ import devdojo.logic.database.compiler.CompilerRepository;
 import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
+import devdojo.logic.websocket.ISocketPublisher;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +21,8 @@ import org.mockito.MockitoAnnotations;
 @DisplayName("CompilerService tests")
 class CompilerServiceTest {
 
+  @Mock
+  private ObjectMapper objectMapper;
   @Mock
   private LanguageRepository languageRepository;
   @Mock
@@ -32,6 +37,10 @@ class CompilerServiceTest {
   private CompilerTaskRepository compilerTaskRepository;
   @Mock
   private CompilerTaskResultRepository compilerTaskResultRepository;
+  @Mock
+  private ISocketPublisher socketPublisher;
+  @Mock
+  private IUserService userService;
 
   @InjectMocks
   private CompilerService compilerService;
@@ -45,13 +54,16 @@ class CompilerServiceTest {
   @DisplayName("should initialize AbstractCompilerService with HeartbeatRepository")
   void shouldInitializeWithHeartbeatRepository() {
     assertDoesNotThrow(
-      () -> new CompilerService(this.languageRepository,
+      () -> new CompilerService(this.objectMapper,
+        this.languageRepository,
         this.taskService,
         this.tasksProgressService,
         this.compilerRepository,
         this.compilerHeartbeatRepository,
         this.compilerTaskRepository,
-        this.compilerTaskResultRepository));
+        this.compilerTaskResultRepository,
+        this.socketPublisher,
+        this.userService));
   }
 
   /*

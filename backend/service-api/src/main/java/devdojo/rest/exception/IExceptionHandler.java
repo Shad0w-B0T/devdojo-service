@@ -7,12 +7,15 @@ import devdojo.schema.exception.permissions.UnauthenticatedException;
 import devdojo.schema.exception.permissions.UnauthorizedException;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 
 public interface IExceptionHandler {
 
   @NotNull ResponseEntity<ErrorResponse> handleUnauthorized(final UnauthorizedException exception);
 
   @NotNull ResponseEntity<ErrorResponse> handleUnauthenticated(final UnauthenticatedException exception);
+
+  @NotNull ResponseEntity<ErrorResponse> handleBadCredentials(final BadCredentialsException exception);
 
   @NotNull ResponseEntity<ErrorResponse> handleRateLimitExceeded(final RateLimitExceededException exception);
 

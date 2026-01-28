@@ -13,6 +13,7 @@ type User implements DateAuditable{
     role: UserRole!
     active: Boolean!
     lastLogin: Long!
+    profilePublic: Boolean!
     createdAt: Long!
     updatedAt: Long!
 }
@@ -27,13 +28,23 @@ input UpdateUserRole {
     role: UserRole!
 }
 
+input UpdateUserProfileVisibility {
+    userId: ID!
+    profilePublic: Boolean!
+}
+
+input GetUser {
+    userId: ID!
+}
+
 extend type Query {
     users: [User!]!
+    user(input: GetUser!): User!
     userSelf: User!
 }
 
 extend type Mutation {
-    updateUserName(input: UpdateUserName!): User!
     updateUserRole(input: UpdateUserRole!): User!
+    updateUserVisibility(input: UpdateUserProfileVisibility!): User!
 }
 

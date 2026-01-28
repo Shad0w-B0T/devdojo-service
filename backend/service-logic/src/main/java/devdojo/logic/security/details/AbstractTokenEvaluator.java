@@ -22,7 +22,7 @@ public abstract class AbstractTokenEvaluator implements ITokenEvaluator {
     if (!(token.getDetails() instanceof ITokenDetails tokenDetails)) {
       return false;
     }
-    return tokenDetails.userRole().id() >= role.id();
+    return tokenDetails.applicationRole().id() >= role.id();
   }
 
   @Override
@@ -33,7 +33,7 @@ public abstract class AbstractTokenEvaluator implements ITokenEvaluator {
       return false;
     }
 
-    if (tokenDetails.userId().equals(UUID.fromString(userId))) {
+    if (tokenDetails.userId().equals(userId)) {
       return true;
     }
 

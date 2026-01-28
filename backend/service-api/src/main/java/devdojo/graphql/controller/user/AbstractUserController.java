@@ -1,18 +1,18 @@
 package devdojo.graphql.controller.user;
 
-import devdojo.graphql.input.user.UpdateUserName;
-import devdojo.graphql.input.user.UpdateUserRole;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.user.IUserService;
+import devdojo.schema.annotation.RoleRequired;
+import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.core.parameters.P;
 
 public abstract class AbstractUserController implements IUserController {
 
@@ -24,6 +24,7 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @QueryMapping("users")
+  @RoleRequired(role = UserRole.ADMIN)
   @Override
   public @NotNull List<UserEntity> users() {
     return this.userService.getUsers();
@@ -35,23 +36,31 @@ public abstract class AbstractUserController implements IUserController {
     return this.userService.getUser(SecurityUtils.currentTokenDetails().userId());
   }
 
-  @MutationMapping("updateUserName")
-  @Override
-  public @NotNull UserEntity updateUserName(
-    @Argument("input") @NotNull final UpdateUserName input) {
-    return this.userService.updateUser(input);
+  @QueryMapping("user")
+  public @NotNull UserEntity user(@Argument("input") final IUserService.GetUserByAuthId input) {
+    return this.userService.getUser(input);
   }
 
   @MutationMapping("updateUserRole")
+  @SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
   @Override
-  public @NotNull UserEntity updateUserRole(@Argument("input") @NotNull final UpdateUserRole input) {
+  public @NotNull UserEntity updateUserRole(
+    @Argument("input") @P("user") @NotNull final IUserService.UpdateUserRole input) {
+    return this.userService.updateUser(input);
+  }
+
+  @MutationMapping("updateUserVisibility")
+  @SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
+  @Override
+  public UserEntity updateUserVisibility(
+    @Argument("input") @P("user") @NotNull final IUserService.UpdateUserProfileVisibility input) {
     return this.userService.updateUser(input);
   }
 
   @SchemaMapping(typeName = "User")
   @Override
-  public @NotNull UUID id(@NotNull final UserEntity userEntity) {
-    return userEntity.id();
+  public @NotNull String id(@NotNull final UserEntity userEntity) {
+    return userEntity.externalId();
   }
 
   @SchemaMapping(typeName = "User")
@@ -69,7 +78,7 @@ public abstract class AbstractUserController implements IUserController {
   @SchemaMapping(typeName = "User")
   @Override
   public @NotNull UserRole role(@NotNull final UserEntity userEntity) {
-    return userEntity.role();
+    return userEntity.applicationRole() != null ? userEntity.applicationRole() : userEntity.ldapRole();
   }
 
   @SchemaMapping(typeName = "User")
@@ -82,6 +91,12 @@ public abstract class AbstractUserController implements IUserController {
   @Override
   public @NotNull long lastLogin(@NotNull final UserEntity userEntity) {
     return userEntity.lastLogin().getTime();
+  }
+
+  @SchemaMapping(typeName = "User")
+  @Override
+  public boolean profilePublic(@NotNull final UserEntity userEntity) {
+    return userEntity.profilePublic();
   }
 
   @SchemaMapping(typeName = "User")

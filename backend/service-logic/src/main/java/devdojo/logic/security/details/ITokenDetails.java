@@ -7,7 +7,7 @@ import java.util.UUID;
 public interface ITokenDetails {
 
   @NotNull
-  UUID userId();
+  String userId();
 
   @NotNull
   String authId();
@@ -19,6 +19,6 @@ public interface ITokenDetails {
   String displayName();
 
   @NotNull
-  UserRole userRole();
+  UserRole applicationRole();
 
 }

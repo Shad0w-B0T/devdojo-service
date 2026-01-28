@@ -2,6 +2,7 @@
 CREATE TABLE compiler
 (
     id           UUID             NOT NULL,
+    external_id  VARCHAR(255)     NOT NULL,
     created_at   TIMESTAMP WITHOUT TIME ZONE,
     updated_at   TIMESTAMP WITHOUT TIME ZONE,
     language_id  UUID             NOT NULL,
@@ -26,6 +27,7 @@ CREATE TABLE compiler_heartbeat
 CREATE TABLE language
 (
     id            UUID         NOT NULL,
+    external_id   VARCHAR(255) NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE,
     updated_at    TIMESTAMP WITHOUT TIME ZONE,
     token         VARCHAR(255) NOT NULL,
@@ -35,19 +37,43 @@ CREATE TABLE language
     CONSTRAINT pk_language PRIMARY KEY (id)
 );
 
+CREATE TABLE tag
+(
+    id         UUID         NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE,
+    updated_at TIMESTAMP WITHOUT TIME ZONE,
+    task_id    UUID         NOT NULL,
+    name       VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_tag PRIMARY KEY (id)
+);
+
 CREATE TABLE task
 (
-    id          UUID         NOT NULL,
-    created_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE,
-    language_id UUID         NOT NULL,
-    name        VARCHAR(255) NOT NULL,
-    description TEXT         NOT NULL,
-    difficulty  SMALLINT,
-    template    TEXT         NOT NULL,
-    complete    TEXT         NOT NULL,
-    active      BOOLEAN      NOT NULL,
+    id              UUID         NOT NULL,
+    external_id     VARCHAR(255) NOT NULL,
+    created_at      TIMESTAMP WITHOUT TIME ZONE,
+    updated_at      TIMESTAMP WITHOUT TIME ZONE,
+    language_id     UUID         NOT NULL,
+    user_created_id UUID,
+    user_updated_id UUID,
+    name            VARCHAR(255) NOT NULL,
+    description     TEXT         NOT NULL,
+    difficulty      SMALLINT     NOT NULL,
+    template        TEXT         NOT NULL,
+    complete        TEXT         NOT NULL,
+    active          BOOLEAN      NOT NULL,
     CONSTRAINT pk_task PRIMARY KEY (id)
+);
+
+CREATE TABLE task_rating
+(
+    id         UUID    NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE,
+    updated_at TIMESTAMP WITHOUT TIME ZONE,
+    task_id    UUID    NOT NULL,
+    user_id    UUID    NOT NULL,
+    rating     INTEGER NOT NULL,
+    CONSTRAINT pk_task_rating PRIMARY KEY (id)
 );
 
 CREATE TABLE task_user_progress
@@ -96,17 +122,23 @@ CREATE TABLE user_settings
 
 CREATE TABLE users
 (
-    id           UUID                        NOT NULL,
-    created_at   TIMESTAMP WITHOUT TIME ZONE,
-    updated_at   TIMESTAMP WITHOUT TIME ZONE,
-    auth_id      VARCHAR(255)                NOT NULL,
-    email        VARCHAR(300)                NOT NULL,
-    display_name VARCHAR(255)                NOT NULL,
-    role         SMALLINT                    NOT NULL,
-    active       BOOLEAN                     NOT NULL,
-    last_login   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    id               UUID                        NOT NULL,
+    external_id      VARCHAR(255)                NOT NULL,
+    created_at       TIMESTAMP WITHOUT TIME ZONE,
+    updated_at       TIMESTAMP WITHOUT TIME ZONE,
+    auth_id          VARCHAR(255)                NOT NULL,
+    email            VARCHAR(300)                NOT NULL,
+    display_name     VARCHAR(255)                NOT NULL,
+    ldap_role        SMALLINT                    NOT NULL,
+    application_role SMALLINT                    NOT NULL,
+    active           BOOLEAN                     NOT NULL,
+    last_login       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    profile_public   BOOLEAN                     NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
+
+ALTER TABLE task_rating
+    ADD CONSTRAINT uc_29fd3c079ac73a12c775d8a65 UNIQUE (task_id, user_id);
 
 ALTER TABLE task_user_progress
     ADD CONSTRAINT uc_7fe69ee6d550cd3315887c1f9 UNIQUE (user_id, task_id);
@@ -114,11 +146,20 @@ ALTER TABLE task_user_progress
 ALTER TABLE compiler
     ADD CONSTRAINT uc_compiler_compilerid UNIQUE (compiler_id);
 
+ALTER TABLE compiler
+    ADD CONSTRAINT uc_compiler_externalid UNIQUE (external_id);
+
+ALTER TABLE language
+    ADD CONSTRAINT uc_language_externalid UNIQUE (external_id);
+
 ALTER TABLE language
     ADD CONSTRAINT uc_language_languagename UNIQUE (language_name);
 
 ALTER TABLE language
     ADD CONSTRAINT uc_language_token UNIQUE (token);
+
+ALTER TABLE task
+    ADD CONSTRAINT uc_task_externalid UNIQUE (external_id);
 
 ALTER TABLE users
     ADD CONSTRAINT uc_users_authid UNIQUE (auth_id);
@@ -126,7 +167,12 @@ ALTER TABLE users
 ALTER TABLE users
     ADD CONSTRAINT uc_users_displayname UNIQUE (display_name);
 
+ALTER TABLE users
+    ADD CONSTRAINT uc_users_externalid UNIQUE (external_id);
+
 CREATE INDEX contactEmailContactIdAndName ON task_user_progress (user_id, task_id);
+
+CREATE INDEX idx_task_rating_task_user ON task_rating (task_id, user_id);
 
 ALTER TABLE compiler_heartbeat
     ADD CONSTRAINT FK_COMPILERHEARTBEAT_ON_COMPILER FOREIGN KEY (compiler_id) REFERENCES compiler (id);
@@ -134,8 +180,25 @@ ALTER TABLE compiler_heartbeat
 ALTER TABLE compiler
     ADD CONSTRAINT FK_COMPILER_ON_LANGUAGE FOREIGN KEY (language_id) REFERENCES language (id);
 
+ALTER TABLE tag
+    ADD CONSTRAINT FK_TAG_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);
+
 ALTER TABLE task
     ADD CONSTRAINT FK_TASK_ON_LANGUAGE FOREIGN KEY (language_id) REFERENCES language (id);
+
+ALTER TABLE task
+    ADD CONSTRAINT FK_TASK_ON_USER_CREATED FOREIGN KEY (user_created_id) REFERENCES users (id);
+
+ALTER TABLE task
+    ADD CONSTRAINT FK_TASK_ON_USER_UPDATED FOREIGN KEY (user_updated_id) REFERENCES users (id);
+
+ALTER TABLE task_rating
+    ADD CONSTRAINT FK_TASK_RATING_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);
+
+CREATE INDEX idx_task_rating_task ON task_rating (task_id);
+
+ALTER TABLE task_rating
+    ADD CONSTRAINT FK_TASK_RATING_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
 
 ALTER TABLE task_user_progress
     ADD CONSTRAINT FK_TASK_USER_PROGRESS_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);

@@ -62,24 +62,30 @@ final class TaskProgressRepositoryTest extends BaseJpaTest {
       "rick@hdm-stuttgart.de",
       "Rick",
       UserRole.ADMIN,
+      UserRole.ADMIN,
       true,
-      this.DATE
+      this.DATE,
+      false
     );
     this.user2 = new UserEntity(
       "14997803-9298-471b-87ca-403520169ede",
       "morty@hdm-stuttgart.de",
       "Morty",
       UserRole.STUDENT,
+      UserRole.STUDENT,
       true,
-      this.DATE
+      this.DATE,
+      false
     );
     this.user3 = new UserEntity(
       "e25a0f7f-6f46-412c-ac86-4f50bc5faed4",
       "summer@hdm-stuttgart.de",
       "Summer",
       UserRole.GUEST,
+      UserRole.GUEST,
       true,
-      this.DATE
+      this.DATE,
+      false
     );
     this.userRepository.saveAll(List.of(this.user1, this.user2, this.user3));
 

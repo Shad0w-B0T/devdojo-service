@@ -22,49 +22,20 @@ public abstract class AbstractLdapService implements ILdapService {
   @Override
   public UserEntity loadOrSyncUser(final String authId) {
     try {
-      return userService.getUser(new IUserService.UserGet() {
-        @Override
-        public String authId() {
-          return authId;
-        }
-
-        @Override
-        public java.util.UUID userId() {
-          return null;
-        }
-      });
+      return this.userService.getUser(new IUserService.GetUserByAuthId(authId));
     } catch (NotFoundException e) {
       Map<String, Object> attrs = this.ldapAttributeService.loadUserAttributes(authId);
 
-      UserRole role =
+      UserRole ldapUserRole =
         mapLdapUserRole(attrs.get("eduPersonAffiliation"));
 
-      return userService.createUser(new IUserService.UserCreate() {
-        @Override
-        public String authId() {
-          return authId;
-        }
-
-        @Override
-        public String email() {
-          return Objects.toString(attrs.get("mail"), "");
-        }
-
-        @Override
-        public String displayName() {
-          return Objects.toString(attrs.get("displayName"), "");
-        }
-
-        @Override
-        public UserRole role() {
-          return role;
-        }
-
-        @Override
-        public boolean active() {
-          return true;
-        }
-      });
+      return this.userService.createUser(new IUserService.CreateUser(
+        authId,
+        Objects.toString(attrs.get("mail"), ""),
+        Objects.toString(attrs.get("displayName"), ""),
+        ldapUserRole,
+        ldapUserRole,
+        true));
     }
   }
 

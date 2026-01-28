@@ -47,76 +47,11 @@ public abstract class AbstractCodeController implements ICodeController {
   @ResponseBody
   @Override
   public ResponseEntity<IProcessCodeResponse> processCode(@RequestBody final String payload,
-                                                          @RequestParam(value = "taskId") final UUID taskId) {
-    final TaskEntity taskEntity = this.taskService.getTask(() -> taskId);
+                                                          @RequestParam(value = "taskId") final String taskId) {
+    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(taskId));
     final List<List<Object>> testInputs = extractTestInputs(taskEntity);
 
     final UUID results = this.codeService.executeCode(taskEntity, payload, testInputs);
-
-    System.out.println("Extracted results: " + results);
-/*
-    final List<CodeResultUnit> resultUnits = results.stream()
-      .map(result -> mapToResultUnit(result, taskEntity))
-      .toList();
-
-    System.out.println("Mapped results: " + resultUnits);
-
-    final boolean complete = resultUnits.stream().allMatch(codeResultUnit -> codeResultUnit.pass());
-
-    TaskProgressState state = TaskProgressState.NOT_STARTED;
-    int score = 0;
-
-    if (!complete && !payload.trim().equalsIgnoreCase(taskEntity.template())) {
-      state = TaskProgressState.RUNNING;
-    }
-
-    if (complete) {
-      state = TaskProgressState.FINISHED;
-      score = taskEntity.difficulty().score();
-    }
-
-    System.out.println("state: " + state);
-    System.out.println("Score: " + score);
-
-    int finalScore = score;
-    TaskProgressState finalState = state;
-
-    final TaskProgressEntity taskProgressEntity =
-      this.tasksProgressService.updateTaskProgress(new ITasksProgressService.UpdateTaskProgress() {
-        @Override
-        public String input() {
-          return payload.trim();
-        }
-
-        @Override
-        public TaskProgressState state() {
-          return finalState;
-        }
-
-        @Override
-        public int score() {
-          return finalScore;
-        }
-
-        @Override
-        public UUID userId() {
-          return SecurityUtils.localThreadClient().userId();
-        }
-
-        @Override
-        public UUID taskId() {
-          return taskId;
-        }
-      });
-
-    System.out.println(taskProgressEntity);
-
-    return ResponseEntity.ok(new ProcessCodeResponse(resultUnits,
-      taskProgressEntity.state() == TaskProgressState.FINISHED,
-      taskProgressEntity.score()));
-
- */
-
     return ResponseEntity.ok(new ProcessCodeResponse(results));
   }
 

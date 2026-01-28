@@ -20,8 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Slf4j
 public abstract class AbstractSecurityConfig implements ISecurityConfig {
-  private final static String LOGIN_URL = "/api/login";
-  private final static String LOGOUT_URL = "/api/logout";
 
   @Bean
   public AuthenticationManager authenticationManager(final AuthenticationConfiguration configuration) throws Exception {
@@ -51,7 +49,7 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
           (req, res, ex) ->
             res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/login", "/api/refresh").permitAll()
+        .requestMatchers("/api/login", "/api/refresh",  "/ws/**").permitAll()
         .anyRequest().authenticated())
       .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
       .addFilterAfter(authFilter, JwtAuthenticationFilter.class)

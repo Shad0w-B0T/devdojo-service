@@ -1,6 +1,7 @@
 package devdojo.logic.database.language;
 
 import devdojo.logic.database.EntityRepository;
+import devdojo.logic.database.ExternalEntityRepository;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -11,12 +12,9 @@ import java.util.UUID;
  * <p>
  * Provides methods to find a language entry or check if one exists.
  */
-public interface LanguageRepository extends EntityRepository<LanguageEntity> {
+public interface LanguageRepository extends ExternalEntityRepository<LanguageEntity> {
 
   boolean existsByLanguageName(@NotNull final String languageName);
-
-  @NotNull
-  Optional<LanguageEntity> findById(@NotNull(message = "ID cannot be null.") final UUID uuid);
 
   @NotNull
   List<LanguageEntity> findAllByActiveTrue();

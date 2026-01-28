@@ -1,96 +1,134 @@
 package devdojo.graphql.controller.task;
 
-import devdojo.graphql.input.task.*;
+import devdojo.graphql.controller.AbstractGraphController;
 import devdojo.logic.database.language.LanguageEntity;
+import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
+import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.task.*;
+import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-public abstract class AbstractTaskController implements ITaskController {
+public abstract class AbstractTaskController extends AbstractGraphController implements ITaskController {
 
   private final @NotNull ITaskService taskService;
+  private final @NotNull IUserService userService;
   private final @NotNull ITasksProgressService tasksProgressService;
 
   protected AbstractTaskController(final ITaskService taskService,
+                                   @NotNull final IUserService userService,
                                    @NotNull final ITasksProgressService tasksProgressService) {
     Objects.requireNonNull(taskService, "taskService cannot be null");
 
     this.taskService = taskService;
+    this.userService = userService;
     this.tasksProgressService = tasksProgressService;
   }
 
   @QueryMapping("tasks")
   @Override
-  public @NotNull List<TaskEntity> tasks(@Argument("input") final GetTasks getTasks) {
+  public @NotNull List<TaskEntity> tasks(@Argument("input") final ITaskService.GetTasksByLangauge getTasks) {
     return this.taskService.getTasks(getTasks);
   }
 
   @QueryMapping("task")
   @Override
-  public @NotNull TaskEntity task(@Argument("input") @NotNull final GetTask getTask) {
+  public @NotNull TaskEntity task(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
     return this.taskService.getTask(getTask);
   }
 
-  @QueryMapping("nextTask")
+  @QueryMapping("taskRating")
   @Override
-  public TaskEntity nextTask(@Argument("input") @NotNull final GetNextTask getNextTask) {
+  public double taskRating(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
+    return this.taskService.getTaskRating(getTask);
+  }
+
+  @QueryMapping("nextTask")
+  @SelfRequired(field = "#user.userId()")
+  @Override
+  public TaskEntity nextTask(
+    @Argument("input") @P("user") @NotNull final ITasksProgressService.GetNextTask getNextTask) {
     return this.tasksProgressService.getNextTask(getNextTask);
   }
 
   @QueryMapping("userRank")
   @Override
-  public int userRank(@Argument("input") final GetUserRank getUserRank) {
+  public TaskProgressRepository.UserRankingProjection userRank(
+    @Argument("input") final ITasksProgressService.GetUserRank getUserRank) {
     return this.tasksProgressService.getUserRank(getUserRank);
   }
 
   @QueryMapping("leaderboard")
   @Override
   public List<TaskProgressRepository.UserRankingProjection> leaderboard(
-    @Argument("input") final GetLeaderboard getLeaderboard) {
+    @Argument("input") final ITasksProgressService.GetLeaderboard getLeaderboard) {
     return this.tasksProgressService.getLeaderboard(getLeaderboard);
   }
 
   @MutationMapping("createTask")
-  public @NotNull TaskEntity createTask(@Argument("input") @NotNull final CreateTask input) {
+  public @NotNull TaskEntity createTask(@Argument("input") @NotNull final ITaskService.CreateTask input) {
     return this.taskService.createTask(input);
   }
 
   @MutationMapping("updateTask")
-  public @NotNull TaskEntity updateTask(@Argument("input") @NotNull final UpdateTask input) {
+  public @NotNull TaskEntity updateTask(@Argument("input") @NotNull final ITaskService.UpdateTask input) {
     return this.taskService.updateTask(input);
   }
 
   @MutationMapping("appendUnitTest")
-  public @NotNull TaskEntity appendUnitTest(@Argument("input") @NotNull final AppendTest input) {
+  public @NotNull TaskEntity appendUnitTest(@Argument("input") @NotNull final ITaskService.AppendTest input) {
     return this.taskService.appendUnitTest(input);
   }
 
   @MutationMapping("updateTaskUserInput")
+  @SelfRequired(field = "#user.userId()")
   @Override
-  public boolean updateTaskUserInput(@Argument("input") @NotNull final UpdateTaskUserInput input) {
+  public boolean updateTaskUserInput(
+    @Argument("input") @P("user") @NotNull final ITasksProgressService.UpdateTaskProgressInput input) {
     this.tasksProgressService.updateTaskProgress(input);
     return true;
   }
 
+
+  @MutationMapping("removeTagFromTask")
+  public boolean removeTagFromTask(@Argument("input") @NotNull final ITaskService.RemoveTagFromTask input) {
+    return this.taskService.removeTagFromTask(input);
+  }
+
+  @MutationMapping("setTaskRating")
+  @Override
+  public boolean setTaskRating(@Argument("input") @NotNull final ITaskService.SetTaskRating setTaskRating) {
+    return this.taskService.setTaskRating(setTaskRating) != null;
+  }
+
+  @SchemaMapping(typeName = "Task", value = "tags")
+  @Override
+  public @NotNull List<String> tags(@NotNull final TaskEntity task) {
+    return task.tagEntities().stream().map(TagEntity::name).collect(Collectors.toList());
+  }
+
   @SchemaMapping(typeName = "Task", value = "id")
   @Override
-  public @NotNull UUID id(@NotNull final TaskEntity task) {
-    return task.id();
+  public @NotNull String id(@NotNull final TaskEntity task) {
+    return task.externalId();
   }
 
   @SchemaMapping(typeName = "Task", value = "language")
@@ -144,16 +182,34 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "Task", value = "userProgress")
   @Override
   public @NotNull ITaskUserProgress userProgress(@NotNull final TaskEntity task,
-                                                 @Argument("userId") final UUID userId) {
-    final UUID progressUserId = userId != null ? userId : SecurityUtils.currentTokenDetails().userId();
+                                                 @Argument("userId") final String userId) {
+    final String progressUserId = userId != null ? userId : SecurityUtils.currentTokenDetails().userId();
 
     try {
       final TaskProgressEntity taskProgressEntity =
-        this.tasksProgressService.getTaskProgress(progressUserId, task.id());
+        this.tasksProgressService.getTaskProgress(progressUserId, task.externalId());
       return new TaskUserProgress(taskProgressEntity.input(), taskProgressEntity.state(), taskProgressEntity.score());
     } catch (final NotFoundException exception) {
       return new TaskUserProgress("", TaskProgressState.NOT_STARTED, 0);
     }
+  }
+
+  @SchemaMapping(typeName = "Task", value = "createdBy")
+  @Override
+  public UserEntity createdBy(final TaskEntity task) {
+    return this.anonymousUser(task.createdByUserEntity());
+  }
+
+  @SchemaMapping(typeName = "Task", value = "updatedBy")
+  @Override
+  public UserEntity updatedBy(final TaskEntity task) {
+    return this.anonymousUser(task.updatedByUserEntity());
+  }
+
+  @SchemaMapping(typeName = "Task", value = "rating")
+  @Override
+  public double rating(@NotNull final TaskEntity task) {
+    return this.taskService.getTaskRating(new ITaskService.GetTask(task.externalId()));
   }
 
   @SchemaMapping(typeName = "TaskUserProgress", value = "input")
@@ -204,10 +260,10 @@ public abstract class AbstractTaskController implements ITaskController {
     return argument.value();
   }
 
-  @SchemaMapping(typeName = "UserRanking", value = "userId")
+  @SchemaMapping(typeName = "UserRanking", value = "user")
   @Override
-  public UUID userId(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
-    return userRankingProjection.userId();
+  public @NotNull UserEntity user(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
+    return this.anonymousUser(this.userService.getInternalUser(userRankingProjection.userId()));
   }
 
   @SchemaMapping(typeName = "UserRanking", value = "totalScore")

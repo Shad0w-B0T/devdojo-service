@@ -37,11 +37,11 @@ public abstract class AbstractAuthWebFilter extends OncePerRequestFilter impleme
 
       final UserEntity user = this.ldapService.loadOrSyncUser(authId);
       final ITokenDetails details = new TokenDetails(
-        user.id(),
+        user.externalId(),
         user.authId(),
         user.email(),
         user.displayName(),
-        user.role()
+        user.applicationRole()
       );
 
       token.setDetails(details);

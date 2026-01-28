@@ -1,6 +1,6 @@
 package devdojo.logic.database.compiler;
 
-import devdojo.logic.database.AbstractEntity;
+import devdojo.logic.database.AbstractExternalEntity;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.schema.compiler.ICompiler;
 import jakarta.persistence.*;
@@ -19,7 +19,7 @@ import lombok.experimental.Accessors;
 @Setter
 @NoArgsConstructor
 @Accessors(fluent = true)
-public final class CompilerEntity extends AbstractEntity implements ICompiler {
+public final class CompilerEntity extends AbstractExternalEntity implements ICompiler {
 
   @NotNull(message = "Language entity must not be null")
   @ManyToOne(fetch = FetchType.LAZY)
@@ -53,5 +53,10 @@ public final class CompilerEntity extends AbstractEntity implements ICompiler {
     this.compilerId = compilerId;
     this.cpuCores = cpuCores;
     this.memoryTotal = memoryTotal;
+  }
+
+  @Override
+  protected String prefix() {
+    return "com";
   }
 }

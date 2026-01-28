@@ -18,14 +18,15 @@ public interface ITasksProgressService {
   TaskProgressEntity getTaskProgress(@NotNull final GetTaskProgress getTaskProgress);
 
   @NotNull
-  TaskProgressEntity getTaskProgress(@NotNull(message = "userId must not be null") final UUID userId,
-                                     @NotNull(message = "taskId must not be null") final UUID taskId);
+  TaskProgressEntity getTaskProgress(@NotNull(message = "userId must not be null") final String userId,
+                                     @NotNull(message = "taskId must not be null") final String taskId);
 
   @NotNull
   TaskEntity getNextTask(@NotNull(message = "GetNextTask must not be null") final GetNextTask getNextTask);
 
   @NotNull(message = "Returned rank must not be null")
-  int getUserRank(@NotNull(message = "GetUserRank data must not be null") final GetUserRank getUserRank);
+  TaskProgressRepository.UserRankingProjection getUserRank(
+    @NotNull(message = "GetUserRank data must not be null") final GetUserRank getUserRank);
 
   @NotNull(message = "Returned leaderboard must not be null")
   List<TaskProgressRepository.UserRankingProjection> getLeaderboard(
@@ -38,61 +39,94 @@ public interface ITasksProgressService {
   TaskProgressEntity updateTaskProgress(@NotNull final UpdateTaskProgressInput updateTaskProgressInput);
 
   // DTOs
-  interface GetTaskProgresses {
-    @NotNull(message = "completedTasksId must not be null")
-    UUID userId();
+  record GetTaskProgresses(
+
+    @NotNull(message = "userId must not be null")
+    String userId
+
+  ) {
   }
 
-  interface GetTaskProgress {
+  record GetTaskProgress(
+
     @NotNull(message = "userId must not be null")
-    UUID userId();
+    String userId,
 
     @NotNull(message = "taskId must not be null")
-    UUID taskId();
+    String taskId
+
+  ) {
   }
 
-  interface GetUserRank {
+  record GetUserRank(
+
     @NotNull(message = "userId must not be null")
-    UUID userId();
+    String userId,
 
     @NotNull(message = "languageId must not be null")
-    UUID languageId();
+    String languageId
+
+  ) {
   }
 
-  interface GetLeaderboard {
-    @NotNull(message = "languageId must not be null")
-    UUID languageId();
+  record GetLeaderboard(
 
-    @NotNull(message = "start must not be null")
+    @NotNull(message = "languageId must not be null")
+    String languageId,
+
     @Min(value = 0, message = "start must be greater than or equal to 0")
-    int start();
+    int start,
 
-    @NotNull(message = "end must not be null")
     @Min(value = 0, message = "end must be greater than or equal to 0")
-    int end();
+    int end
+
+  ) {
   }
 
-  interface GetNextTask {
+  record GetNextTask(
+
     @NotNull(message = "userId must not be null")
-    UUID userId();
+    String userId,
 
-    UUID languageId();
+    String languageId, // optional
 
     @NotNull(message = "state must not be null")
-    TaskProgressState state();
+    TaskProgressState state
+
+  ) {
   }
 
-  interface UpdateTaskProgressInput extends GetTaskProgress {
+  record UpdateTaskProgressInput(
+
+    @NotNull(message = "userId must not be null")
+    String userId,
+
+    @NotNull(message = "taskId must not be null")
+    String taskId,
+
     @NotNull(message = "input must not be null")
-    String input();
+    String input
+
+  ) {
   }
 
-  interface UpdateTaskProgress extends UpdateTaskProgressInput {
-    @NotNull(message = "state must not be null")
-    TaskProgressState state();
+  record UpdateTaskProgress(
 
-    @NotNull(message = "score must not be null")
-    @Min(value = 0, message = "score must be postive")
-    int score();
+    @NotNull(message = "userId must not be null")
+    String userId,
+
+    @NotNull(message = "taskId must not be null")
+    String taskId,
+
+    @NotNull(message = "input must not be null")
+    String input,
+
+    @NotNull(message = "state must not be null")
+    TaskProgressState state,
+
+    @Min(value = 0, message = "score must be positive")
+    int score
+
+  ) {
   }
 }

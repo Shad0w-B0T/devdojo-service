@@ -1,5 +1,7 @@
 package devdojo.logic.compiler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import devdojo.logic.cache.compiler.CompilerTask;
 import devdojo.logic.cache.compiler.CompilerTaskRepository;
 import devdojo.logic.cache.compiler.CompilerTaskResult;
@@ -13,9 +15,12 @@ import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TestEntity;
+import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
+import devdojo.logic.user.IUserService;
+import devdojo.logic.websocket.ISocketPublisher;
 import devdojo.schema.code.TestRun;
 import devdojo.schema.code.TestRunResult;
 import devdojo.schema.code.TestRunResultChecked;
@@ -39,6 +44,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public abstract class AbstractCompilerService implements ICompilerService {
 
+  private final ObjectMapper objectMapper;
   private final LanguageRepository languageRepository;
   private final ITaskService taskService;
   private final ITasksProgressService tasksProgressService;
@@ -46,15 +52,21 @@ public abstract class AbstractCompilerService implements ICompilerService {
   private final CompilerHeartbeatRepository compilerHeartbeatRepository;
   private final CompilerTaskRepository compilerTaskRepository;
   private final CompilerTaskResultRepository compilerTaskResultRepository;
+  private final ISocketPublisher socketPublisher;
+  private final IUserService userService;
 
   protected AbstractCompilerService(
+    final ObjectMapper objectMapper,
     @NotNull(message = "LanguageRepository must not be null") final LanguageRepository languageRepository,
     final ITaskService taskService,
     final ITasksProgressService tasksProgressService,
     final CompilerRepository compilerRepository,
     final CompilerHeartbeatRepository compilerHeartbeatRepository,
     final CompilerTaskRepository compilerTaskRepository,
-    final CompilerTaskResultRepository compilerTaskResultRepository) {
+    final CompilerTaskResultRepository compilerTaskResultRepository,
+    final ISocketPublisher socketPublisher,
+    final IUserService userService) {
+    this.objectMapper = objectMapper;
     this.languageRepository = languageRepository;
     this.taskService = taskService;
     this.tasksProgressService = tasksProgressService;
@@ -62,6 +74,8 @@ public abstract class AbstractCompilerService implements ICompilerService {
     this.compilerHeartbeatRepository = compilerHeartbeatRepository;
     this.compilerTaskRepository = compilerTaskRepository;
     this.compilerTaskResultRepository = compilerTaskResultRepository;
+    this.socketPublisher = socketPublisher;
+    this.userService = userService;
   }
 
   @Override
@@ -95,7 +109,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
   public CompilerTask createCompilerTask(final CreateCompilerTask createCompilerTask) {
     return this.compilerTaskRepository.save(
       new CompilerTask(createCompilerTask.id(), false, createCompilerTask.methodCode(),
-        UUID.fromString(createCompilerTask.taskId()), SecurityUtils.currentTokenDetails().userId()));
+        createCompilerTask.taskId(), SecurityUtils.currentTokenDetails().userId()));
   }
 
   @Transactional
@@ -105,10 +119,8 @@ public abstract class AbstractCompilerService implements ICompilerService {
       .findById(completeCompilerTask.id())
       .orElseThrow(() -> new NotFoundException("No compiler task found for id=" + completeCompilerTask.id()));
 
-    final TaskEntity taskEntity = this.taskService.getTask(compilerTask::taskId);
-
+    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(compilerTask.taskId()));
     final List<TestRunResult> results = completeCompilerTask.results();
-
     final List<TestRunResultChecked> resultUnits = results.stream()
       .map(result -> mapToResultUnit(result, taskEntity))
       .toList();
@@ -127,41 +139,17 @@ public abstract class AbstractCompilerService implements ICompilerService {
       score = taskEntity.difficulty().score();
     }
 
-    System.out.println("state: " + state);
-    System.out.println("Score: " + score);
-
     int finalScore = score;
     TaskProgressState finalState = state;
 
-    final TaskProgressEntity taskProgressEntity =
-      this.tasksProgressService.updateTaskProgress(new ITasksProgressService.UpdateTaskProgress() {
-        @Override
-        public String input() {
-          return compilerTask.methodCode().trim();
-        }
-
-        @Override
-        public TaskProgressState state() {
-          return finalState;
-        }
-
-        @Override
-        public int score() {
-          return finalScore;
-        }
-
-        @Override
-        public UUID userId() {
-          return compilerTask.userId();
-        }
-
-        @Override
-        public UUID taskId() {
-          return taskEntity.id();
-        }
-      });
-
-    System.out.println(taskProgressEntity);
+    final TaskProgressEntity taskProgressEntity = this.tasksProgressService
+      .updateTaskProgress(new ITasksProgressService.UpdateTaskProgress(
+        compilerTask.userId(),
+        taskEntity.externalId(),
+        compilerTask.methodCode().trim(),
+        finalState,
+        finalScore
+      ));
 
     final TestRun run = new TestRun(
       compilerTask.id(),
@@ -169,13 +157,29 @@ public abstract class AbstractCompilerService implements ICompilerService {
       taskProgressEntity.state() == TaskProgressState.FINISHED,
       taskProgressEntity.score());
 
-    final CompilerTaskResult result =
-      this.compilerTaskResultRepository.save(new CompilerTaskResult(compilerTask.id(), run, compilerTask.userId()));
+    final CompilerTaskResult result;
+    try {
+      result = this.compilerTaskResultRepository.save(
+        new CompilerTaskResult(compilerTask.id(), compilerTask.userId(), this.objectMapper.writeValueAsString(run)));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
 
     compilerTask.processed(true);
     this.compilerTaskRepository.save(compilerTask);
+    this.sendWebsocket(compilerTask, run);
 
     return result;
+  }
+
+  private void sendWebsocket(final CompilerTask compilerTask,
+                             final TestRun testRun) {
+    try {
+      final UserEntity userEntity = this.userService.getUser(compilerTask.userId());
+      this.socketPublisher.notifyTaskUpdate(userEntity.authId(), testRun);
+    } catch (final NotFoundException exception) {
+      log.error("No user found to send task compile response={}, ignoring. ", compilerTask.id());
+    }
   }
 
   @Transactional
@@ -257,7 +261,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
                                             final TaskEntity taskEntity) {
     return taskEntity.testEntities().stream()
       .filter(testEntity -> Objects.equals(
-        testEntity.input().stream().map(ITestArgument::value).toList(),
+        result.input(),
         testEntity.input().stream().map(ITestArgument::value).toList()
       ))
       .findFirst()
