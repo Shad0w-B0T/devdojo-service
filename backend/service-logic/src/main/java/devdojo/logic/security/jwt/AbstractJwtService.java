@@ -14,7 +14,7 @@ import javax.crypto.SecretKey;
 
 public abstract class AbstractJwtService implements IJwtService {
 
-  private final static int EXPIRE_MINUTES = 15;
+  private final static int EXPIRE_MINUTES = 12;
 
   private final SecretKey key;
 
@@ -28,7 +28,7 @@ public abstract class AbstractJwtService implements IJwtService {
       .subject(userEntity.authId())
       .claim("role", userEntity.ldapRole().name())
       .issuedAt(new Date())
-      .expiration(Date.from(Instant.now().plus(EXPIRE_MINUTES, ChronoUnit.MINUTES)))
+      .expiration(Date.from(Instant.now().plus(EXPIRE_MINUTES, ChronoUnit.HOURS)))
       .signWith(key)
       .compact();
   }
