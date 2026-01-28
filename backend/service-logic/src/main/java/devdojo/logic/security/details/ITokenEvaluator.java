@@ -11,7 +11,7 @@ public interface ITokenEvaluator {
 
   boolean hasRole(@NotNull final AbstractAuthenticationToken token,
                   @NotNull final UserRole role) throws UsernameNotFoundException;
-
+  
   boolean isSelf(@NotNull final AbstractAuthenticationToken token,
                  @NotNull final String userId,
                  @NotNull final UserRole bypassRole);

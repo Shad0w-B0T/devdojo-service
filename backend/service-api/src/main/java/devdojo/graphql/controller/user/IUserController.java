@@ -24,6 +24,8 @@ public interface IUserController {
   @NotNull
   UserEntity updateUserRole(@NotNull final IUserService.UpdateUserRole input);
 
+  @NotNull
+  UserEntity updateUserVisibility(@NotNull final IUserService.UpdateUserProfileVisibility input);
   // ────── Schema ──────
 
   //User
@@ -44,6 +46,9 @@ public interface IUserController {
 
   @NotNull
   long lastLogin(@NotNull final UserEntity userEntity);
+
+  @NotNull
+  boolean profilePublic(@NotNull final UserEntity userEntity);
 
   @NotNull
   long createdAt(@NotNull final UserEntity userEntity);

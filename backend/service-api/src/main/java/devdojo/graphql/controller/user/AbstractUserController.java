@@ -3,6 +3,8 @@ package devdojo.graphql.controller.user;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.user.IUserService;
+import devdojo.schema.annotation.RoleRequired;
+import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -10,6 +12,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.core.parameters.P;
 
 public abstract class AbstractUserController implements IUserController {
 
@@ -21,6 +24,7 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @QueryMapping("users")
+  @RoleRequired(role = UserRole.ADMIN)
   @Override
   public @NotNull List<UserEntity> users() {
     return this.userService.getUsers();
@@ -38,8 +42,18 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @MutationMapping("updateUserRole")
+  @SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
   @Override
-  public @NotNull UserEntity updateUserRole(@Argument("input") @NotNull final IUserService.UpdateUserRole input) {
+  public @NotNull UserEntity updateUserRole(
+    @Argument("input") @P("user") @NotNull final IUserService.UpdateUserRole input) {
+    return this.userService.updateUser(input);
+  }
+
+  @MutationMapping("updateUserVisibility")
+  @SelfRequired(field = "#user.userId()", bypassRole = UserRole.ADMIN)
+  @Override
+  public UserEntity updateUserVisibility(
+    @Argument("input") @P("user") @NotNull final IUserService.UpdateUserProfileVisibility input) {
     return this.userService.updateUser(input);
   }
 
@@ -77,6 +91,12 @@ public abstract class AbstractUserController implements IUserController {
   @Override
   public @NotNull long lastLogin(@NotNull final UserEntity userEntity) {
     return userEntity.lastLogin().getTime();
+  }
+
+  @SchemaMapping(typeName = "User")
+  @Override
+  public boolean profilePublic(@NotNull final UserEntity userEntity) {
+    return userEntity.profilePublic();
   }
 
   @SchemaMapping(typeName = "User")

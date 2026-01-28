@@ -99,7 +99,7 @@ input AppendTestInput {
 }
 
 input UpdateTaskUserInput {
-    userId: ID
+    userId: ID!
     taskId: ID!
     input: String!
 }
@@ -148,7 +148,7 @@ extend type Query {
 
     nextTask(input: GetNextTask): Task!
 
-    userRank(input: GetUserRank!): Int
+    userRank(input: GetUserRank!): UserRanking!
     leaderboard(input: GetLeaderboard): [UserRanking!]!
 }
 

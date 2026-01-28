@@ -1,5 +1,6 @@
 package devdojo.graphql.controller.task;
 
+import devdojo.graphql.controller.AbstractGraphController;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.TaskEntity;
@@ -10,8 +11,10 @@ import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
 import devdojo.logic.user.IUserService;
+import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.task.*;
+import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
@@ -20,10 +23,11 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-public abstract class AbstractTaskController implements ITaskController {
+public abstract class AbstractTaskController extends AbstractGraphController implements ITaskController {
 
   private final @NotNull ITaskService taskService;
   private final @NotNull IUserService userService;
@@ -58,14 +62,17 @@ public abstract class AbstractTaskController implements ITaskController {
   }
 
   @QueryMapping("nextTask")
+  @SelfRequired(field = "#user.userId()")
   @Override
-  public TaskEntity nextTask(@Argument("input") @NotNull final ITasksProgressService.GetNextTask getNextTask) {
+  public TaskEntity nextTask(
+    @Argument("input") @P("user") @NotNull final ITasksProgressService.GetNextTask getNextTask) {
     return this.tasksProgressService.getNextTask(getNextTask);
   }
 
   @QueryMapping("userRank")
   @Override
-  public int userRank(@Argument("input") final ITasksProgressService.GetUserRank getUserRank) {
+  public TaskProgressRepository.UserRankingProjection userRank(
+    @Argument("input") final ITasksProgressService.GetUserRank getUserRank) {
     return this.tasksProgressService.getUserRank(getUserRank);
   }
 
@@ -92,9 +99,10 @@ public abstract class AbstractTaskController implements ITaskController {
   }
 
   @MutationMapping("updateTaskUserInput")
+  @SelfRequired(field = "#user.userId()")
   @Override
   public boolean updateTaskUserInput(
-    @Argument("input") @NotNull final ITasksProgressService.UpdateTaskProgressInput input) {
+    @Argument("input") @P("user") @NotNull final ITasksProgressService.UpdateTaskProgressInput input) {
     this.tasksProgressService.updateTaskProgress(input);
     return true;
   }
@@ -189,13 +197,13 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "Task", value = "createdBy")
   @Override
   public UserEntity createdBy(final TaskEntity task) {
-    return task.createdByUserEntity();
+    return this.anonymousUser(task.createdByUserEntity());
   }
 
   @SchemaMapping(typeName = "Task", value = "updatedBy")
   @Override
   public UserEntity updatedBy(final TaskEntity task) {
-    return task.updatedByUserEntity();
+    return this.anonymousUser(task.updatedByUserEntity());
   }
 
   @SchemaMapping(typeName = "Task", value = "rating")
@@ -255,7 +263,7 @@ public abstract class AbstractTaskController implements ITaskController {
   @SchemaMapping(typeName = "UserRanking", value = "user")
   @Override
   public @NotNull UserEntity user(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
-    return this.userService.getInternalUser(userRankingProjection.userId());
+    return this.anonymousUser(this.userService.getInternalUser(userRankingProjection.userId()));
   }
 
   @SchemaMapping(typeName = "UserRanking", value = "totalScore")

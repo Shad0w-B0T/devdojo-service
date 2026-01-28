@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
+import java.io.*;
 import java.util.Date;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(fluent = true)
-public final class UserEntity extends AbstractExternalEntity implements IUser {
+public final class UserEntity extends AbstractExternalEntity implements IUser, Serializable {
 
   @NotNull(message = "Auth ID must not be null")
   @Column(name = "authId", nullable = false, updatable = false, unique = true)
@@ -61,6 +62,9 @@ public final class UserEntity extends AbstractExternalEntity implements IUser {
   @Column(name = "lastLogin", nullable = false)
   private Date lastLogin;
 
+  @Column(name = "profilePublic", nullable = false)
+  private boolean profilePublic;
+
   /*@OneToOne(
     mappedBy = "user",
     fetch = FetchType.LAZY,
@@ -80,6 +84,7 @@ public final class UserEntity extends AbstractExternalEntity implements IUser {
    * @param applicationRole the internal application role.
    * @param active          whether the user is active or not.
    * @param lastLogin       the last login timestamp.
+   * @param profilePublic   if the profile is public
    */
   public UserEntity(@NotNull final String authId,
                     @NotNull final String email,
@@ -87,7 +92,8 @@ public final class UserEntity extends AbstractExternalEntity implements IUser {
                     @NotNull final UserRole ldapRole,
                     @NotNull final UserRole applicationRole,
                     @NotNull final Boolean active,
-                    @NotNull final Date lastLogin) {
+                    @NotNull final Date lastLogin,
+                    @NotNull final Boolean profilePublic) {
     this.authId = authId;
     this.email = email;
     this.displayName = displayName;
@@ -95,6 +101,7 @@ public final class UserEntity extends AbstractExternalEntity implements IUser {
     this.applicationRole = applicationRole;
     this.active = Boolean.TRUE.equals(active);
     this.lastLogin = lastLogin;
+    this.profilePublic = Boolean.TRUE.equals(profilePublic);
   }
 
   @Override

@@ -4,6 +4,7 @@ package devdojo.logic.security.web;
 import devdojo.logic.security.jwt.IJwtBlacklistService;
 import devdojo.logic.security.jwt.IJwtService;
 import devdojo.schema.user.UserRole;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,18 +37,22 @@ public abstract class AbstractJwtAuthenticationFilter extends OncePerRequestFilt
   }
 
   protected UsernamePasswordAuthenticationToken authenticateToken(final String token) {
-    if (this.blacklistService.isBlacklisted(this.jwtService.extractJti(token))) {
-      throw new AccessDeniedException("JWT is blacklisted");
+    try {
+      if (this.blacklistService.isBlacklisted(this.jwtService.extractJti(token))) {
+        throw new AccessDeniedException("JWT is blacklisted");
+      }
+
+      final String authId = this.jwtService.extractUsername(token);
+      final UserRole role = this.jwtService.extractRole(token);
+
+      return new UsernamePasswordAuthenticationToken(
+        authId,
+        null,
+        List.of(new SimpleGrantedAuthority("ROLE_" + role))
+      );
+    } catch (final ExpiredJwtException exception) {
+      throw new AccessDeniedException("JWT expired", exception);
     }
-
-    final String authId = this.jwtService.extractUsername(token);
-    final UserRole role = this.jwtService.extractRole(token);
-
-    return new UsernamePasswordAuthenticationToken(
-      authId,
-      null,
-      List.of(new SimpleGrantedAuthority("ROLE_" + role))
-    );
   }
 
   @Override
@@ -80,12 +85,15 @@ public abstract class AbstractJwtAuthenticationFilter extends OncePerRequestFilt
       MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
     if (accessor != null && StompCommand.CONNECT.equals(accessor.getCommand())) {
-
       final String authHeader = accessor.getFirstNativeHeader("Authorization");
 
       if (authHeader != null && authHeader.startsWith("Bearer ")) {
         final String token = authHeader.substring(7);
-        accessor.setUser(authenticateToken(token));
+        try {
+          accessor.setUser(authenticateToken(token));
+        } catch (final AccessDeniedException ex) {
+          /*ignoring error -> no user wil be set, so no user context is given to websocket.*/
+        }
       }
     }
 

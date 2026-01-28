@@ -26,7 +26,7 @@ public interface ITaskController {
   @NotNull
   TaskEntity nextTask(@NotNull final ITasksProgressService.GetNextTask getNextTask);
 
-  int userRank(@NotNull final ITasksProgressService.GetUserRank getUserRank);
+  TaskProgressRepository.UserRankingProjection userRank(@NotNull final ITasksProgressService.GetUserRank getUserRank);
 
   @NotNull
   List<TaskProgressRepository.UserRankingProjection> leaderboard(
