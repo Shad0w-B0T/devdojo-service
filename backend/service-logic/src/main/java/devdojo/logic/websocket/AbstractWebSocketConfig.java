@@ -38,7 +38,7 @@ public abstract class AbstractWebSocketConfig implements IWebSocketConfig {
 
   @Override
   public void registerStompEndpoints(final StompEndpointRegistry registry) {
-    registry.addEndpoint("/ws");
+    registry.addEndpoint("/ws").setAllowedOrigins("https://devdojo.mi.hdm-stuttgart.de");
   }
 
   @Override
