@@ -31,7 +31,7 @@ public abstract class AbstractLdapAttributeService implements ILdapAttributeServ
     final List<Map<String, Object>> results = ldapTemplate.search(
       USERS_BASE_DN,
       "(uid=" + uid + ")",
-      userAttributesMapper()
+      userAttributesMapper(uid)
     );
 
     return results.stream()
@@ -43,30 +43,33 @@ public abstract class AbstractLdapAttributeService implements ILdapAttributeServ
       );
   }
 
-  private AttributesMapper<Map<String, Object>> userAttributesMapper() {
-    return attrs -> Map.of(
-      "displayName", getSingle(attrs, "displayName"),
-      "mail", getSingle(attrs, "mail"),
-      "eduPersonAffiliation", getMulti(attrs, "eduPersonAffiliation"),
-      "employeeType", getSingle(attrs, "employeeType"),
-      "givenName", getSingle(attrs, "givenName"),
-      "sn", getSingle(attrs, "sn")
-    );
+  private AttributesMapper<Map<String, Object>> userAttributesMapper(final String uid) {
+    return attrs -> {
+      System.out.println("Attribute:" + attrs);
+      return Map.of(
+        "displayName", getSingle(attrs, "displayName", ""),
+        "mail", getSingle(attrs, "mail", uid + "@hdm-stuttgart.de"),
+        "eduPersonAffiliation", getMulti(attrs, "eduPersonAffiliation"),
+        "employeeType", getSingle(attrs, "employeeType", ""),
+        "givenName", getSingle(attrs, "givenName", ""),
+        "sn", getSingle(attrs, "sn", uid)
+      );
+    };
   }
 
-  private String getSingle(final Attributes attrs, final String name) {
+  private String getSingle(final Attributes attrs, final String name, final String defaultValue) {
     try {
       return Optional.ofNullable(attrs.get(name))
         .map(attr -> {
           try {
             return attr.get().toString();
           } catch (Exception e) {
-            return null;
+            return defaultValue;
           }
         })
-        .orElse(null);
+        .orElse(defaultValue);
     } catch (Exception e) {
-      return null;
+      return defaultValue;
     }
   }
 
