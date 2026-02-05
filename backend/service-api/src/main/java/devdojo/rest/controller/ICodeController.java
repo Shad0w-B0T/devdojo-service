@@ -13,17 +13,9 @@ public interface ICodeController {
   );
 
   interface IProcessCodeResponse {
+
     @NotNull(message = "Id must not be null")
     UUID id();
-   /* @NotNull(message = "Results must not be null")
-    List<CodeResultUnit> results();
 
-    @NotNull(message = "Completed must not be null")
-    boolean completed();
-
-    @NotNull(message = "Score must not be null")
-    int score();
-
-    */
   }
 }
