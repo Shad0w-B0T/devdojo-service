@@ -1,4 +1,4 @@
-package devdojo.logic.security.ldap;
+package devdojo.logic.security.ldap.config;
 
 import jakarta.validation.constraints.NotNull;
 import org.springframework.ldap.core.LdapTemplate;

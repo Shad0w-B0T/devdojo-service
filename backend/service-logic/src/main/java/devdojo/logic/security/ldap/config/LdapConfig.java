@@ -1,4 +1,4 @@
-package devdojo.logic.security.ldap;
+package devdojo.logic.security.ldap.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

@@ -3,7 +3,7 @@ package devdojo.logic.security.web;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.details.ITokenDetails;
 import devdojo.logic.security.details.TokenDetails;
-import devdojo.logic.security.ldap.ILdapService;
+import devdojo.logic.security.ldap.service.ILdapService;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

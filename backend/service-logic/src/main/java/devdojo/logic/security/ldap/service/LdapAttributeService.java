@@ -1,4 +1,4 @@
-package devdojo.logic.security.ldap;
+package devdojo.logic.security.ldap.service;
 
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.stereotype.Service;

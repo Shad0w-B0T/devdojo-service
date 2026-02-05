@@ -1,4 +1,4 @@
-package devdojo.logic.security.ldap;
+package devdojo.logic.security.ldap.service;
 
 import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
