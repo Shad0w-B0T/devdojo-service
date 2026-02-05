@@ -5,7 +5,7 @@ import devdojo.logic.security.SecurityUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 
-public abstract class AbstractGraphRateLimitAspect {
+public abstract class AbstractGraphRateLimitAspect implements IGraphRateLimitAspect{
 
   private final static long SECOND = 1000;
   private final IRateLimitService rateLimitService;
@@ -17,6 +17,10 @@ public abstract class AbstractGraphRateLimitAspect {
     this.tokensPerSecond = tokensPerSecond;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   @Around("@annotation(org.springframework.graphql.data.method.annotation.QueryMapping) ||" +
     " @annotation(org.springframework.graphql.data.method.annotation.MutationMapping)")
   public Object rateLimitAllGraphQL(final ProceedingJoinPoint joinPoint) throws Throwable {

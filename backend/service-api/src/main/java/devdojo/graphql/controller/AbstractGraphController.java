@@ -16,8 +16,10 @@ public abstract class AbstractGraphController {
       "anon@hdm-stuttgart.de",
       "anonymous user",
       UserRole.GUEST,
-      UserRole.GUEST, true,
-      new Date(), true);
+      UserRole.GUEST,
+      true,
+      new Date(),
+      true);
   }
 
   protected @NotNull UserEntity anonUser() {
