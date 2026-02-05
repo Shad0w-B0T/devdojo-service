@@ -1,6 +1,5 @@
 package devdojo.logic.database.task;
 
-import devdojo.logic.database.AbstractEntity;
 import devdojo.logic.database.AbstractExternalEntity;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.tag.TagEntity;
@@ -9,7 +8,14 @@ import devdojo.schema.Constants;
 import devdojo.schema.task.Difficulty;
 import devdojo.schema.task.ITask;
 import devdojo.schema.task.ITest;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.ArrayList;

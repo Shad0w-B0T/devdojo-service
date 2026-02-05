@@ -1,6 +1,5 @@
 package devdojo.logic.cache.compiler;
 
-import devdojo.schema.code.TestRun;
 import jakarta.persistence.Id;
 import java.io.*;
 import java.util.UUID;
