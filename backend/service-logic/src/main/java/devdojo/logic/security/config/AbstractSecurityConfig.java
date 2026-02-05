@@ -1,7 +1,6 @@
 package devdojo.logic.security.config;
 
 import devdojo.logic.security.web.IWebFilter;
-import devdojo.logic.security.web.AbstractJwtAuthenticationFilter;
 import devdojo.logic.security.web.JwtAuthenticationFilter;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
@@ -49,7 +48,7 @@ public abstract class AbstractSecurityConfig implements ISecurityConfig {
           (req, res, ex) ->
             res.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/login", "/api/refresh",  "/ws/**").permitAll()
+        .requestMatchers("/api/login", "/api/refresh", "/ws/**").permitAll()
         .anyRequest().authenticated())
       .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
       .addFilterAfter(authFilter, JwtAuthenticationFilter.class)

@@ -1,7 +1,6 @@
 package devdojo.logic.security.config;
 
 import devdojo.logic.security.web.IWebFilter;
-import devdojo.logic.security.web.AbstractJwtAuthenticationFilter;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authorization.method.PrePostTemplateDefaults;
@@ -15,7 +14,7 @@ public interface ISecurityConfig {
    * @param provider
    * @param authFilter the web filter to be applied; must not be null.
    * @param jwtFilter
-   * @param http      the HttpSecurity object used for configuring security features; must not be null.
+   * @param http       the HttpSecurity object used for configuring security features; must not be null.
    * @return the configured security filter chain.
    * @throws Exception if an error occurs during the configuration of the security filter chain.
    */
