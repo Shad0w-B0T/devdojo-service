@@ -5,7 +5,7 @@ import devdojo.logic.security.SecurityUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 
-public abstract class AbstractGraphRateLimitAspect implements IGraphRateLimitAspect{
+public abstract class AbstractGraphRateLimitAspect implements IGraphRateLimitAspect {
 
   private final static long SECOND = 1000;
   private final IRateLimitService rateLimitService;

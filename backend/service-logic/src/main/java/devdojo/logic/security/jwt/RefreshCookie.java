@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RefreshCookie implements IRefreshCookie{
+public class RefreshCookie implements IRefreshCookie {
 
   private final String cookieName;
   private final boolean secure;
