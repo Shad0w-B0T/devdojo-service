@@ -7,8 +7,7 @@ enum ArgumentType {
 enum TaskDifficulty {
     EASY,
     MEDIUM,
-    HARD,
-    GOTTLOS
+    HARD
 }
 
 enum TaskProgressState {
