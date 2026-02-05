@@ -1,6 +1,6 @@
 package devdojo.logic.cache.bucket4j.aspect;
 
-import devdojo.logic.cache.bucket4j.IRateLimitService;
+import devdojo.logic.security.ratelimit.IRateLimitService;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
 package devdojo.logic.cache.bucket4j.aspect;
 
-import devdojo.logic.cache.bucket4j.IRateLimitService;
+import devdojo.logic.security.ratelimit.IRateLimitService;
 import devdojo.logic.cache.bucket4j.annotation.RateLimited;
 import java.lang.reflect.Method;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package devdojo.graphql.security;
 
-import devdojo.logic.cache.bucket4j.IRateLimitService;
+import devdojo.logic.security.ratelimit.IRateLimitService;
 import devdojo.logic.security.SecurityUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
