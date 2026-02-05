@@ -1,6 +1,5 @@
 package devdojo.logic.database.user;
 
-import devdojo.logic.database.EntityRepository;
 import devdojo.logic.database.ExternalEntityRepository;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
