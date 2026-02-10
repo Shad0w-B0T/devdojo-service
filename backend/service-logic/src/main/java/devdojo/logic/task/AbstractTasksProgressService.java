@@ -82,7 +82,8 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
     final LanguageEntity languageEntity =
       this.languageService.getLanguage(new ILanguageService.GetLanguage(getUserRank.languageId()));
 
-    return this.taskProgressRepository.getUserRankForLanguage(userEntity.id(), languageEntity.id());
+    return this.taskProgressRepository.getUserRankForLanguage(userEntity.id(), languageEntity.id())
+      .orElseThrow(() -> new NotFoundException("UserRank not found for user " + userEntity.id()));
   }
 
   @Transactional

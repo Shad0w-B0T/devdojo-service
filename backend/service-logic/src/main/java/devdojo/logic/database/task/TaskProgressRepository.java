@@ -51,7 +51,7 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
       ) ranked
       WHERE ranked.user_id = :userId
     """, nativeQuery = true)
-  UserRankingProjection getUserRankForLanguage(
+  Optional<UserRankingProjection> getUserRankForLanguage(
     @Param("userId") UUID userId,
     @Param("languageId") UUID languageId
   );
