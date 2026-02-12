@@ -96,8 +96,13 @@ public abstract class AbstractCompilerController implements ICompilerController 
   @SchemaMapping(typeName = "Compiler")
   @Override
   public long lastReportedAt(final CompilerEntity compilerEntity) {
-    return this.compilerService.getLastCompilerHeartbeat(new ICompilerService.GetCompiler(compilerEntity.compilerId()))
-      .createdAt().getTime();
+    try {
+      return this.compilerService.getLastCompilerHeartbeat(
+          new ICompilerService.GetCompiler(compilerEntity.compilerId()))
+        .createdAt().getTime();
+    } catch (final NotFoundException exception) {
+      return compilerEntity.updatedAt().getTime();
+    }
   }
 
   @SchemaMapping(typeName = "Compiler")
