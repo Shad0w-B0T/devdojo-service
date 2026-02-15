@@ -39,6 +39,7 @@ input GetUser {
 
 extend type Query {
     users: [User!]!
+    usersActiveCount: Int!
     user(input: GetUser!): User!
     userSelf: User!
 }
