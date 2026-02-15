@@ -35,8 +35,8 @@ public abstract class AbstractCodeService implements ICodeService {
   public @NotNull UUID executeCode(final TaskEntity taskEntity,
                                    @NotNull final String methodCode,
                                    @NotNull final List<List<Object>> argumentSets) {
-    final String compilerKey = taskEntity.languageEntity().token();
-    this.ensureCompilerQueueExists(compilerKey);
+    final String languageId = taskEntity.languageEntity().externalId();
+    this.ensureCompilerQueueExists(languageId);
 
     final UUID uuid = UUID.randomUUID();
     final CompileRequestPayload payload = new CompileRequestPayload(uuid, methodCode, argumentSets);
@@ -45,7 +45,7 @@ public abstract class AbstractCodeService implements ICodeService {
       new ICompilerService.CreateCompilerTask(uuid, methodCode, taskEntity.externalId()));
 
     this.rabbitTemplate.convertAndSend(RabbitConst.EXCHANGE_COMPILER,
-      RabbitConst.routingKeyForCompiler(compilerKey),
+      RabbitConst.routingKeyForCompiler(languageId),
       payload);
 
     return uuid;

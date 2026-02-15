@@ -83,7 +83,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
     log.debug("Updating heartbeat for languageToken='{}'", updateHeartbeat.languageToken());
 
     final LanguageEntity languageEntity =
-      this.languageRepository.findByToken(updateHeartbeat.languageToken()).orElseThrow();
+      this.languageRepository.findByExternalId(updateHeartbeat.languageToken()).orElseThrow();
 
 
     final CompilerEntity compilerEntity = this.compilerRepository

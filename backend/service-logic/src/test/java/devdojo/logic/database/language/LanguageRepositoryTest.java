@@ -71,7 +71,6 @@ final class LanguageRepositoryTest extends BaseJpaTest {
     assertTrue(result.isPresent());
     assertEquals(1, this.cut.count());
     assertEquals(language, result.get());
-    assertEquals(language.token(), result.get().token());
     assertEquals(language.languageName(), result.get().languageName());
     assertEquals(language.description(), result.get().description());
   }
