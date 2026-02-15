@@ -46,13 +46,26 @@ public abstract class AbstractCodeController implements ICodeController {
   @PostMapping("/exercises")
   @ResponseBody
   @Override
-  public ResponseEntity<IProcessCodeResponse> processCode(@RequestBody final String payload,
-                                                          @RequestParam(value = "taskId") final String taskId) {
+  public ResponseEntity<ProcessCodeResponse> processCode(@RequestBody final String payload,
+                                                         @RequestParam(value = "taskId") final String taskId) {
     final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(taskId));
     final List<List<Object>> testInputs = extractTestInputs(taskEntity);
 
     final UUID results = this.codeService.executeCode(taskEntity, payload, testInputs);
     return ResponseEntity.ok(new ProcessCodeResponse(results));
+  }
+
+  @RateLimited(
+    bucket = "#{'rate-code-' + T(devdojo.logic.security.SecurityUtils).currentTokenDetails().userId()}",
+    refillDurationMillis = CODE_RATE_LIMIT_REFILL,
+    totalTokens = 1)
+  @PostMapping("/exercises/raw")
+  @ResponseBody
+  @Override
+  public ResponseEntity<ProcessCodeResponse> processCodeWithTests(
+    @RequestBody final ExecuteCodeWithTestsRequest request) {
+    //final UUID results = this.codeService.executeCode(taskEntity, payload, testInputs);
+    return null;
   }
 
   private List<List<Object>> extractTestInputs(final TaskEntity taskEntity) {
@@ -62,9 +75,5 @@ public abstract class AbstractCodeController implements ICodeController {
         .map(TestArgumentEntity::value)
         .toList())
       .toList();
-  }
-
-  private record ProcessCodeResponse(UUID id) implements IProcessCodeResponse {
-
   }
 }

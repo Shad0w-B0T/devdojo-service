@@ -36,10 +36,6 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public final class LanguageEntity extends AbstractExternalEntity implements ILanguage, Serializable {
 
-  @NotNull(message = "Token name must not be null")
-  @Column(name = "token", nullable = false, unique = true, updatable = false)
-  private String token;
-
   @NotNull(message = "Language name must not be null")
   @Column(name = "languageName", nullable = false, unique = true)
   private String languageName;
@@ -55,7 +51,6 @@ public final class LanguageEntity extends AbstractExternalEntity implements ILan
                         final String languageName,
                         final String description,
                         final boolean active) {
-    this.token = token;
     this.languageName = languageName;
     this.description = description;
     this.active = active;

@@ -92,11 +92,6 @@ public abstract class AbstractLanguageController implements ILanguageController 
     return languageEntity.externalId();
   }
 
-  @SchemaMapping(typeName = "Language", value = "token")
-  public @NotNull String token(@NotNull final LanguageEntity languageEntity) {
-    return languageEntity.token();
-  }
-
   @SchemaMapping(typeName = "Language", value = "languageName")
   @Override
   public @NotNull String languageName(@NotNull final LanguageEntity languageEntity) {

@@ -30,7 +30,6 @@ CREATE TABLE language
     external_id   VARCHAR(255) NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE,
     updated_at    TIMESTAMP WITHOUT TIME ZONE,
-    token         VARCHAR(255) NOT NULL,
     language_name VARCHAR(255) NOT NULL,
     description   VARCHAR(255) NOT NULL,
     active        BOOLEAN      NOT NULL,
@@ -154,9 +153,6 @@ ALTER TABLE language
 
 ALTER TABLE language
     ADD CONSTRAINT uc_language_languagename UNIQUE (language_name);
-
-ALTER TABLE language
-    ADD CONSTRAINT uc_language_token UNIQUE (token);
 
 ALTER TABLE task
     ADD CONSTRAINT uc_task_externalid UNIQUE (external_id);

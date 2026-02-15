@@ -19,6 +19,4 @@ public interface LanguageRepository extends ExternalEntityRepository<LanguageEnt
   @NotNull
   List<LanguageEntity> findAllByActiveTrue();
 
-  @NotNull
-  Optional<LanguageEntity> findByToken(@NotNull(message = "Token cannot be null.") final String token);
 }
