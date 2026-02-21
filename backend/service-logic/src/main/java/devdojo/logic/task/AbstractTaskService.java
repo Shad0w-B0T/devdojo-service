@@ -54,13 +54,13 @@ public abstract class AbstractTaskService implements ITaskService {
 
   @Transactional
   @Override
-  public List<TaskEntity> getTasks(final GetTasksByLangauge getTasksByLangauge) {
-    if (getTasksByLangauge == null || getTasksByLangauge.languageId() == null) {
+  public List<TaskEntity> getTasks(final GetTasksByLanguage getTasksByLanguage) {
+    if (getTasksByLanguage == null || getTasksByLanguage.languageId() == null) {
       return this.taskRepository.findAll();
     }
 
     final LanguageEntity languageEntity =
-      this.languageService.getLanguage(new ILanguageService.GetLanguage(getTasksByLangauge.languageId()));
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(getTasksByLanguage.languageId()));
 
     return this.taskRepository.findAllByLanguageEntity(languageEntity);
   }

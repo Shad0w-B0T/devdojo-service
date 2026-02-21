@@ -82,7 +82,7 @@ public class TestData {
   );
 
 
-  public static final ITaskService.GetTasksByLangauge GET_TASKS = new ITaskService.GetTasksByLangauge(LANGUAGE_ID);
+  public static final ITaskService.GetTasksByLanguage GET_TASKS = new ITaskService.GetTasksByLanguage(LANGUAGE_ID);
 
   public static final ITaskService.GetTask GET_TASK = new ITaskService.GetTask(TASK_ID);
 

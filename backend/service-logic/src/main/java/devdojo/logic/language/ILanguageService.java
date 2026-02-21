@@ -1,8 +1,11 @@
 package devdojo.logic.language;
 
 import devdojo.logic.database.language.LanguageEntity;
+import devdojo.schema.Constants;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public interface ILanguageService {
@@ -63,6 +66,7 @@ public interface ILanguageService {
 
   record GetLanguage(
 
+    @Size(max = Constants.ID_LENGTH, message = "Language ID must not exceed {max} characters")
     @NotNull(message = "Language ID must not be null")
     String languageId
 
@@ -71,10 +75,12 @@ public interface ILanguageService {
 
   record CreateLanguage(
 
-    @NotNull(message = "Language name must not be null")
+    @NotBlank(message = "Language name must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Language name must not exceed {max} characters")
     String languageName,
 
-    @NotNull(message = "Description must not be null")
+    @NotBlank(message = "Description must not be blank")
+    @Size(max = Constants.DESCRIPTION_LENGTH, message = "Description must not exceed {max} characters")
     String description,
 
     boolean active
@@ -84,13 +90,16 @@ public interface ILanguageService {
 
   record UpdateLanguage(
 
-    @NotNull(message = "Language ID must not be null")
+    @NotBlank(message = "Language ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Language ID must not exceed {max} characters")
     String languageId,
 
-    @NotNull(message = "Language name must not be null")
+    @NotBlank(message = "Language name must not be blank")
+    @Size(max = Constants.STRING_DEFAULT_LENGTH, message = "Language name must not exceed {max} characters")
     String languageName,
 
-    @NotNull(message = "Description must not be null")
+    @NotBlank(message = "Description must not be blank")
+    @Size(max = Constants.DESCRIPTION_LENGTH, message = "Description must not exceed {max} characters")
     String description,
 
     boolean active
@@ -100,6 +109,7 @@ public interface ILanguageService {
 
   record DeleteLanguage(
 
+    @Size(max = Constants.ID_LENGTH, message = "Language ID must not exceed {max} characters")
     @NotNull(message = "Language ID must not be null")
     String languageId
 

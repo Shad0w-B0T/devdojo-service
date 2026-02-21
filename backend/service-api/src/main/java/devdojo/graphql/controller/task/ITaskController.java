@@ -15,7 +15,7 @@ public interface ITaskController {
   // ────── Queries ──────
 
   @NotNull
-  List<TaskEntity> tasks(final ITaskService.GetTasksByLangauge getTasks);
+  List<TaskEntity> tasks(final ITaskService.GetTasksByLanguage getTasks);
 
   @NotNull
   TaskEntity task(@NotNull final ITaskService.GetTask getTask);
