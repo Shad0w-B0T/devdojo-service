@@ -5,6 +5,8 @@ import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.task.ITaskService;
 import devdojo.schema.task.ArgumentType;
 import devdojo.schema.task.Difficulty;
+import devdojo.schema.task.Test;
+import devdojo.schema.task.TestArgument;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,7 +14,7 @@ public class TestData {
 
   public static final String TASK_ID = "72bf18f6-bbdf-4efa-b0e4-fe2b96b717b4";
   public static final String LANGUAGE_ID = "f2378c02-4a78-4f39-a9b8-d040f6a2001d";
-  private static final List<? extends ITaskService.TestData> LANGUAGE_UNIT_TESTS = List.of();
+  private static final List<Test> LANGUAGE_UNIT_TESTS = List.of();
   public static final LanguageEntity LANGUAGE_ENTITY_JAVA =
     new LanguageEntity("123456789", "Java", "Token for Java", true);
   public static final LanguageEntity LANGUAGE_ENTITY_PYTHON =
@@ -123,13 +125,13 @@ public class TestData {
   public static final ITaskService.DeleteTask DELETE_TASK = new ITaskService.DeleteTask(TASK_ID);
 
 
-  private static final ITaskService.TestArgumentData TEST_ARGUMENT_DATA_RECORD = new ITaskService.TestArgumentData(
+  private static final TestArgument TEST_ARGUMENT_DATA_RECORD = new TestArgument(
     ArgumentType.INPUT,
     "",
     List.of()
   );
 
-  private static final ITaskService.TestData TEST_DATA_RECORD = new ITaskService.TestData(
+  private static final Test TEST_DATA_RECORD = new Test(
     List.of(),
     TEST_ARGUMENT_DATA_RECORD
   );
@@ -143,9 +145,9 @@ public class TestData {
 
   public static final ITaskService.AppendTest APPEND_TEST_TASK_EXPECTED = new ITaskService.AppendTest(
     TASK_ID,
-    new ITaskService.TestData(
+    new Test(
       List.of(),
-      new ITaskService.TestArgumentData(
+      new TestArgument(
         ArgumentType.INPUT,
         "",
         List.of()

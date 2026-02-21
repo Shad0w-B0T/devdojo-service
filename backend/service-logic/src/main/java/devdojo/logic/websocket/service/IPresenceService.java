@@ -1,5 +1,7 @@
 package devdojo.logic.websocket.service;
 
+import jakarta.validation.constraints.NotBlank;
+
 /**
  * Service for managing cluster-wide WebSocket presence state.
  * <p>
@@ -13,14 +15,14 @@ public interface IPresenceService {
    *
    * @param userId the authenticated user identifier
    */
-  void userConnected(final String userId);
+  void userConnected(@NotBlank final String userId);
 
   /**
    * Registers a user as disconnected.
    *
    * @param userId the authenticated user identifier
    */
-  void userDisconnected(final String userId);
+  void userDisconnected(@NotBlank final String userId);
 
   /**
    * Returns the current number of active users.

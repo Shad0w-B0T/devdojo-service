@@ -21,6 +21,9 @@ public interface ITasksProgressService {
   TaskProgressEntity getTaskProgress(@NotNull(message = "userId must not be null") final String userId,
                                      @NotNull(message = "taskId must not be null") final String taskId);
 
+  List<TaskProgressRepository.LanguageProgressProjection> getLanguageProgress(
+    @NotNull(message = "userId must not be null") final GetLanguageProgress getLanguageProgress);
+
   @NotNull
   TaskEntity getNextTask(@NotNull(message = "GetNextTask must not be null") final GetNextTask getNextTask);
 
@@ -39,6 +42,11 @@ public interface ITasksProgressService {
   TaskProgressEntity updateTaskProgress(@NotNull final UpdateTaskProgressInput updateTaskProgressInput);
 
   // DTOs
+  record GetLanguageProgress(@NotNull(message = "User ID must not be null")
+                             String userId) {
+
+  }
+
   record GetTaskProgresses(
 
     @NotNull(message = "userId must not be null")

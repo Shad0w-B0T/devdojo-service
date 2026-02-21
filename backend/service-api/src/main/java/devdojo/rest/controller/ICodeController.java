@@ -1,5 +1,8 @@
 package devdojo.rest.controller;
 
+import devdojo.schema.task.Test;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -22,8 +25,12 @@ public interface ICodeController {
   }
 
   record ExecuteCodeWithTestsRequest(
-    String payload,
-    List<List<Object>> testInputs
+    @NotNull
+    String languageId,
+    @NotBlank String payload,
+    @NotNull(message = "Unit tests list must not be null")
+    @Valid
+    List<Test> unitTests
   ) {
   }
 }

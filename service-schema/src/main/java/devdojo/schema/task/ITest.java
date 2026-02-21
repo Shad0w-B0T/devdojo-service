@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface ITest {
 
-  List<ITestArgument> input();
+  List<? extends ITestArgument> input();
 
   ITestArgument output();
 
