@@ -45,7 +45,7 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
 
   @QueryMapping("tasks")
   @Override
-  public @NotNull List<TaskEntity> tasks(@Argument("input") final ITaskService.GetTasksByLangauge getTasks) {
+  public @NotNull List<TaskEntity> tasks(@Argument("input") final ITaskService.GetTasksByLanguage getTasks) {
     return this.taskService.getTasks(getTasks);
   }
 
