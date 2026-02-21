@@ -12,6 +12,8 @@ import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.exception.permissions.UnauthorizedException;
 import devdojo.schema.task.ArgumentType;
+import devdojo.schema.task.ITestArgument;
+import devdojo.schema.task.Test;
 import devdojo.schema.user.UserRole;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
@@ -390,12 +392,12 @@ public abstract class AbstractTaskService implements ITaskService {
    * @return the created TestEntity
    * @throws IllegalArgumentException if any input argument is not of type INPUT
    */
-  private TestEntity testEntity(final @NotNull TestData data) {
+  private TestEntity testEntity(final @NotNull Test data) {
     final TestEntity test = new TestEntity();
 
     final List<TestArgumentEntity> args = IntStream.range(0, data.input().size())
       .mapToObj(i -> {
-        final TestArgumentData argumentData = data.input().get(i);
+        final ITestArgument argumentData = data.input().get(i);
 
         if (argumentData.type() != ArgumentType.INPUT) {
           log.error("Invalid argument type for input test argument: expected INPUT but got {}", argumentData.type());

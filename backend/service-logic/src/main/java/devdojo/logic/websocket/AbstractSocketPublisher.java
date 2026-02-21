@@ -37,7 +37,6 @@ public abstract class AbstractSocketPublisher implements ISocketPublisher {
 
   @Override
   public void notifyUsersActiveCount() {
-    System.out.println("Published " + this.presenceService.getActiveUserCount());
     this.messagingTemplate.convertAndSend(
       "/topic/usersactivecount",
       this.presenceService.getActiveUserCount()

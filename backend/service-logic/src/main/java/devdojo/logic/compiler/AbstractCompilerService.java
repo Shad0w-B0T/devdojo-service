@@ -26,9 +26,7 @@ import devdojo.schema.code.TestRunResult;
 import devdojo.schema.code.TestRunResultChecked;
 import devdojo.schema.compiler.CompilerResourceAnalytic;
 import devdojo.schema.exception.database.NotFoundException;
-import devdojo.schema.task.ArgumentType;
-import devdojo.schema.task.ITestArgument;
-import devdojo.schema.task.TaskProgressState;
+import devdojo.schema.task.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
@@ -109,77 +107,108 @@ public abstract class AbstractCompilerService implements ICompilerService {
   public CompilerTask createCompilerTask(final CreateCompilerTask createCompilerTask) {
     return this.compilerTaskRepository.save(
       new CompilerTask(createCompilerTask.id(), false, createCompilerTask.methodCode(),
-        createCompilerTask.taskId(), SecurityUtils.currentTokenDetails().userId()));
+        createCompilerTask.unitTests().stream()
+          .map(iTest -> {
+            try {
+              return new Test(
+                iTest.input().stream()
+                  .map(arg -> {
+                    try {
+                      return new TestArgument(arg.type(), arg.variant(),
+                        objectMapper.writeValueAsString(arg.value()));
+                    } catch (JsonProcessingException e) {
+                      throw new RuntimeException(e);
+                    }
+                  })
+                  .toList(),
+                new TestArgument(iTest.output().type(), iTest.output().variant(),
+                  objectMapper.writeValueAsString(iTest.output().value()))
+              );
+            } catch (JsonProcessingException e) {
+              throw new RuntimeException(e);
+            }
+          })
+          .toList(),
+        createCompilerTask.taskId(),
+        createCompilerTask.languageId(),
+        SecurityUtils.currentTokenDetails().userId()));
   }
 
   @Transactional
   @Override
   public CompilerTaskResult completeCompilerTask(final CompleteCompilerTask completeCompilerTask) {
+
     final CompilerTask compilerTask = this.compilerTaskRepository
       .findById(completeCompilerTask.id())
       .orElseThrow(() -> new NotFoundException("No compiler task found for id=" + completeCompilerTask.id()));
 
-    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(compilerTask.taskId()));
-    final List<TestRunResult> results = completeCompilerTask.results();
-    final List<TestRunResultChecked> resultUnits = results.stream()
-      .map(result -> mapToResultUnit(result, taskEntity))
-      .toList();
+    final List<ITest> expectedTests = List.copyOf(compilerTask.tests());
 
-    final boolean complete = resultUnits.stream().allMatch(TestRunResultChecked::pass);
+    final List<TestRunResultChecked> checkedResults =
+      completeCompilerTask.results().stream()
+        .map(result -> mapToResultUnit(result, expectedTests))
+        .toList();
+
+    final boolean allPassed = checkedResults.stream().allMatch(TestRunResultChecked::pass);
 
     TaskProgressState state = TaskProgressState.NOT_STARTED;
     int score = 0;
+    boolean finished = allPassed;
 
-    if (!complete && !compilerTask.methodCode().trim().equalsIgnoreCase(taskEntity.template())) {
-      state = TaskProgressState.RUNNING;
+    if (compilerTask.taskId() != null) {
+      final TaskEntity taskEntity =
+        this.taskService.getTask(new ITaskService.GetTask(compilerTask.taskId()));
+
+      state = computeProgressState(taskEntity, compilerTask.methodCode(), allPassed);
+      score = allPassed ? taskEntity.difficulty().score() : 0;
+
+
+      final TaskProgressEntity taskProgressEntity =
+        this.tasksProgressService.updateTaskProgress(
+          new ITasksProgressService.UpdateTaskProgress(
+            compilerTask.userId(),
+            taskEntity.externalId(),
+            compilerTask.methodCode().trim(),
+            state,
+            score
+          )
+        );
+
+      finished = taskProgressEntity.state() == TaskProgressState.FINISHED;
+      score = taskProgressEntity.score();
     }
-
-    if (complete) {
-      state = TaskProgressState.FINISHED;
-      score = taskEntity.difficulty().score();
-    }
-
-    int finalScore = score;
-    TaskProgressState finalState = state;
-
-    final TaskProgressEntity taskProgressEntity = this.tasksProgressService
-      .updateTaskProgress(new ITasksProgressService.UpdateTaskProgress(
-        compilerTask.userId(),
-        taskEntity.externalId(),
-        compilerTask.methodCode().trim(),
-        finalState,
-        finalScore
-      ));
 
     final TestRun run = new TestRun(
       compilerTask.id(),
-      resultUnits,
-      taskProgressEntity.state() == TaskProgressState.FINISHED,
-      taskProgressEntity.score());
+      checkedResults,
+      finished,
+      score
+    );
 
-    final CompilerTaskResult result;
-    try {
-      result = this.compilerTaskResultRepository.save(
-        new CompilerTaskResult(compilerTask.id(), compilerTask.userId(), this.objectMapper.writeValueAsString(run)));
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
+    final CompilerTaskResult stored = storeResult(compilerTask, run);
 
     compilerTask.processed(true);
     this.compilerTaskRepository.save(compilerTask);
-    this.sendWebsocket(compilerTask, run);
 
-    return result;
+    sendWebsocket(compilerTask, run);
+
+    return stored;
   }
 
-  private void sendWebsocket(final CompilerTask compilerTask,
-                             final TestRun testRun) {
-    try {
-      final UserEntity userEntity = this.userService.getUser(compilerTask.userId());
-      this.socketPublisher.notifyTaskUpdate(userEntity.authId(), testRun);
-    } catch (final NotFoundException exception) {
-      log.error("No user found to send task compile response={}, ignoring. ", compilerTask.id());
+  private Object deserialize(final Object value) {
+    if (value == null) {
+      return null;
     }
+
+    if (value instanceof String s) {
+      try {
+        return objectMapper.readValue(s, Object.class);
+      } catch (Exception e) {
+        return s;
+      }
+    }
+
+    return value;
   }
 
   @Transactional
@@ -232,17 +261,55 @@ public abstract class AbstractCompilerService implements ICompilerService {
   }
 
 
-  private TestRunResultChecked mapToResultUnit(final TestRunResult result,
-                                               final TaskEntity taskEntity) {
-    final TestEntity matchedTest = findMatchingTestEntity(result, taskEntity);
+  private CompilerTaskResult storeResult(final CompilerTask compilerTask, final TestRun run) {
+    try {
+      return this.compilerTaskResultRepository.save(
+        new CompilerTaskResult(
+          compilerTask.id(),
+          compilerTask.userId(),
+          this.objectMapper.writeValueAsString(run)
+        )
+      );
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private TaskProgressState computeProgressState(final TaskEntity taskEntity,
+                                                 final String methodCode,
+                                                 final boolean allPassed) {
+
+    if (allPassed) {
+      return TaskProgressState.FINISHED;
+    }
+
+    if (!methodCode.trim().equalsIgnoreCase(taskEntity.template())) {
+      return TaskProgressState.RUNNING;
+    }
+
+    return TaskProgressState.NOT_STARTED;
+  }
+
+
+  private TestRunResultChecked mapToResultUnit(
+    final TestRunResult result,
+    final List<? extends ITest> expectedTests) {
+
+    final ITest matched = expectedTests.stream()
+      .filter(test -> jsonEquals(result.input(), expectedInputList(test)))
+      .findFirst()
+      .orElse(null);
 
     boolean pass = false;
 
-    if (matchedTest != null && matchedTest.output() != null) {
-      if (matchedTest.output().type() == ArgumentType.OUTPUT) {
-        pass = checkOutputMatch(result, matchedTest);
-      } else if (matchedTest.output().type() == ArgumentType.THROWABLE) {
-        pass = checkThrowableMatch(result, matchedTest);
+    if (matched != null && matched.output() != null) {
+      if (matched.output().type() == ArgumentType.OUTPUT) {
+        pass = jsonEquals(
+          result.output(),
+          deserialize(matched.output().value())
+        );
+      } else if (matched.output().type() == ArgumentType.THROWABLE) {
+        pass = checkThrowableMatch(result, matched);
       }
     }
 
@@ -257,42 +324,75 @@ public abstract class AbstractCompilerService implements ICompilerService {
     );
   }
 
-  private TestEntity findMatchingTestEntity(final TestRunResult result,
-                                            final TaskEntity taskEntity) {
-    return taskEntity.testEntities().stream()
-      .filter(testEntity -> Objects.equals(
-        result.input(),
-        testEntity.input().stream().map(ITestArgument::value).toList()
-      ))
-      .findFirst()
-      .orElse(null);
+  private List<Object> expectedInputList(final ITest test) {
+    return test.input().stream()
+      .filter(arg -> arg.type() == ArgumentType.INPUT)
+      .map(arg -> deserialize(arg.value()))
+      .toList();
   }
 
-  private boolean checkOutputMatch(final TestRunResult result,
-                                   final TestEntity testEntity) {
-    return Objects.equals(
-      String.valueOf(result.output()),
-      String.valueOf(testEntity.output().value())
-    );
+  private boolean jsonEquals(final Object a, final Object b) {
+    try {
+      if (a == null && b == null) {
+        return true;
+      }
+      if (a == null || b == null) {
+        return false;
+      }
+
+      final String jsonA = objectMapper.writeValueAsString(a);
+      final String jsonB = objectMapper.writeValueAsString(b);
+
+      return jsonA.equals(jsonB);
+    } catch (Exception e) {
+      return false;
+    }
   }
 
-  private boolean checkThrowableMatch(final TestRunResult result,
-                                      final TestEntity testEntity) {
-    if (result == null || result.errors() == null || testEntity == null || testEntity.output() == null) {
+  private boolean checkThrowableMatch(
+    final TestRunResult result,
+    final ITest expectedTest) {
+
+    if (result == null || result.errors() == null) {
       return false;
     }
 
-    final String expectedType = testEntity.output().variant();
-    final String expectedMessage = String.valueOf(testEntity.output().value());
+    final String expectedType =
+      expectedTest.output().variant() != null
+        ? String.valueOf(deserialize(expectedTest.output().variant()))
+        : null;
 
-    return result.errors().stream()
-      .anyMatch(error ->
-        expectedType != null &&
-          expectedType.equals(error.type()) &&
-          expectedMessage != null &&
-          expectedMessage.equalsIgnoreCase(
-            error.message() != null ? error.message() : ""
-          )
-      );
+    final String expectedMessage =
+      expectedTest.output().value() != null
+        ? String.valueOf(deserialize(expectedTest.output().value()))
+        : null;
+
+    return result.errors().stream().anyMatch(error -> {
+      final boolean typeMatch =
+        expectedType != null && expectedType.equals(error.type());
+
+      if (!typeMatch) {
+        return false;
+      }
+
+      if (expectedMessage == null) {
+        return true;
+      }
+
+      final String actualMessage =
+        error.message() != null ? error.message() : "";
+
+      return expectedMessage.equalsIgnoreCase(actualMessage);
+    });
+  }
+
+  private void sendWebsocket(final CompilerTask compilerTask,
+                             final TestRun testRun) {
+    try {
+      final UserEntity userEntity = this.userService.getUser(compilerTask.userId());
+      this.socketPublisher.notifyTaskUpdate(userEntity.authId(), testRun);
+    } catch (Exception e) {
+      log.error("No user found to send task compile response={}, ignoring. ", compilerTask.id());
+    }
   }
 }

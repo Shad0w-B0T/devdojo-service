@@ -26,6 +26,10 @@ public interface ITaskController {
   @NotNull
   TaskEntity nextTask(@NotNull final ITasksProgressService.GetNextTask getNextTask);
 
+  @NotNull
+  List<TaskProgressRepository.LanguageProgressProjection> languageProgress(
+    @NotNull final ITasksProgressService.GetLanguageProgress getLanguageProgress);
+
   TaskProgressRepository.UserRankingProjection userRank(@NotNull final ITasksProgressService.GetUserRank getUserRank);
 
   @NotNull
@@ -120,6 +124,20 @@ public interface ITaskController {
   long totalScore(@NotNull final TaskProgressRepository.UserRankingProjection userRankingProjection);
 
   long rank(@NotNull final TaskProgressRepository.UserRankingProjection userRankingProjection);
+
+  @NotNull
+  String languageId(@NotNull TaskProgressRepository.LanguageProgressProjection projection);
+
+  @NotNull
+  String languageName(@NotNull TaskProgressRepository.LanguageProgressProjection projection);
+
+  long totalTasks(@NotNull TaskProgressRepository.LanguageProgressProjection projection);
+
+  long completedTasks(@NotNull TaskProgressRepository.LanguageProgressProjection projection);
+
+  long totalScore(@NotNull TaskProgressRepository.LanguageProgressProjection projection);
+
+  double averageScore(@NotNull TaskProgressRepository.LanguageProgressProjection projection);
 
   interface ITaskUserProgress {
 

@@ -2,14 +2,10 @@ package devdojo.rest.controller;
 
 import devdojo.logic.cache.bucket4j.annotation.RateLimited;
 import devdojo.logic.code.ICodeService;
-import devdojo.logic.compiler.ICompilerService;
-import devdojo.logic.database.task.TaskEntity;
-import devdojo.logic.database.task.TestArgumentEntity;
+import devdojo.logic.language.ILanguageService;
 import devdojo.logic.task.ITaskService;
-import devdojo.logic.task.ITasksProgressService;
-import devdojo.schema.task.ArgumentType;
+import devdojo.schema.task.ITest;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,22 +17,20 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public abstract class AbstractCodeController implements ICodeController {
 
-  private final static long CODE_RATE_LIMIT_REFILL = 1000;
+  private static final long CODE_RATE_LIMIT_REFILL = 1000;
 
   private final ITaskService taskService;
   private final ICodeService codeService;
-  private final ITasksProgressService tasksProgressService;
-  private final ICompilerService compilerService;
+  private final ILanguageService languageService;
 
   public AbstractCodeController(
     @NotNull(message = "TaskService must not be null") final ITaskService taskService,
     @NotNull(message = "CodeService must not be null") final ICodeService codeService,
-    @NotNull(message = "TasksProgressService must not be null") final ITasksProgressService tasksProgressService,
-    @NotNull(message = "CompilerService must not be null") final ICompilerService compilerService) {
+    @NotNull(message = "LanguageService must not be null") final ILanguageService languageService
+  ) {
     this.taskService = taskService;
     this.codeService = codeService;
-    this.tasksProgressService = tasksProgressService;
-    this.compilerService = compilerService;
+    this.languageService = languageService;
   }
 
   @RateLimited(
@@ -48,10 +42,8 @@ public abstract class AbstractCodeController implements ICodeController {
   @Override
   public ResponseEntity<ProcessCodeResponse> processCode(@RequestBody final String payload,
                                                          @RequestParam(value = "taskId") final String taskId) {
-    final TaskEntity taskEntity = this.taskService.getTask(new ITaskService.GetTask(taskId));
-    final List<List<Object>> testInputs = extractTestInputs(taskEntity);
-
-    final UUID results = this.codeService.executeCode(taskEntity, payload, testInputs);
+    final var taskEntity = this.taskService.getTask(new ITaskService.GetTask(taskId));
+    final UUID results = this.codeService.executeCode(taskEntity, payload);
     return ResponseEntity.ok(new ProcessCodeResponse(results));
   }
 
@@ -64,16 +56,17 @@ public abstract class AbstractCodeController implements ICodeController {
   @Override
   public ResponseEntity<ProcessCodeResponse> processCodeWithTests(
     @RequestBody final ExecuteCodeWithTestsRequest request) {
-    //final UUID results = this.codeService.executeCode(taskEntity, payload, testInputs);
-    return null;
-  }
+    final var language = this.languageService.getLanguage(
+      new ILanguageService.GetLanguage(request.languageId())
+    );
 
-  private List<List<Object>> extractTestInputs(final TaskEntity taskEntity) {
-    return taskEntity.testEntities().stream()
-      .map(testEntity -> testEntity.argumentEntities().stream()
-        .filter(arg -> arg.type() == ArgumentType.INPUT)
-        .map(TestArgumentEntity::value)
-        .toList())
-      .toList();
+    final UUID results = this.codeService.executeCode(
+      language,
+      null,
+      request.payload(),
+      request.unitTests().stream().map(test -> (ITest) test).toList()
+    );
+
+    return ResponseEntity.ok(new ProcessCodeResponse(results));
   }
 }

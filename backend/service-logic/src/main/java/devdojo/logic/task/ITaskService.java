@@ -2,8 +2,7 @@ package devdojo.logic.task;
 
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskRatingEntity;
-import devdojo.schema.task.ArgumentType;
-import devdojo.schema.task.Difficulty;
+import devdojo.schema.task.*;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -97,7 +96,7 @@ public interface ITaskService {
 
     @NotNull(message = "Unit tests list must not be null")
     @Valid
-    List<? extends TestData> unitTests,
+    List<Test> unitTests,
 
     boolean active,
 
@@ -128,7 +127,7 @@ public interface ITaskService {
 
     @NotNull(message = "Unit tests list must not be null")
     @Valid
-    List<? extends TestData> unitTests,
+    List<Test> unitTests,
 
     boolean active,
 
@@ -152,33 +151,7 @@ public interface ITaskService {
 
     @NotNull(message = "Unit test must not be null")
     @Valid
-    TestData unitTest
-
-  ) {
-  }
-
-  record TestData(
-
-    @NotNull(message = "Input arguments list must not be null")
-    @Valid
-    List<? extends TestArgumentData> input,
-
-    @NotNull(message = "Output argument must not be null")
-    @Valid
-    TestArgumentData output
-
-  ) {
-  }
-
-  record TestArgumentData(
-
-    @NotNull(message = "Argument type must not be null")
-    ArgumentType type,
-
-    String variant, // optional
-
-    @NotNull(message = "Argument value must not be null")
-    Object value
+    Test unitTest
 
   ) {
   }

@@ -156,7 +156,6 @@ public abstract class AbstractCompilerController implements ICompilerController 
   @SchemaMapping(typeName = "TestRunResult")
   @Override
   public List<Object> input(final TestRunResultChecked result) {
-    System.out.println("___" + result);
     return Optional.ofNullable(result.input()).orElse(Collections.emptyList());
   }
 

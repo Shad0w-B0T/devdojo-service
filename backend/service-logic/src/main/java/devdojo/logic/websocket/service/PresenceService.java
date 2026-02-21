@@ -1,7 +1,5 @@
 package devdojo.logic.websocket.service;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +29,13 @@ public class PresenceService implements IPresenceService {
   }
 
   @Override
-  public void userConnected(@NotBlank final String userId) {
+  public void userConnected(final String userId) {
     this.redis.opsForSet().add(KEY, userId);
     log.debug("Presence: user connected '{}'", userId);
   }
 
   @Override
-  public void userDisconnected(@NotBlank final String userId) {
+  public void userDisconnected(final String userId) {
     this.redis.opsForSet().remove(KEY, userId);
     log.debug("Presence: user disconnected '{}'", userId);
   }

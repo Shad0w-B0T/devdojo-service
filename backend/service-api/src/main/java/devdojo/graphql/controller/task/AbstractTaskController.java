@@ -69,6 +69,13 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     return this.tasksProgressService.getNextTask(getNextTask);
   }
 
+  @QueryMapping("languageProgress")
+  @Override
+  public @NotNull List<TaskProgressRepository.LanguageProgressProjection>
+  languageProgress(@Argument("input") final ITasksProgressService.GetLanguageProgress getLanguageProgress) {
+    return this.tasksProgressService.getLanguageProgress(getLanguageProgress);
+  }
+
   @QueryMapping("userRank")
   @Override
   public TaskProgressRepository.UserRankingProjection userRank(
@@ -233,7 +240,7 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
   @SchemaMapping(typeName = "Test", value = "input")
   @Override
   public @NotNull List<ITestArgument> input(@NotNull final ITest taskUnitTest) {
-    return taskUnitTest.input();
+    return List.copyOf(taskUnitTest.input());
   }
 
   @SchemaMapping(typeName = "Test", value = "output")
@@ -276,6 +283,46 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
   @Override
   public long rank(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
     return userRankingProjection.rank();
+  }
+
+  // ───── LanguageProgress ─────
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "languageId")
+  public @NotNull String languageId(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.languageId().toString();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "languageName")
+  public @NotNull String languageName(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.languageName();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "totalTasks")
+  public long totalTasks(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.totalTasks();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "completedTasks")
+  public long completedTasks(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.completedTasks();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "totalScore")
+  public long totalScore(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.totalScore();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "averageScore")
+  public double averageScore(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.averageScore() != null
+      ? projection.averageScore()
+      : 0.0;
   }
 
   private record TaskUserProgress(String input,
