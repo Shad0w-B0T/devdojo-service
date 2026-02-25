@@ -70,8 +70,6 @@ test-core:
   script:
     - echo 'Starting Test Stage'
     - mvn $MAVEN_CLI_OPTS test
-    - echo '---------- STACKTRACE ----------'
-    - mvn test -e -X
   artifacts:
     reports:
       junit:
