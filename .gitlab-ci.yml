@@ -53,6 +53,7 @@ test-core:
   before_script:
     - apt-get update
     - apt-get install -y python3
+    - apt-get install -y nodejs npm
   cache:
     key:
       files:
