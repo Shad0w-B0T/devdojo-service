@@ -50,6 +50,9 @@ build-core:
 test-core:
   stage: test
   image: $BASE_IMAGE
+  before_script:
+    - apt-get update
+    - apt-get install -y python3
   cache:
     key:
       files:
