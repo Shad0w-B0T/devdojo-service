@@ -3,12 +3,10 @@ package devdojo.logic.language;
 import devdojo.logic.database.language.LanguageEntity;
 import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.RandomStringGenerator;
-import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.exception.database.AlreadyExistsException;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.DeletionException;
 import devdojo.schema.exception.database.NotFoundException;
-import devdojo.schema.user.UserRole;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -74,7 +72,7 @@ public abstract class AbstractLanguageService implements ILanguageService {
     final LanguageEntity languageEntity;
     try {
       final String token = RandomStringGenerator.generateRandomString(128);
-      languageEntity = this.languageRepository.save(new LanguageEntity(token, createLanguage.languageName(),
+      languageEntity = this.languageRepository.save(new LanguageEntity(createLanguage.languageName(),
         createLanguage.description(), createLanguage.active()));
     } catch (final DataAccessException exception) {
       throw new DatabaseException("Error while creating language in database.", exception);
