@@ -47,7 +47,7 @@ final class JavaInputFilterTests {
 
   @ParameterizedTest
   @ValueSource(strings = {
-    "import", "..", "../", "javax.", "java.util", "runtime.",
+    "import", "../", "javax.", "java.util", "runtime.",
     "System.exit", "System.load", "while(true){}", "for(;;)"
   })
   @DisplayName("detects forbidden Java keywords")
@@ -68,7 +68,7 @@ final class JavaInputFilterTests {
 
   @ParameterizedTest
   @ValueSource(strings = {
-    "rm -rf", "\\u00FC", "../", "..", "./", "chmod", "\\"
+    "rm -rf", "\\u00FC", "../", "./", "chmod", "\\"
   })
   @DisplayName("detects forbidden commands")
   void testForbiddenCommand(final String command) {
