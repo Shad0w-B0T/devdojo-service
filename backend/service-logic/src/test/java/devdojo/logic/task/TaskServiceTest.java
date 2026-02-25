@@ -77,7 +77,7 @@ public class TaskServiceTest {
     @Test
     void getTask() {
       final TaskEntity expected = TestData.TASK_ENTITIES_TOTAL.getFirst();
-      when(taskRepository.findById(any())).thenReturn(Optional.of(TestData.TASK_ENTITY_JAVA_1));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(TestData.TASK_ENTITY_JAVA_1));
 
       final TaskEntity result = cut.getTask(TestData.GET_TASK);
 
