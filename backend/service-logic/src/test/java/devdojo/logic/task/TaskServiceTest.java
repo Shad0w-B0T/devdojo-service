@@ -133,7 +133,7 @@ public class TaskServiceTest {
     void updateTask() {
       final TaskEntity expected = TestData.UPDATED_ENTITY;
 
-      when(taskRepository.findById(any())).thenReturn(Optional.of(expected));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(expected));
       when(taskRepository.save(any())).thenReturn(expected);
 
       final TaskEntity result = cut.updateTask(TestData.UPDATE_TASK);
@@ -177,7 +177,7 @@ public class TaskServiceTest {
     void appendUnit() {
       final TaskEntity expected = TestData.TASK_ENTITY_PYTHON_1;
 
-      when(taskRepository.findById(any())).thenReturn(Optional.of(expected));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(expected));
       when(taskRepository.save(any())).thenReturn(expected);
 
       final TaskEntity result = cut.appendUnitTest(TestData.APPEND_TEST_TASK);
@@ -185,7 +185,7 @@ public class TaskServiceTest {
       assertEquals(expected, result);
       assertFalse(result.testEntities().isEmpty());
       assertEquals(1, result.testEntities().size());
-      verify(taskRepository).findById(any());
+      verify(taskRepository).findByExternalId(any());
       verify(taskRepository).save(expected);
     }
 
@@ -195,7 +195,7 @@ public class TaskServiceTest {
     void appendUnitThrowDatabaseException() {
       final TaskEntity task = TestData.TASK_ENTITY_PYTHON_1;
 
-      when(taskRepository.findById(any())).thenReturn(Optional.of(task));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(task));
       when(taskRepository.save(any())).thenThrow(new DataAccessResourceFailureException("DB down"));
 
       final DatabaseException exception = assertThrows(
