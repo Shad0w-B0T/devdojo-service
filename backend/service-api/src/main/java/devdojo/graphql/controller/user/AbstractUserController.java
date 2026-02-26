@@ -47,7 +47,7 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @QueryMapping("user")
-  public @NotNull UserEntity user(@Argument("input") final IUserService.GetUserByAuthId input) {
+  public @NotNull UserEntity user(@Argument("input") final IUserService.GetUser input) {
     return this.userService.getUser(input);
   }
 

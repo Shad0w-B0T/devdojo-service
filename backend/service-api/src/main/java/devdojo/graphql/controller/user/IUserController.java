@@ -20,7 +20,7 @@ public interface IUserController {
   UserEntity userSelf();
 
   @NotNull
-  UserEntity user(@NotNull final IUserService.GetUserByAuthId input);
+  UserEntity user(@NotNull final IUserService.GetUser input);
 
   // ────── Mutations ──────
 
