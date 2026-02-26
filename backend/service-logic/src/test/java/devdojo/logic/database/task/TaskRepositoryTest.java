@@ -32,7 +32,7 @@ final class TaskRepositoryTest extends BaseJpaTest {
 
   @BeforeEach
   void setUp() {
-    this.languageEntity = new LanguageEntity("123456789", "Java", "Token for Java", true);
+    this.languageEntity = new LanguageEntity("Java", "Token for Java", true);
     this.languageRepository.save(this.languageEntity);
 
     this.task1 = new TaskEntity(

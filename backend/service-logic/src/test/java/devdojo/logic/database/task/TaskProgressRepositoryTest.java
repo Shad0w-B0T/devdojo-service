@@ -89,7 +89,7 @@ final class TaskProgressRepositoryTest extends BaseJpaTest {
     );
     this.userRepository.saveAll(List.of(this.user1, this.user2, this.user3));
 
-    this.languageEntity = new LanguageEntity("123456789", "Java", "Token for Java", true);
+    this.languageEntity = new LanguageEntity("Java", "Token for Java", true);
     this.languageRepository.save(this.languageEntity);
 
     this.task1 = new TaskEntity(

@@ -22,7 +22,6 @@ final class LanguageRepositoryTest extends BaseJpaTest {
   @BeforeEach
   void setUp() {
     this.language = new LanguageEntity(
-      "mY1kZlUti3R3DRHSurfRk0mG3e1ILpAdiYjuJ5drcqTHMvf5bEg0sZ1s06HmbH5m",
       "Java",
       "Write once run everywhere.",
       true
