@@ -7,14 +7,12 @@ import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.language.ILanguageService;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.user.IUserService;
-import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.exception.permissions.UnauthorizedException;
 import devdojo.schema.task.ArgumentType;
 import devdojo.schema.task.ITestArgument;
 import devdojo.schema.task.Test;
-import devdojo.schema.user.UserRole;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -87,7 +85,6 @@ public abstract class AbstractTaskService implements ITaskService {
       });
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity createTask(final CreateTask createTask) {
@@ -140,7 +137,6 @@ public abstract class AbstractTaskService implements ITaskService {
     }
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity updateTask(final UpdateTask updateTask) {
@@ -209,7 +205,6 @@ public abstract class AbstractTaskService implements ITaskService {
    * @return true if the tag was successfully removed from the task, false if the tag was not found.
    * @throws NullPointerException If the input object or any of the IDs is null.
    */
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public boolean removeTagFromTask(final RemoveTagFromTask removeTagFromTask) {
@@ -233,7 +228,6 @@ public abstract class AbstractTaskService implements ITaskService {
     }
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity appendUnitTest(final AppendTest append) {
@@ -254,7 +248,6 @@ public abstract class AbstractTaskService implements ITaskService {
     }
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity deleteTask(final DeleteTask deleteTask) {

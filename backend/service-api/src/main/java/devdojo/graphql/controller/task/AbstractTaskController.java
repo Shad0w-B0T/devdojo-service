@@ -11,6 +11,7 @@ import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
 import devdojo.logic.user.IUserService;
+import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.task.*;
@@ -43,18 +44,21 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     this.tasksProgressService = tasksProgressService;
   }
 
+  @RoleRequired(role = UserRole.USER)
   @QueryMapping("tasks")
   @Override
   public @NotNull List<TaskEntity> tasks(@Argument("input") final ITaskService.GetTasksByLanguage getTasks) {
     return this.taskService.getTasks(getTasks);
   }
 
+  @RoleRequired(role = UserRole.USER)
   @QueryMapping("task")
   @Override
   public @NotNull TaskEntity task(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
     return this.taskService.getTask(getTask);
   }
 
+  @RoleRequired(role = UserRole.USER)
   @QueryMapping("taskRating")
   @Override
   public double taskRating(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
@@ -70,16 +74,18 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
   }
 
   @QueryMapping("languageProgress")
+  @SelfRequired(field = "#user.userId()")
   @Override
   public @NotNull List<TaskProgressRepository.LanguageProgressProjection>
-  languageProgress(@Argument("input") final ITasksProgressService.GetLanguageProgress getLanguageProgress) {
+  languageProgress(@Argument("input") @P("user") final ITasksProgressService.GetLanguageProgress getLanguageProgress) {
     return this.tasksProgressService.getLanguageProgress(getLanguageProgress);
   }
 
   @QueryMapping("userRank")
+  @SelfRequired(field = "#user.userId()")
   @Override
   public TaskProgressRepository.UserRankingProjection userRank(
-    @Argument("input") final ITasksProgressService.GetUserRank getUserRank) {
+    @Argument("input") @P("user") final ITasksProgressService.GetUserRank getUserRank) {
     return this.tasksProgressService.getUserRank(getUserRank);
   }
 
@@ -90,16 +96,19 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     return this.tasksProgressService.getLeaderboard(getLeaderboard);
   }
 
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("createTask")
   public @NotNull TaskEntity createTask(@Argument("input") @NotNull final ITaskService.CreateTask input) {
     return this.taskService.createTask(input);
   }
 
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("updateTask")
   public @NotNull TaskEntity updateTask(@Argument("input") @NotNull final ITaskService.UpdateTask input) {
     return this.taskService.updateTask(input);
   }
 
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("appendUnitTest")
   public @NotNull TaskEntity appendUnitTest(@Argument("input") @NotNull final ITaskService.AppendTest input) {
     return this.taskService.appendUnitTest(input);
@@ -114,15 +123,16 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     return true;
   }
 
-
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("removeTagFromTask")
   public boolean removeTagFromTask(@Argument("input") @NotNull final ITaskService.RemoveTagFromTask input) {
     return this.taskService.removeTagFromTask(input);
   }
 
+  @SelfRequired(field = "#user.userId()")
   @MutationMapping("setTaskRating")
   @Override
-  public boolean setTaskRating(@Argument("input") @NotNull final ITaskService.SetTaskRating setTaskRating) {
+  public boolean setTaskRating(@Argument("input") @P("user") @NotNull final ITaskService.SetTaskRating setTaskRating) {
     return this.taskService.setTaskRating(setTaskRating) != null;
   }
 

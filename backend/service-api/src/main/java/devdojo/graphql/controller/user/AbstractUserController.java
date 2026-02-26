@@ -35,6 +35,7 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @QueryMapping("usersActiveCount")
+  @RoleRequired(role = UserRole.USER)
   @Override
   public long usersActiveCount() {
     return this.presenceService.getActiveUserCount();
@@ -47,6 +48,7 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @QueryMapping("user")
+  @RoleRequired(role = UserRole.USER)
   public @NotNull UserEntity user(@Argument("input") final IUserService.GetUser input) {
     return this.userService.getUser(input);
   }
