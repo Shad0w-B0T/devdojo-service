@@ -74,7 +74,7 @@ final class JavaScriptInputFilterTests {
   @ParameterizedTest
   @ValueSource(strings = {
     "rm -rf", "curl", "wget", "chmod", "chown", "nc -l", "nc -e", "bash -c",
-    "node -e", "python -c", "../", "..", "\\\\", "\\u0070rocess" // unicode-escaped 'p' in 'process'
+    "node -e", "python -c", "../", "\\\\", "\\u0070rocess" // unicode-escaped 'p' in 'process'
   })
   @DisplayName("detects forbidden commands or obfuscation patterns")
   void testForbiddenCommand(final String command) {

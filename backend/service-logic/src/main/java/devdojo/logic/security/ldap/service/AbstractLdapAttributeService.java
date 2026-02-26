@@ -45,7 +45,6 @@ public abstract class AbstractLdapAttributeService implements ILdapAttributeServ
 
   private AttributesMapper<Map<String, Object>> userAttributesMapper(final String uid) {
     return attrs -> {
-      System.out.println("Attribute:" + attrs);
       return Map.of(
         "displayName", getSingle(attrs, "displayName", ""),
         "mail", getSingle(attrs, "mail", uid + "@hdm-stuttgart.de"),

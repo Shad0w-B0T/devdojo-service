@@ -39,7 +39,6 @@ type Mutation {
 """Represents a programming language"""
 type Language {
     id: ID
-    token: String!
     languageName: String
     description: String
     active: Boolean!

@@ -56,6 +56,15 @@ type UserRanking {
     rank: Long!
 }
 
+type LanguageProgress {
+    languageId: ID!
+    languageName: String!
+    totalTasks: Long!
+    completedTasks: Long!
+    totalScore: Long!
+    averageScore: Float!
+}
+
 input TestArgumentInput {
     type: ArgumentType!
     variant: String
@@ -128,6 +137,10 @@ input GetUserRank {
     languageId: ID!
 }
 
+input GetTaskProgresses {
+    userId: ID!
+}
+
 input GetLeaderboard {
     languageId: ID!
     start: Long!
@@ -148,6 +161,7 @@ extend type Query {
     nextTask(input: GetNextTask): Task!
 
     userRank(input: GetUserRank!): UserRanking!
+    languageProgress(input: GetTaskProgresses!): [LanguageProgress!]!
     leaderboard(input: GetLeaderboard): [UserRanking!]!
 }
 

@@ -8,14 +8,7 @@ import devdojo.schema.Constants;
 import devdojo.schema.task.Difficulty;
 import devdojo.schema.task.ITask;
 import devdojo.schema.task.ITest;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
@@ -24,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Table(name = "task")
@@ -31,6 +25,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(fluent = true)
+@Slf4j
 public final class TaskEntity extends AbstractExternalEntity implements ITask {
 
   @NotNull(message = "Language entity must not be null")
@@ -98,19 +93,6 @@ public final class TaskEntity extends AbstractExternalEntity implements ITask {
       .stream()
       .map(taskUnitTestEntity -> (ITest) taskUnitTestEntity)
       .toList();
-  }
-
-
-  public void addTagEntity(final TagEntity tagEntity) {
-    if (!this.tagEntities.contains(tagEntity)) {
-      this.tagEntities.add(tagEntity);
-      tagEntity.setTaskEntity(this);
-    }
-  }
-
-  public void setTagEntities(final List<TagEntity> tagEntities) {
-    this.tagEntities.clear();
-    tagEntities.forEach(this::addTagEntity);
   }
 
   @Override

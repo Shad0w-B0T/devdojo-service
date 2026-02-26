@@ -7,7 +7,7 @@ public final class ServerConfig {
 
   public String token() {
     return get("COMPILER_TOKEN",
-      "U2pZMPXUSiOIVoztZDyx7Mvt8QxzILMsJRCObCo0IqXFW2hE3PB6LNsxua4xUmAVIHrQFlRcTLXyjWzK0DgaIeJCHOWj28wlvL9L4UTw5UFUNQM2VlJ85ncRbrtaACfQ");
+      "lng_1");
   }
 
   public String rabbitHost() {

@@ -1,10 +1,14 @@
 package devdojo.logic.user;
 
 import devdojo.logic.database.user.UserEntity;
+import devdojo.schema.Constants;
 import devdojo.schema.user.UserRole;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -71,24 +75,38 @@ public interface IUserService {
   UserEntity deleteUser(@NotNull(message = "User delete data must not be null")
                         @Valid final IUserService.DeleteUser deleteUser);
 
-  record GetUser(@NotNull(message = "User ID must not be null")
-                 String userId) {
+  record GetUser(
 
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
+    String userId
+
+  ) {
   }
 
-  record GetUserByAuthId(@NotNull(message = "Auth ID must not be null")
-                         String authId) {
 
+  record GetUserByAuthId(
+
+    @NotBlank(message = "Auth ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Auth ID must not exceed {max} characters")
+    String authId
+
+  ) {
   }
 
   record CreateUser(
-    @NotNull(message = "Auth ID must not be null")
+
+    @NotBlank(message = "Auth ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Auth ID must not exceed {max} characters")
     String authId,
 
-    @NotNull(message = "Email must not be null")
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Email must be a valid email address")
+    @Size(max = Constants.EMAIL_LENGTH, message = "Email must not exceed {max} characters")
     String email,
 
-    @NotNull(message = "Display name must not be null")
+    @NotBlank(message = "Display name must not be blank")
+    @Size(max = Constants.STRING_DEFAULT_LENGTH, message = "Display name must not exceed {max} characters")
     String displayName,
 
     @NotNull(message = "LDAP role must not be null")
@@ -98,17 +116,23 @@ public interface IUserService {
     UserRole applicationRole,
 
     boolean active
+
   ) {
   }
 
   record UpdateUser(
-    @NotNull(message = "User ID must not be null")
+
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
-    @NotNull(message = "Email must not be null")
+    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Email must be a valid email address")
+    @Size(max = Constants.EMAIL_LENGTH, message = "Email must not exceed {max} characters")
     String email,
 
-    @NotNull(message = "Display name must not be null")
+    @NotBlank(message = "Display name must not be blank")
+    @Size(max = Constants.STRING_DEFAULT_LENGTH, message = "Display name must not exceed {max} characters")
     String displayName,
 
     @Nullable
@@ -120,29 +144,40 @@ public interface IUserService {
     Date lastLogin,
 
     boolean profilePublic
+
   ) {
   }
 
   record UpdateUserRole(
-    @NotNull(message = "User ID must not be null")
+
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
     @Nullable
     UserRole role
+
   ) {
   }
 
   record UpdateUserProfileVisibility(
-    @NotNull(message = "User ID must not be null")
+
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
     boolean profilePublic
+
   ) {
   }
 
+
   record DeleteUser(
-    @NotNull(message = "User ID must not be null")
+
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId
+
   ) {
   }
 }

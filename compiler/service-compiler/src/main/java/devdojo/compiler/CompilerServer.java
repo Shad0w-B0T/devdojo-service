@@ -69,7 +69,6 @@ public final class CompilerServer {
         this.securityCheck(payload.methodCode());
       } catch (final Exception exception) {
         log.warn("Error while checking security filters.", exception);
-        System.out.println("error");
         return;
       }
 
@@ -95,8 +94,6 @@ public final class CompilerServer {
             json.getBytes(StandardCharsets.UTF_8)
           );
         }
-
-        System.out.println(results);
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

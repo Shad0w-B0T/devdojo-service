@@ -13,4 +13,5 @@ public class TaskController extends AbstractTaskController {
                            final ITasksProgressService tasksProgressService) {
     super(taskService, userService, tasksProgressService);
   }
+
 }

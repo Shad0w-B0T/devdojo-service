@@ -1,26 +1,26 @@
 package devdojo.logic.task;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import devdojo.logic.data.TestData;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskRepository;
-import devdojo.logic.data.TestData;
 import devdojo.logic.language.ILanguageService;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.NotFoundException;
 import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessResourceFailureException;
 
@@ -77,7 +77,7 @@ public class TaskServiceTest {
     @Test
     void getTask() {
       final TaskEntity expected = TestData.TASK_ENTITIES_TOTAL.getFirst();
-      when(taskRepository.findById(any())).thenReturn(Optional.of(TestData.TASK_ENTITY_JAVA_1));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(TestData.TASK_ENTITY_JAVA_1));
 
       final TaskEntity result = cut.getTask(TestData.GET_TASK);
 
@@ -133,7 +133,7 @@ public class TaskServiceTest {
     void updateTask() {
       final TaskEntity expected = TestData.UPDATED_ENTITY;
 
-      when(taskRepository.findById(any())).thenReturn(Optional.of(expected));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(expected));
       when(taskRepository.save(any())).thenReturn(expected);
 
       final TaskEntity result = cut.updateTask(TestData.UPDATE_TASK);
@@ -177,7 +177,7 @@ public class TaskServiceTest {
     void appendUnit() {
       final TaskEntity expected = TestData.TASK_ENTITY_PYTHON_1;
 
-      when(taskRepository.findById(any())).thenReturn(Optional.of(expected));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(expected));
       when(taskRepository.save(any())).thenReturn(expected);
 
       final TaskEntity result = cut.appendUnitTest(TestData.APPEND_TEST_TASK);
@@ -185,7 +185,7 @@ public class TaskServiceTest {
       assertEquals(expected, result);
       assertFalse(result.testEntities().isEmpty());
       assertEquals(1, result.testEntities().size());
-      verify(taskRepository).findById(any());
+      verify(taskRepository).findByExternalId(any());
       verify(taskRepository).save(expected);
     }
 
@@ -195,7 +195,7 @@ public class TaskServiceTest {
     void appendUnitThrowDatabaseException() {
       final TaskEntity task = TestData.TASK_ENTITY_PYTHON_1;
 
-      when(taskRepository.findById(any())).thenReturn(Optional.of(task));
+      when(taskRepository.findByExternalId(any())).thenReturn(Optional.of(task));
       when(taskRepository.save(any())).thenThrow(new DataAccessResourceFailureException("DB down"));
 
       final DatabaseException exception = assertThrows(

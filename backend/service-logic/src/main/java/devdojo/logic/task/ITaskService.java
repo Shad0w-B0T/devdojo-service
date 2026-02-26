@@ -2,13 +2,12 @@ package devdojo.logic.task;
 
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskRatingEntity;
-import devdojo.schema.task.ArgumentType;
+import devdojo.schema.Constants;
 import devdojo.schema.task.Difficulty;
+import devdojo.schema.task.Test;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ public interface ITaskService {
   int RATING_MAX = 5;
 
   @NotNull(message = "Returned tasks must not be null")
-  List<TaskEntity> getTasks(final GetTasksByLangauge getTasksByLangauge);
+  List<TaskEntity> getTasks(final GetTasksByLanguage getTasksByLangauge);
 
   @NotNull(message = "Returned task must not be null")
   TaskEntity getTask(
@@ -63,83 +62,113 @@ public interface ITaskService {
 
   // ———— DTOs ————
 
-  record GetTasksByLangauge(
-    @NotNull(message = "Language ID must not be null")
+
+  record GetTasksByLanguage(
+
+    @NotBlank(message = "Language ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Language ID must not exceed {max} characters")
     String languageId
+
   ) {
   }
 
   record GetTask(
-    @NotNull(message = "Task ID must not be null")
+
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId
+
   ) {
   }
 
   record CreateTask(
 
-    @NotNull(message = "LanguageId must not be null")
+    @NotBlank(message = "LanguageId must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "LanguageId must not exceed {max} characters")
     String languageId,
 
-    @NotNull(message = "Task name must not be null")
+    @NotBlank(message = "Task name must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task name must not exceed {max} characters")
     String name,
 
-    @NotNull(message = "Task description must not be null")
+    @NotBlank(message = "Task description must not be blank")
+    @Size(max = Constants.DESCRIPTION_LENGTH, message = "Task description must not exceed {max} characters")
     String description,
 
     @NotNull(message = "Task difficulty must not be null")
     Difficulty difficulty,
 
-    @NotNull(message = "Task template must not be null")
+    @NotBlank(message = "Task template must not be blank")
+    @Size(max = Constants.CODE_LENGTH, message = "Task template must not exceed {max} characters")
     String template,
 
-    @NotNull(message = "Task complete field must not be null")
+    @NotBlank(message = "Task complete field must not be blank")
+    @Size(max = Constants.CODE_LENGTH, message = "Task complete field must not exceed {max} characters")
     String complete,
 
     @NotNull(message = "Unit tests list must not be null")
+    @Size(max = Constants.TEST_LIMIT, message = "Unit tests must not exceed {max} entries")
     @Valid
-    List<? extends TestData> unitTests,
+    List<Test> unitTests,
 
     boolean active,
 
     @Nullable
-    List<String> tags
+    @Size(max = Constants.TAG_LIMIT, message = "Tags must not exceed {max} entries")
+    List<
+      @NotBlank(message = "Tag must not be blank")
+      @Size(max = Constants.STRING_DEFAULT_LENGTH, message = "Tag must not exceed {max} characters")
+        String> tags
   ) {
   }
 
   record UpdateTask(
 
-    @NotNull(message = "Task ID must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId,
 
-    @NotNull(message = "Task name must not be null")
+    @NotBlank(message = "Task name must not be blank")
+    @Size(max = Constants.STRING_DEFAULT_LENGTH, message = "Task name must not exceed {max} characters")
     String name,
 
-    @NotNull(message = "Task description must not be null")
+    @NotBlank(message = "Task description must not be blank")
+    @Size(max = Constants.DESCRIPTION_LENGTH, message = "Task description must not exceed {max} characters")
     String description,
 
     @NotNull(message = "Task difficulty must not be null")
     Difficulty difficulty,
 
-    @NotNull(message = "Task template must not be null")
+    @NotBlank(message = "Task template must not be blank")
+    @Size(max = Constants.CODE_LENGTH, message = "Task template must not exceed {max} characters")
     String template,
 
-    @NotNull(message = "Task complete field must not be null")
+    @NotBlank(message = "Task complete field must not be blank")
+    @Size(max = Constants.CODE_LENGTH, message = "Task complete field must not exceed {max} characters")
     String complete,
 
     @NotNull(message = "Unit tests list must not be null")
+    @Size(max = Constants.TEST_LIMIT, message = "Unit tests must not exceed {max} entries")
     @Valid
-    List<? extends TestData> unitTests,
+    List<Test> unitTests,
 
     boolean active,
 
     @Nullable
-    List<String> tags
+    @Size(max = Constants.TAG_LIMIT, message = "Tags must not exceed {max} entries")
+    List<
+      @NotBlank(message = "Tag must not be blank")
+      @Size(max = Constants.STRING_DEFAULT_LENGTH, message = "Tag must not exceed {max} characters")
+        String
+      > tags
+
   ) {
   }
 
   record DeleteTask(
 
-    @NotNull(message = "Task ID must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId
 
   ) {
@@ -147,45 +176,21 @@ public interface ITaskService {
 
   record AppendTest(
 
-    @NotNull(message = "Task ID must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId,
 
     @NotNull(message = "Unit test must not be null")
     @Valid
-    TestData unitTest
-
-  ) {
-  }
-
-  record TestData(
-
-    @NotNull(message = "Input arguments list must not be null")
-    @Valid
-    List<? extends TestArgumentData> input,
-
-    @NotNull(message = "Output argument must not be null")
-    @Valid
-    TestArgumentData output
-
-  ) {
-  }
-
-  record TestArgumentData(
-
-    @NotNull(message = "Argument type must not be null")
-    ArgumentType type,
-
-    String variant, // optional
-
-    @NotNull(message = "Argument value must not be null")
-    Object value
+    Test unitTest
 
   ) {
   }
 
   record RemoveTagFromTask(
 
-    @NotNull(message = "Task ID must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId,
 
     @NotNull(message = "Tag ID must not be null")
@@ -196,15 +201,16 @@ public interface ITaskService {
 
   record SetTaskRating(
 
-    @NotNull(message = "Task ID must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId,
 
-    @NotNull(message = "User ID must not be null")
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
-
-    @Min(1)
-    @Max(RATING_MAX)
+    @Min(value = 1, message = "Rating must be at least {value}")
+    @Max(value = RATING_MAX, message = "Rating must not exceed {value}")
     int rating
 
   ) {

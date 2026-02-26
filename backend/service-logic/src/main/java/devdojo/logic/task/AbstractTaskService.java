@@ -5,14 +5,14 @@ import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.*;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.language.ILanguageService;
-import devdojo.logic.user.IUserService;
 import devdojo.logic.security.SecurityUtils;
-import devdojo.schema.annotation.RoleRequired;
+import devdojo.logic.user.IUserService;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.exception.permissions.UnauthorizedException;
 import devdojo.schema.task.ArgumentType;
-import devdojo.schema.user.UserRole;
+import devdojo.schema.task.ITestArgument;
+import devdojo.schema.task.Test;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -52,13 +52,13 @@ public abstract class AbstractTaskService implements ITaskService {
 
   @Transactional
   @Override
-  public List<TaskEntity> getTasks(final GetTasksByLangauge getTasksByLangauge) {
-    if (getTasksByLangauge == null || getTasksByLangauge.languageId() == null) {
+  public List<TaskEntity> getTasks(final GetTasksByLanguage getTasksByLanguage) {
+    if (getTasksByLanguage == null || getTasksByLanguage.languageId() == null) {
       return this.taskRepository.findAll();
     }
 
     final LanguageEntity languageEntity =
-      this.languageService.getLanguage(new ILanguageService.GetLanguage(getTasksByLangauge.languageId()));
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(getTasksByLanguage.languageId()));
 
     return this.taskRepository.findAllByLanguageEntity(languageEntity);
   }
@@ -85,7 +85,6 @@ public abstract class AbstractTaskService implements ITaskService {
       });
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity createTask(final CreateTask createTask) {
@@ -103,15 +102,13 @@ public abstract class AbstractTaskService implements ITaskService {
       createTask.active()
     );
 
-    final List<TagEntity> tags =
-      Optional.ofNullable(createTask.tags())
-        .orElse(List.of())
-        .stream()
-        .distinct()
-        .map(name -> new TagEntity(task, name))
-        .toList();
-
-    task.setTagEntities(tags);
+    if (createTask.tags() != null) {
+      task.tagEntities().addAll(
+        createTask.tags().stream()
+          .map(tag -> new TagEntity(task, tag))
+          .toList()
+      );
+    }
 
     createTask.unitTests()
       .stream().map(this::testEntity)
@@ -140,7 +137,6 @@ public abstract class AbstractTaskService implements ITaskService {
     }
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity updateTask(final UpdateTask updateTask) {
@@ -158,15 +154,15 @@ public abstract class AbstractTaskService implements ITaskService {
     task.complete(updateTask.complete());
     task.active(updateTask.active());
 
-    final List<TagEntity> tags =
-      Optional.ofNullable(updateTask.tags())
-        .orElse(List.of())
-        .stream()
-        .distinct()
-        .map(name -> new TagEntity(task, name))
-        .toList();
+    if (updateTask.tags() != null) {
+      task.tagEntities().clear();
+      task.tagEntities().addAll(
+        updateTask.tags().stream()
+          .map(tag -> new TagEntity(task, tag))
+          .toList()
+      );
+    }
 
-    task.setTagEntities(tags);
 
     task.testEntities().clear();
     updateTask.unitTests()
@@ -209,7 +205,6 @@ public abstract class AbstractTaskService implements ITaskService {
    * @return true if the tag was successfully removed from the task, false if the tag was not found.
    * @throws NullPointerException If the input object or any of the IDs is null.
    */
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public boolean removeTagFromTask(final RemoveTagFromTask removeTagFromTask) {
@@ -233,7 +228,6 @@ public abstract class AbstractTaskService implements ITaskService {
     }
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity appendUnitTest(final AppendTest append) {
@@ -254,7 +248,6 @@ public abstract class AbstractTaskService implements ITaskService {
     }
   }
 
-  @RoleRequired(role = UserRole.PROFESSOR)
   @Override
   @Transactional
   public TaskEntity deleteTask(final DeleteTask deleteTask) {
@@ -390,12 +383,12 @@ public abstract class AbstractTaskService implements ITaskService {
    * @return the created TestEntity
    * @throws IllegalArgumentException if any input argument is not of type INPUT
    */
-  private TestEntity testEntity(final @NotNull TestData data) {
+  private TestEntity testEntity(final @NotNull Test data) {
     final TestEntity test = new TestEntity();
 
     final List<TestArgumentEntity> args = IntStream.range(0, data.input().size())
       .mapToObj(i -> {
-        final TestArgumentData argumentData = data.input().get(i);
+        final ITestArgument argumentData = data.input().get(i);
 
         if (argumentData.type() != ArgumentType.INPUT) {
           log.error("Invalid argument type for input test argument: expected INPUT but got {}", argumentData.type());
