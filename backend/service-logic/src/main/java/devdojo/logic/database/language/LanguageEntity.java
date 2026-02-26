@@ -47,8 +47,7 @@ public final class LanguageEntity extends AbstractExternalEntity implements ILan
   @Column(nullable = false)
   boolean active;
 
-  public LanguageEntity(final String token,
-                        final String languageName,
+  public LanguageEntity(final String languageName,
                         final String description,
                         final boolean active) {
     this.languageName = languageName;
