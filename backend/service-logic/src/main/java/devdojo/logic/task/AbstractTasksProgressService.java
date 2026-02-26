@@ -18,7 +18,9 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.context.annotation.Bean;
@@ -165,6 +167,9 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
       getLeaderboard.end());
   }
 
+  @Caching(evict = {
+    @CacheEvict(cacheNames = "languageProgress", key = "#p0.userId()"),
+  })
   @Override
   public TaskProgressEntity updateTaskProgress(final UpdateTaskProgress updateTaskProgress) {
     final TaskProgressTrio trio =
