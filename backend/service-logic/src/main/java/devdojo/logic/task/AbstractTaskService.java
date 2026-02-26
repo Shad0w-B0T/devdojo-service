@@ -5,8 +5,8 @@ import devdojo.logic.database.tag.TagEntity;
 import devdojo.logic.database.task.*;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.language.ILanguageService;
-import devdojo.logic.user.IUserService;
 import devdojo.logic.security.SecurityUtils;
+import devdojo.logic.user.IUserService;
 import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.NotFoundException;
@@ -105,15 +105,13 @@ public abstract class AbstractTaskService implements ITaskService {
       createTask.active()
     );
 
-    final List<TagEntity> tags =
-      Optional.ofNullable(createTask.tags())
-        .orElse(List.of())
-        .stream()
-        .distinct()
-        .map(name -> new TagEntity(task, name))
-        .toList();
-
-    task.setTagEntities(tags);
+    if (createTask.tags() != null) {
+      task.tagEntities().addAll(
+        createTask.tags().stream()
+          .map(tag -> new TagEntity(task, tag))
+          .toList()
+      );
+    }
 
     createTask.unitTests()
       .stream().map(this::testEntity)
@@ -160,15 +158,15 @@ public abstract class AbstractTaskService implements ITaskService {
     task.complete(updateTask.complete());
     task.active(updateTask.active());
 
-    final List<TagEntity> tags =
-      Optional.ofNullable(updateTask.tags())
-        .orElse(List.of())
-        .stream()
-        .distinct()
-        .map(name -> new TagEntity(task, name))
-        .toList();
+    if (updateTask.tags() != null) {
+      task.tagEntities().clear();
+      task.tagEntities().addAll(
+        updateTask.tags().stream()
+          .map(tag -> new TagEntity(task, tag))
+          .toList()
+      );
+    }
 
-    task.setTagEntities(tags);
 
     task.testEntities().clear();
     updateTask.unitTests()
