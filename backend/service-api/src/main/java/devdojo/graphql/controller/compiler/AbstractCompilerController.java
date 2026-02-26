@@ -7,11 +7,13 @@ import devdojo.graphql.input.compiler.GetTestRun;
 import devdojo.logic.compiler.ICompilerService;
 import devdojo.logic.database.compiler.CompilerEntity;
 import devdojo.logic.database.language.LanguageEntity;
+import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.code.TestError;
 import devdojo.schema.code.TestRun;
 import devdojo.schema.code.TestRunResultChecked;
 import devdojo.schema.compiler.CompilerResourceAnalytic;
 import devdojo.schema.exception.database.NotFoundException;
+import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -34,12 +36,14 @@ public abstract class AbstractCompilerController implements ICompilerController 
   }
 
   @QueryMapping("compilers")
+  @RoleRequired(role = UserRole.ADMIN)
   @Override
   public List<CompilerEntity> compilers() {
     return this.compilerService.getCompilers();
   }
 
   @QueryMapping("compiler")
+  @RoleRequired(role = UserRole.ADMIN)
   @Override
   public CompilerEntity compiler(@Argument("input") final ICompilerService.GetCompiler input) {
     return this.compilerService.getCompiler(input);

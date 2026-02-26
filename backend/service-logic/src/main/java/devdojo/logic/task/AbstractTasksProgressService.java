@@ -7,7 +7,6 @@ import devdojo.logic.database.task.TaskProgressRepository;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.language.ILanguageService;
 import devdojo.logic.user.IUserService;
-import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.IllegalInputException;
@@ -157,7 +156,6 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
     )
 
     */
-  @RoleRequired(role = UserRole.USER)
   @Override
   public List<TaskProgressRepository.UserRankingProjection> getLeaderboard(final GetLeaderboard getLeaderboard) {
     final LanguageEntity languageEntity =
