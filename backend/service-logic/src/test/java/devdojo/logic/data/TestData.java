@@ -8,11 +8,10 @@ import devdojo.schema.task.Difficulty;
 import devdojo.schema.task.Test;
 import devdojo.schema.task.TestArgument;
 import java.util.List;
-import java.util.UUID;
 
 public class TestData {
 
-  public static final String TASK_ID = "72bf18f6-bbdf-4efa-b0e4-fe2b96b717b4";
+  public static final String TASK_ID = "tsk_1";
   public static final String LANGUAGE_ID = "f2378c02-4a78-4f39-a9b8-d040f6a2001d";
   private static final List<Test> LANGUAGE_UNIT_TESTS = List.of();
   public static final LanguageEntity LANGUAGE_ENTITY_JAVA =
