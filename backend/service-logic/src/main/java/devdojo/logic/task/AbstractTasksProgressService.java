@@ -94,7 +94,7 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
   @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
   @Cacheable(
     cacheNames = "ranking",
-    key = "#p0.userId()",
+    key = "#p0.userId() + '_' + #p0.languageId()",
     unless = "#result == null"
   )
   @Override
