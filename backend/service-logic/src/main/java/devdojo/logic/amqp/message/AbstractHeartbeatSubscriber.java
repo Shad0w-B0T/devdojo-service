@@ -3,6 +3,7 @@ package devdojo.logic.amqp.message;
 import devdojo.logic.compiler.ICompilerService;
 import devdojo.schema.amqp.HeartbeatPayload;
 import devdojo.schema.amqp.RabbitConst;
+import devdojo.schema.exception.database.NotFoundException;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -18,25 +19,29 @@ public abstract class AbstractHeartbeatSubscriber {
 
   @RabbitListener(queues = RabbitConst.QUEUE_HEARTBEAT)
   public void handleHeartbeatMessage(final HeartbeatPayload payload) {
-    this.compilerService.updateHeartbeat(new ICompilerService.UpdateHeartbeat(
-      UUID.fromString(payload.compilerId()),
-      payload.languageKey(),
-      payload.cpuUsage(),
-      payload.cpuCores(),
-      payload.memoryUsageMb(),
-      payload.memoryTotalMb(),
-      payload.totalTasksProcessed()));
+    try {
+      this.compilerService.updateHeartbeat(new ICompilerService.UpdateHeartbeat(
+        UUID.fromString(payload.compilerId()),
+        payload.languageKey(),
+        payload.cpuUsage(),
+        payload.cpuCores(),
+        payload.memoryUsageMb(),
+        payload.memoryTotalMb(),
+        payload.totalTasksProcessed()));
 
-    log.debug(
-      "Heartbeat received from compiler {} (language: {}): " +
-        "CPU {}% ({} cores), Memory {} / {} MB, Total tasks processed: {}",
-      payload.compilerId(),
-      payload.languageKey(),
-      payload.cpuUsage(),
-      payload.cpuCores(),
-      payload.memoryUsageMb(),
-      payload.memoryTotalMb(),
-      payload.totalTasksProcessed()
-    );
+      log.debug(
+        "Heartbeat received from compiler {} (language: {}): " +
+          "CPU {}% ({} cores), Memory {} / {} MB, Total tasks processed: {}",
+        payload.compilerId(),
+        payload.languageKey(),
+        payload.cpuUsage(),
+        payload.cpuCores(),
+        payload.memoryUsageMb(),
+        payload.memoryTotalMb(),
+        payload.totalTasksProcessed()
+      );
+    } catch (final NotFoundException ignore) {
+      /* consume message */
+    }
   }
 }
