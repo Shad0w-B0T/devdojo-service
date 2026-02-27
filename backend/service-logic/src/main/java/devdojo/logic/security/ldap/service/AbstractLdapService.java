@@ -22,12 +22,33 @@ public abstract class AbstractLdapService implements ILdapService {
   @Override
   public UserEntity loadOrSyncUser(final String authId) {
     try {
-      return this.userService.getUser(new IUserService.GetUserByAuthId(authId));
-    } catch (NotFoundException e) {
-      Map<String, Object> attrs = this.ldapAttributeService.loadUserAttributes(authId);
+      final UserEntity userEntity = this.userService.getUser(new IUserService.GetUserByAuthId(authId));
 
-      UserRole ldapUserRole =
-        mapLdapUserRole(attrs.get("eduPersonAffiliation"));
+      final long THIRTY_MINUTES_MILLIS = 30 * 60 * 1000;
+      if (userEntity.lastLogin() != null &&
+        (new Date().getTime() - userEntity.lastLogin().getTime() < THIRTY_MINUTES_MILLIS)) {
+        return userEntity;
+      }
+
+      final Map<String, Object> attrs = this.ldapAttributeService.loadUserAttributes(authId);
+
+      final UserEntity updatedUser = this.userService.updateUser(
+        new IUserService.UpdateUser(
+          userEntity.externalId(),
+          Objects.toString(attrs.get("mail"), ""),
+          Objects.toString(attrs.get("displayName"), ""),
+          userEntity.applicationRole(),
+          true,
+          new Date(),
+          userEntity.profilePublic()
+        )
+      );
+
+      return updatedUser;
+
+    } catch (NotFoundException e) {
+      final Map<String, Object> attrs = this.ldapAttributeService.loadUserAttributes(authId);
+      final UserRole ldapUserRole = mapLdapUserRole(attrs.get("eduPersonAffiliation"));
 
       return this.userService.createUser(new IUserService.CreateUser(
         authId,
@@ -35,7 +56,8 @@ public abstract class AbstractLdapService implements ILdapService {
         Objects.toString(attrs.get("displayName"), ""),
         ldapUserRole,
         ldapUserRole,
-        true));
+        true
+      ));
     }
   }
 

@@ -6,6 +6,7 @@ import devdojo.logic.cache.compiler.CompilerTaskResultRepository;
 import devdojo.logic.database.compiler.CompilerHeartbeatRepository;
 import devdojo.logic.database.compiler.CompilerRepository;
 import devdojo.logic.database.language.LanguageRepository;
+import devdojo.logic.language.ILanguageService;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
 import devdojo.logic.user.IUserService;
@@ -17,7 +18,7 @@ public class CompilerService extends AbstractCompilerService {
 
 
   protected CompilerService(final ObjectMapper objectMapper,
-                            final LanguageRepository languageRepository,
+                            final ILanguageService languageService,
                             final ITaskService taskService,
                             final ITasksProgressService tasksProgressService,
                             final CompilerRepository compilerRepository,
@@ -26,7 +27,7 @@ public class CompilerService extends AbstractCompilerService {
                             final CompilerTaskResultRepository compilerTaskResultRepository,
                             final ISocketPublisher socketPublisher,
                             final IUserService userService) {
-    super(objectMapper, languageRepository, taskService, tasksProgressService, compilerRepository,
+    super(objectMapper, languageService, taskService, tasksProgressService, compilerRepository,
       compilerHeartbeatRepository, compilerTaskRepository, compilerTaskResultRepository,
       socketPublisher, userService);
   }

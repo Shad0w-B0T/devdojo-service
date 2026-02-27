@@ -5,7 +5,7 @@ import devdojo.logic.cache.compiler.CompilerTaskRepository;
 import devdojo.logic.cache.compiler.CompilerTaskResultRepository;
 import devdojo.logic.database.compiler.CompilerHeartbeatRepository;
 import devdojo.logic.database.compiler.CompilerRepository;
-import devdojo.logic.database.language.LanguageRepository;
+import devdojo.logic.language.ILanguageService;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
 import devdojo.logic.user.IUserService;
@@ -24,7 +24,7 @@ class CompilerServiceTest {
   @Mock
   private ObjectMapper objectMapper;
   @Mock
-  private LanguageRepository languageRepository;
+  private ILanguageService languageService;
   @Mock
   private ITaskService taskService;
   @Mock
@@ -55,7 +55,7 @@ class CompilerServiceTest {
   void shouldInitializeWithHeartbeatRepository() {
     assertDoesNotThrow(
       () -> new CompilerService(this.objectMapper,
-        this.languageRepository,
+        this.languageService,
         this.taskService,
         this.tasksProgressService,
         this.compilerRepository,

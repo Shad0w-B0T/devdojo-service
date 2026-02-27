@@ -15,6 +15,8 @@ import devdojo.logic.database.language.LanguageRepository;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.user.UserEntity;
+import devdojo.logic.language.ILanguageService;
+import devdojo.logic.language.LanguageService;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
@@ -40,7 +42,7 @@ import org.springframework.validation.annotation.Validated;
 public abstract class AbstractCompilerService implements ICompilerService {
 
   private final ObjectMapper objectMapper;
-  private final LanguageRepository languageRepository;
+  private final ILanguageService languageService;
   private final ITaskService taskService;
   private final ITasksProgressService tasksProgressService;
   private final CompilerRepository compilerRepository;
@@ -52,7 +54,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
 
   protected AbstractCompilerService(
     final ObjectMapper objectMapper,
-    @NotNull(message = "LanguageRepository must not be null") final LanguageRepository languageRepository,
+    final ILanguageService languageService,
     final ITaskService taskService,
     final ITasksProgressService tasksProgressService,
     final CompilerRepository compilerRepository,
@@ -62,7 +64,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
     final ISocketPublisher socketPublisher,
     final IUserService userService) {
     this.objectMapper = objectMapper;
-    this.languageRepository = languageRepository;
+    this.languageService = languageService;
     this.taskService = taskService;
     this.tasksProgressService = tasksProgressService;
     this.compilerRepository = compilerRepository;
@@ -78,7 +80,7 @@ public abstract class AbstractCompilerService implements ICompilerService {
     log.debug("Updating heartbeat for languageToken='{}'", updateHeartbeat.languageToken());
 
     final LanguageEntity languageEntity =
-      this.languageRepository.findByExternalId(updateHeartbeat.languageToken()).orElseThrow();
+      this.languageService.getLanguage(new ILanguageService.GetLanguage(updateHeartbeat.languageToken()));
 
 
     final CompilerEntity compilerEntity = this.compilerRepository
