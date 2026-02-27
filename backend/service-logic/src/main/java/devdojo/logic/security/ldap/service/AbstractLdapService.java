@@ -1,4 +1,4 @@
-package devdojo.logic.security.ldap;
+package devdojo.logic.security.ldap.service;
 
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.user.IUserService;

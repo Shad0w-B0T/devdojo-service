@@ -1,29 +1,36 @@
 package devdojo.rest.controller;
 
+import devdojo.schema.task.Test;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 
 public interface ICodeController {
 
   @NotNull(message = "Response must not be null")
-  ResponseEntity<IProcessCodeResponse> processCode(
-    @NotNull(message = "Payload must not be null") String payload,
-    @NotNull(message = "Task ID must not be null") String taskId
+  ResponseEntity<ProcessCodeResponse> processCode(
+    @NotNull(message = "Payload must not be null") final String payload,
+    @NotNull(message = "Task ID must not be null") final String taskId
   );
 
-  interface IProcessCodeResponse {
-    @NotNull(message = "Id must not be null")
-    UUID id();
-   /* @NotNull(message = "Results must not be null")
-    List<CodeResultUnit> results();
+  ResponseEntity<ProcessCodeResponse> processCodeWithTests(
+    final ExecuteCodeWithTestsRequest request
+  );
 
-    @NotNull(message = "Completed must not be null")
-    boolean completed();
+  record ProcessCodeResponse(@NotNull(message = "Id must not be null") UUID id) {
 
-    @NotNull(message = "Score must not be null")
-    int score();
+  }
 
-    */
+  record ExecuteCodeWithTestsRequest(
+    @NotNull
+    String languageId,
+    @NotBlank String payload,
+    @NotNull(message = "Unit tests list must not be null")
+    @Valid
+    List<Test> unitTests
+  ) {
   }
 }

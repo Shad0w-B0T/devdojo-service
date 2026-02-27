@@ -18,23 +18,6 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
                                                              final TaskEntity taskEntity);
 
   @Query(value = """
-    SELECT 
-        t.name AS name,
-        t.description AS description,
-        t.difficulty AS difficulty,
-        COALESCE(tp.state, 0) AS state,
-        COALESCE(tp.score, 0) AS score
-    FROM task t
-    LEFT JOIN task_user_progress tp
-        ON tp.task_id = t.id AND tp.user_id = :userId
-    WHERE t.language_id = :languageId
-    """, nativeQuery = true)
-  List<TaskWithProgressProjection> findAllTasksWithProgressByUserAndLanguage(
-    @Param("userId") UUID userId,
-    @Param("languageId") UUID languageId
-  );
-
-  @Query(value = """
       SELECT
         ranked.user_id     AS userId,
         ranked.total_score AS totalScore,
@@ -51,7 +34,7 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
       ) ranked
       WHERE ranked.user_id = :userId
     """, nativeQuery = true)
-  UserRankingProjection getUserRankForLanguage(
+  Optional<UserRankingProjection> getUserRankByLanguage(
     @Param("userId") UUID userId,
     @Param("languageId") UUID languageId
   );
@@ -136,6 +119,31 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
     @Param("state") TaskProgressState state
   );
 
+  @Query(value = """
+        SELECT
+            l.id                                      AS languageId,
+            l.language_name                           AS languageName,
+            CAST(COUNT(t.id) AS BIGINT)               AS totalTasks,
+            CAST(COUNT(CASE WHEN tp.state = 2 THEN 1 END) AS BIGINT) AS completedTasks,
+            CAST(COALESCE(SUM(tp.score), 0) AS BIGINT) AS totalScore,
+            CAST(
+                COALESCE(
+                    AVG(CASE WHEN tp.state = 2 THEN tp.score END),
+                    0
+                ) AS DOUBLE PRECISION
+            ) AS averageScore
+        FROM devdojo.language l
+        LEFT JOIN devdojo.task t
+            ON t.language_id = l.id
+        LEFT JOIN devdojo.task_user_progress tp
+            ON tp.task_id = t.id
+            AND tp.user_id = :userId
+        WHERE l.active = true
+        GROUP BY l.id, l.language_name
+        ORDER BY averageScore DESC
+    """, nativeQuery = true)
+  List<LanguageProgressProjection> getLanguageProgress(@Param("userId") UUID userId);
+
   interface TaskWithProgressProjection {
     String name();
 
@@ -146,6 +154,16 @@ public interface TaskProgressRepository extends EntityRepository<TaskProgressEnt
     int state();
 
     int score();
+  }
+
+  record LanguageProgressProjection(
+    UUID languageId,
+    String languageName,
+    long totalTasks,
+    long completedTasks,
+    long totalScore,
+    Double averageScore
+  ) implements Serializable {
   }
 
   record UserRankingProjection(UUID userId,

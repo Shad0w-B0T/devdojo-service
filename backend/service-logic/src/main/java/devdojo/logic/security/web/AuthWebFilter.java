@@ -1,7 +1,6 @@
 package devdojo.logic.security.web;
 
-import devdojo.logic.security.ldap.ILdapService;
-import devdojo.logic.user.IUserService;
+import devdojo.logic.security.ldap.service.ILdapService;
 import org.springframework.stereotype.Service;
 
 @Service("auth")

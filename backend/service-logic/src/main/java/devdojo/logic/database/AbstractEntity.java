@@ -2,7 +2,14 @@ package devdojo.logic.database;
 
 import devdojo.schema.entity.DateAuditable;
 import devdojo.schema.entity.Identifiable;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreRemove;
+import jakarta.persistence.PreUpdate;
 import java.io.*;
 import java.util.Date;
 import java.util.UUID;

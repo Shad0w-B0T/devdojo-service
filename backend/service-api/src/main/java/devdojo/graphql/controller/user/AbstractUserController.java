@@ -3,6 +3,7 @@ package devdojo.graphql.controller.user;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.user.IUserService;
+import devdojo.logic.websocket.service.IPresenceService;
 import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.user.UserRole;
@@ -17,10 +18,13 @@ import org.springframework.security.core.parameters.P;
 public abstract class AbstractUserController implements IUserController {
 
   private final @NotNull(message = "UserService cannot be null.") IUserService userService;
+  private final IPresenceService presenceService;
 
 
-  protected AbstractUserController(@NotNull final IUserService userService) {
+  protected AbstractUserController(@NotNull final IUserService userService,
+                                   @NotNull final IPresenceService presenceService) {
     this.userService = userService;
+    this.presenceService = presenceService;
   }
 
   @QueryMapping("users")
@@ -30,6 +34,13 @@ public abstract class AbstractUserController implements IUserController {
     return this.userService.getUsers();
   }
 
+  @QueryMapping("usersActiveCount")
+  @RoleRequired(role = UserRole.USER)
+  @Override
+  public long usersActiveCount() {
+    return this.presenceService.getActiveUserCount();
+  }
+
   @QueryMapping("userSelf")
   @Override
   public @NotNull UserEntity userSelf() {
@@ -37,7 +48,8 @@ public abstract class AbstractUserController implements IUserController {
   }
 
   @QueryMapping("user")
-  public @NotNull UserEntity user(@Argument("input") final IUserService.GetUserByAuthId input) {
+  @RoleRequired(role = UserRole.USER)
+  public @NotNull UserEntity user(@Argument("input") final IUserService.GetUser input) {
     return this.userService.getUser(input);
   }
 

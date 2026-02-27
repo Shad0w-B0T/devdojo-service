@@ -1,11 +1,11 @@
 package devdojo.logic.database.language;
 
-import devdojo.logic.database.BaseJpaTest;
-import java.util.Optional;
-import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import devdojo.logic.database.BaseJpaTest;
+import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,6 @@ final class LanguageRepositoryTest extends BaseJpaTest {
   @BeforeEach
   void setUp() {
     this.language = new LanguageEntity(
-      "mY1kZlUti3R3DRHSurfRk0mG3e1ILpAdiYjuJ5drcqTHMvf5bEg0sZ1s06HmbH5m",
       "Java",
       "Write once run everywhere.",
       true
@@ -71,7 +70,6 @@ final class LanguageRepositoryTest extends BaseJpaTest {
     assertTrue(result.isPresent());
     assertEquals(1, this.cut.count());
     assertEquals(language, result.get());
-    assertEquals(language.token(), result.get().token());
     assertEquals(language.languageName(), result.get().languageName());
     assertEquals(language.description(), result.get().description());
   }

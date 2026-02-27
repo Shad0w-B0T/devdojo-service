@@ -7,7 +7,6 @@ import devdojo.logic.database.task.TaskProgressRepository;
 import devdojo.logic.database.user.UserEntity;
 import devdojo.logic.language.ILanguageService;
 import devdojo.logic.user.IUserService;
-import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.DatabaseException;
 import devdojo.schema.exception.database.IllegalInputException;
@@ -18,9 +17,10 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKey;
 import org.springframework.context.annotation.Bean;
@@ -72,8 +72,31 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
 
   @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
   @Cacheable(
-    cacheNames = "ranking",
+    cacheNames = "languageProgress",
     key = "#p0.userId()",
+    unless = "#result == null || #result.isEmpty()"
+  )
+  @Override
+  public List<TaskProgressRepository.LanguageProgressProjection> getLanguageProgress(
+    @P("q") final GetLanguageProgress getLanguageProgress) {
+    final UserEntity userEntity = this.userService.getUser(getLanguageProgress.userId());
+
+    try {
+      return this.taskProgressRepository.getLanguageProgress(userEntity.id());
+    } catch (final DataAccessException exception) {
+      log.error("Database error while fetching language progress for user '{}': {}",
+        userEntity.id(),
+        exception.getMessage(),
+        exception
+      );
+      throw new DatabaseException("Failed to fetch language progress", exception);
+    }
+  }
+
+  @SelfRequired(bypassRole = UserRole.ADMIN, field = "#q.userId()")
+  @Cacheable(
+    cacheNames = "ranking",
+    key = "#p0.userId() + '_' + #p0.languageId()",
     unless = "#result == null"
   )
   @Override
@@ -82,7 +105,8 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
     final LanguageEntity languageEntity =
       this.languageService.getLanguage(new ILanguageService.GetLanguage(getUserRank.languageId()));
 
-    return this.taskProgressRepository.getUserRankForLanguage(userEntity.id(), languageEntity.id());
+    return this.taskProgressRepository.getUserRankByLanguage(userEntity.id(), languageEntity.id())
+      .orElseThrow(() -> new NotFoundException("UserRank not found for user " + userEntity.id()));
   }
 
   @Transactional
@@ -134,7 +158,6 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
     )
 
     */
-  @RoleRequired(role = UserRole.USER)
   @Override
   public List<TaskProgressRepository.UserRankingProjection> getLeaderboard(final GetLeaderboard getLeaderboard) {
     final LanguageEntity languageEntity =
@@ -144,6 +167,9 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
       getLeaderboard.end());
   }
 
+  @Caching(evict = {
+    @CacheEvict(cacheNames = "languageProgress", key = "#p0.userId()"),
+  })
   @Override
   public TaskProgressEntity updateTaskProgress(final UpdateTaskProgress updateTaskProgress) {
     final TaskProgressTrio trio =

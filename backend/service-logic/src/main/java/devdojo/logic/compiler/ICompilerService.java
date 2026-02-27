@@ -6,8 +6,10 @@ import devdojo.logic.database.compiler.CompilerEntity;
 import devdojo.logic.database.compiler.CompilerHeartbeatEntity;
 import devdojo.schema.code.TestRunResult;
 import devdojo.schema.compiler.CompilerResourceAnalytic;
+import devdojo.schema.task.ITest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
@@ -91,9 +93,14 @@ public interface ICompilerService {
     @NotNull(message = "Method code must not be null")
     String methodCode,
 
-    @NotNull(message = "Task ID must not be null")
-    String taskId
+    @NotNull(message = "Unit tests list must not be null")
+    List<ITest> unitTests,
 
+    @Null
+    String taskId,
+
+    @NotNull(message = "LanguageId must not be null")
+    String languageId
   ) {
   }
 

@@ -7,8 +7,7 @@ enum ArgumentType {
 enum TaskDifficulty {
     EASY,
     MEDIUM,
-    HARD,
-    GOTTLOS
+    HARD
 }
 
 enum TaskProgressState {
@@ -55,6 +54,15 @@ type UserRanking {
     user: User!
     totalScore: Long!
     rank: Long!
+}
+
+type LanguageProgress {
+    languageId: ID!
+    languageName: String!
+    totalTasks: Long!
+    completedTasks: Long!
+    totalScore: Long!
+    averageScore: Float!
 }
 
 input TestArgumentInput {
@@ -129,6 +137,10 @@ input GetUserRank {
     languageId: ID!
 }
 
+input GetTaskProgresses {
+    userId: ID!
+}
+
 input GetLeaderboard {
     languageId: ID!
     start: Long!
@@ -149,6 +161,7 @@ extend type Query {
     nextTask(input: GetNextTask): Task!
 
     userRank(input: GetUserRank!): UserRanking!
+    languageProgress(input: GetTaskProgresses!): [LanguageProgress!]!
     leaderboard(input: GetLeaderboard): [UserRanking!]!
 }
 

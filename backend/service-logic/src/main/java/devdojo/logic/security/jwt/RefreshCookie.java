@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RefreshCookie {
+public class RefreshCookie implements IRefreshCookie {
 
   private final String cookieName;
   private final boolean secure;
@@ -24,10 +24,12 @@ public class RefreshCookie {
     this.path = path;
   }
 
+  @Override
   public String name() {
     return cookieName;
   }
 
+  @Override
   public void set(final HttpServletResponse response,
                   final String refreshToken,
                   final long maxAgeSeconds) {
@@ -41,6 +43,7 @@ public class RefreshCookie {
     response.addHeader(HttpHeaders.SET_COOKIE, cookie);
   }
 
+  @Override
   public void clear(final HttpServletResponse response) {
     final String cookie = cookieName + "=; Max-Age=0; Path=" + path + "; HttpOnly" +
       (secure ? "; Secure" : "") +

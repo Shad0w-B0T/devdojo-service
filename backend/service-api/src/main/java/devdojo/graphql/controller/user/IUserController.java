@@ -14,10 +14,13 @@ public interface IUserController {
   List<UserEntity> users();
 
   @NotNull
+  long usersActiveCount();
+
+  @NotNull
   UserEntity userSelf();
 
   @NotNull
-  UserEntity user(@NotNull final IUserService.GetUserByAuthId input);
+  UserEntity user(@NotNull final IUserService.GetUser input);
 
   // ────── Mutations ──────
 

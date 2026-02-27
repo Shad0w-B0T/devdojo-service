@@ -3,11 +3,13 @@ package devdojo.logic.task;
 import devdojo.logic.database.task.TaskEntity;
 import devdojo.logic.database.task.TaskProgressEntity;
 import devdojo.logic.database.task.TaskProgressRepository;
+import devdojo.schema.Constants;
 import devdojo.schema.task.TaskProgressState;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
-import java.util.UUID;
 
 public interface ITasksProgressService {
 
@@ -20,6 +22,9 @@ public interface ITasksProgressService {
   @NotNull
   TaskProgressEntity getTaskProgress(@NotNull(message = "userId must not be null") final String userId,
                                      @NotNull(message = "taskId must not be null") final String taskId);
+
+  List<TaskProgressRepository.LanguageProgressProjection> getLanguageProgress(
+    @NotNull(message = "userId must not be null") final GetLanguageProgress getLanguageProgress);
 
   @NotNull
   TaskEntity getNextTask(@NotNull(message = "GetNextTask must not be null") final GetNextTask getNextTask);
@@ -39,20 +44,28 @@ public interface ITasksProgressService {
   TaskProgressEntity updateTaskProgress(@NotNull final UpdateTaskProgressInput updateTaskProgressInput);
 
   // DTOs
-  record GetTaskProgresses(
+  record GetLanguageProgress(@NotBlank(message = "User ID must not be blank")
+                             @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
+                             String userId
 
-    @NotNull(message = "userId must not be null")
-    String userId
+  ) {
+  }
+
+  record GetTaskProgresses(@NotBlank(message = "User ID must not be blank")
+                           @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
+                           String userId
 
   ) {
   }
 
   record GetTaskProgress(
 
-    @NotNull(message = "userId must not be null")
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
-    @NotNull(message = "taskId must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId
 
   ) {
@@ -60,10 +73,12 @@ public interface ITasksProgressService {
 
   record GetUserRank(
 
-    @NotNull(message = "userId must not be null")
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
-    @NotNull(message = "languageId must not be null")
+    @NotBlank(message = "Language ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Language ID must not exceed {max} characters")
     String languageId
 
   ) {
@@ -71,13 +86,14 @@ public interface ITasksProgressService {
 
   record GetLeaderboard(
 
-    @NotNull(message = "languageId must not be null")
+    @NotBlank(message = "Language ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Language ID must not exceed {max} characters")
     String languageId,
 
-    @Min(value = 0, message = "start must be greater than or equal to 0")
+    @Min(value = 0, message = "Start must be greater than or equal to {value}")
     int start,
 
-    @Min(value = 0, message = "end must be greater than or equal to 0")
+    @Min(value = 0, message = "End must be greater than or equal to {value}")
     int end
 
   ) {
@@ -85,26 +101,32 @@ public interface ITasksProgressService {
 
   record GetNextTask(
 
-    @NotNull(message = "userId must not be null")
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
+    @Size(max = Constants.ID_LENGTH, message = "Language ID must not exceed {max} characters")
     String languageId, // optional
 
-    @NotNull(message = "state must not be null")
+    @NotNull(message = "State must not be null")
     TaskProgressState state
 
   ) {
   }
 
+
   record UpdateTaskProgressInput(
 
-    @NotNull(message = "userId must not be null")
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
-    @NotNull(message = "taskId must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId,
 
-    @NotNull(message = "input must not be null")
+    @NotBlank(message = "Input must not be blank")
+    @Size(max = Constants.CODE_LENGTH, message = "Input must not exceed {max} characters")
     String input
 
   ) {
@@ -112,19 +134,22 @@ public interface ITasksProgressService {
 
   record UpdateTaskProgress(
 
-    @NotNull(message = "userId must not be null")
+    @NotBlank(message = "User ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "User ID must not exceed {max} characters")
     String userId,
 
-    @NotNull(message = "taskId must not be null")
+    @NotBlank(message = "Task ID must not be blank")
+    @Size(max = Constants.ID_LENGTH, message = "Task ID must not exceed {max} characters")
     String taskId,
 
-    @NotNull(message = "input must not be null")
+    @NotBlank(message = "Input must not be blank")
+    @Size(max = Constants.CODE_LENGTH, message = "Input must not exceed {max} characters")
     String input,
 
-    @NotNull(message = "state must not be null")
+    @NotNull(message = "State must not be null")
     TaskProgressState state,
 
-    @Min(value = 0, message = "score must be positive")
+    @Min(value = 0, message = "Score must be greater than or equal to {value}")
     int score
 
   ) {

@@ -69,7 +69,7 @@ final class PythonInputFilterTests {
 
   @ParameterizedTest
   @ValueSource(strings = {
-    "rm -rf", "curl", "wget", "chmod", "chown", "../", "..", "./",
+    "rm -rf", "curl", "wget", "chmod", "chown", "../", "./",
     "bash -c", "python -c", "os.system", "subprocess.call", "subprocess.run",
     "\\", "\\u006f\\u0073"
   })

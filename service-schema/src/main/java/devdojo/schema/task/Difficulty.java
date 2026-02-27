@@ -11,8 +11,7 @@ import lombok.experimental.Accessors;
 public enum Difficulty implements Identifiable<Integer> {
   EASY(0, 1),
   MEDIUM(1, 3),
-  HARD(2, 5),
-  GOTTLOS(3, 10);
+  HARD(2, 5);
 
   private final Integer id;
   private final int score;

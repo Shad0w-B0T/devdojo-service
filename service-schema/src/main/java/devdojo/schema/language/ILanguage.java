@@ -11,8 +11,6 @@ import java.util.UUID;
  */
 public interface ILanguage extends Identifiable<UUID>, DateAuditable, Activatable {
 
-  String token();
-
   /**
    * @return the language name.
    */

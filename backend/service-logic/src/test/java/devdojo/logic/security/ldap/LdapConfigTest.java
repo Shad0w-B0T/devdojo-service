@@ -1,6 +1,6 @@
 package devdojo.logic.security.ldap;
 
-import jakarta.validation.ConstraintViolationException;
+import devdojo.logic.security.ldap.config.AbstractLdapConfig;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;

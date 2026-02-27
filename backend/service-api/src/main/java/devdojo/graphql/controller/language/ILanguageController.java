@@ -12,9 +12,6 @@ public interface ILanguageController {
   String id(@NotNull final LanguageEntity languageEntity);
 
   @NotNull
-  String token(@NotNull final LanguageEntity languageEntity);
-
-  @NotNull
   String languageName(@NotNull final LanguageEntity languageEntity);
 
   @NotNull

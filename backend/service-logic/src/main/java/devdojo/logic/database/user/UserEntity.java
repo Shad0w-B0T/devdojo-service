@@ -1,11 +1,9 @@
 package devdojo.logic.database.user;
 
-import devdojo.logic.database.AbstractEntity;
 import devdojo.logic.database.AbstractExternalEntity;
 import devdojo.schema.Constants;
 import devdojo.schema.user.IUser;
 import devdojo.schema.user.UserRole;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

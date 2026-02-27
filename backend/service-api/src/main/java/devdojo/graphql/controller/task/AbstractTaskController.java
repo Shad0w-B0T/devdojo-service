@@ -11,6 +11,7 @@ import devdojo.logic.security.SecurityUtils;
 import devdojo.logic.task.ITaskService;
 import devdojo.logic.task.ITasksProgressService;
 import devdojo.logic.user.IUserService;
+import devdojo.schema.annotation.RoleRequired;
 import devdojo.schema.annotation.SelfRequired;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.task.*;
@@ -43,18 +44,21 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     this.tasksProgressService = tasksProgressService;
   }
 
+  @RoleRequired(role = UserRole.USER)
   @QueryMapping("tasks")
   @Override
-  public @NotNull List<TaskEntity> tasks(@Argument("input") final ITaskService.GetTasksByLangauge getTasks) {
+  public @NotNull List<TaskEntity> tasks(@Argument("input") final ITaskService.GetTasksByLanguage getTasks) {
     return this.taskService.getTasks(getTasks);
   }
 
+  @RoleRequired(role = UserRole.USER)
   @QueryMapping("task")
   @Override
   public @NotNull TaskEntity task(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
     return this.taskService.getTask(getTask);
   }
 
+  @RoleRequired(role = UserRole.USER)
   @QueryMapping("taskRating")
   @Override
   public double taskRating(@Argument("input") @NotNull final ITaskService.GetTask getTask) {
@@ -69,10 +73,19 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     return this.tasksProgressService.getNextTask(getNextTask);
   }
 
+  @QueryMapping("languageProgress")
+  @SelfRequired(field = "#user.userId()")
+  @Override
+  public @NotNull List<TaskProgressRepository.LanguageProgressProjection>
+  languageProgress(@Argument("input") @P("user") final ITasksProgressService.GetLanguageProgress getLanguageProgress) {
+    return this.tasksProgressService.getLanguageProgress(getLanguageProgress);
+  }
+
   @QueryMapping("userRank")
+  @SelfRequired(field = "#user.userId()")
   @Override
   public TaskProgressRepository.UserRankingProjection userRank(
-    @Argument("input") final ITasksProgressService.GetUserRank getUserRank) {
+    @Argument("input") @P("user") final ITasksProgressService.GetUserRank getUserRank) {
     return this.tasksProgressService.getUserRank(getUserRank);
   }
 
@@ -83,16 +96,19 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     return this.tasksProgressService.getLeaderboard(getLeaderboard);
   }
 
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("createTask")
   public @NotNull TaskEntity createTask(@Argument("input") @NotNull final ITaskService.CreateTask input) {
     return this.taskService.createTask(input);
   }
 
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("updateTask")
   public @NotNull TaskEntity updateTask(@Argument("input") @NotNull final ITaskService.UpdateTask input) {
     return this.taskService.updateTask(input);
   }
 
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("appendUnitTest")
   public @NotNull TaskEntity appendUnitTest(@Argument("input") @NotNull final ITaskService.AppendTest input) {
     return this.taskService.appendUnitTest(input);
@@ -107,15 +123,16 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
     return true;
   }
 
-
+  @RoleRequired(role = UserRole.PROFESSOR)
   @MutationMapping("removeTagFromTask")
   public boolean removeTagFromTask(@Argument("input") @NotNull final ITaskService.RemoveTagFromTask input) {
     return this.taskService.removeTagFromTask(input);
   }
 
+  @SelfRequired(field = "#user.userId()")
   @MutationMapping("setTaskRating")
   @Override
-  public boolean setTaskRating(@Argument("input") @NotNull final ITaskService.SetTaskRating setTaskRating) {
+  public boolean setTaskRating(@Argument("input") @P("user") @NotNull final ITaskService.SetTaskRating setTaskRating) {
     return this.taskService.setTaskRating(setTaskRating) != null;
   }
 
@@ -233,7 +250,7 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
   @SchemaMapping(typeName = "Test", value = "input")
   @Override
   public @NotNull List<ITestArgument> input(@NotNull final ITest taskUnitTest) {
-    return taskUnitTest.input();
+    return List.copyOf(taskUnitTest.input());
   }
 
   @SchemaMapping(typeName = "Test", value = "output")
@@ -276,6 +293,46 @@ public abstract class AbstractTaskController extends AbstractGraphController imp
   @Override
   public long rank(final TaskProgressRepository.UserRankingProjection userRankingProjection) {
     return userRankingProjection.rank();
+  }
+
+  // ───── LanguageProgress ─────
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "languageId")
+  public @NotNull String languageId(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.languageId().toString();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "languageName")
+  public @NotNull String languageName(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.languageName();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "totalTasks")
+  public long totalTasks(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.totalTasks();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "completedTasks")
+  public long completedTasks(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.completedTasks();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "totalScore")
+  public long totalScore(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.totalScore();
+  }
+
+  @SchemaMapping(typeName = "LanguageProgress", value = "averageScore")
+  public double averageScore(
+    final TaskProgressRepository.LanguageProgressProjection projection) {
+    return projection.averageScore() != null
+      ? projection.averageScore()
+      : 0.0;
   }
 
   private record TaskUserProgress(String input,
