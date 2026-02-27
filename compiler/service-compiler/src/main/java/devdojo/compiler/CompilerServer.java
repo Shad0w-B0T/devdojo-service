@@ -138,9 +138,9 @@ public final class CompilerServer {
     log.info("Compiler consumer started. Queue={}", queueName);
   }
 
-  private void publishSuccess(RabbitConnection rabbitConnection,
-                              UUID requestId,
-                              List<TestRunResult> results) {
+  private void publishSuccess(final RabbitConnection rabbitConnection,
+                              final UUID requestId,
+                              final List<TestRunResult> results) {
     try (Connection connection = rabbitConnection.newConnection();
          Channel channel = connection.createChannel()) {
 
@@ -161,9 +161,9 @@ public final class CompilerServer {
     }
   }
 
-  private void publishError(RabbitConnection rabbitConnection,
-                            UUID requestId,
-                            String message) {
+  private void publishError(final RabbitConnection rabbitConnection,
+                            final UUID requestId,
+                            final String message) {
 
     try (Connection connection = rabbitConnection.newConnection();
          Channel channel = connection.createChannel()) {
