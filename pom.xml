@@ -66,6 +66,8 @@
 
     <dependency.version.netty.all>4.2.9.Final</dependency.version.netty.all>
 
+    <dependency.version.rabbitmq>5.28.0</dependency.version.rabbitmq>
+
     <!-- ### Code style -->
     <dependency.version.checkstyle.tools>12.3.1</dependency.version.checkstyle.tools>
 

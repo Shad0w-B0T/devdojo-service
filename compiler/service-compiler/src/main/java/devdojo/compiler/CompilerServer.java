@@ -13,8 +13,10 @@ import devdojo.compiler.security.ISecurityFilter;
 import devdojo.schema.amqp.CompileRequestPayload;
 import devdojo.schema.amqp.CompileResponsePayload;
 import devdojo.schema.amqp.RabbitConst;
+import devdojo.schema.code.TestError;
 import devdojo.schema.code.TestRunResult;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +41,11 @@ public final class CompilerServer {
 
   private CompilerServer() {
     // Prevent instantiation
+    log.debug("Initializing CompilerServer");
   }
 
   public void begin() throws Exception {
+
     final UUID id = UUID.randomUUID();
     final ServerConfig config = new ServerConfig();
 
@@ -50,67 +54,149 @@ public final class CompilerServer {
       config.rabbitPort(),
       config.rabbitUsername(),
       config.rabbitPassword(),
-      config.rabbitVirtualHost());
+      config.rabbitVirtualHost()
+    );
 
     final String queueName = RabbitConst.queueForCompiler(config.token());
 
-    DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-      final String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
-      System.out.println(" [x] Received: " + message);
-      final CompileRequestPayload payload = this.objectMapper.readValue(message, CompileRequestPayload.class);
-
-      final ICompiler compiler = CompilerContext.instance().compiler();
-
-      if (compiler == null) {
-        System.out.println("Error");
-      }
-
-      try {
-        this.securityCheck(payload.methodCode());
-      } catch (final Exception exception) {
-        log.warn("Error while checking security filters.", exception);
-        return;
-      }
-
-      final Object[][] argsArray = payload.arguments().stream()
-        .map(innerList -> innerList.toArray(new Object[0]))
-        .toArray(Object[][]::new);
-
-
-      try {
-        final List<TestRunResult> results = compiler.compileAndRun(payload.methodCode(), argsArray);
-
-        try (final Connection connection = rabbitConnection.newConnection();
-             final Channel channel = connection.createChannel()) {
-
-          final CompileResponsePayload responsePayload = new CompileResponsePayload(payload.requestId(), results);
-
-          final String json = objectMapper.writeValueAsString(responsePayload);
-
-          channel.basicPublish(
-            RabbitConst.EXCHANGE_COMPILER_REPORT,
-            RabbitConst.KEY_COMPILER_REPORT,
-            null,
-            json.getBytes(StandardCharsets.UTF_8)
-          );
-        }
-      } catch (Exception e) {
-        throw new RuntimeException(e);
-      }
-
-    };
-
-    CancelCallback cancelCallback = consumerTag -> {
-      System.out.println(" [x] Consumer cancelled: " + consumerTag);
-    };
-
-
     final Channel channel = rabbitConnection.newConnection().createChannel();
-
     channel.queueDeclare(queueName, true, false, false, null);
+
+    DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+
+      try {
+        final String message = new String(delivery.getBody(), StandardCharsets.UTF_8);
+        log.debug("Received compile request: {}", message);
+
+        final CompileRequestPayload payload =
+          this.objectMapper.readValue(message, CompileRequestPayload.class);
+
+        final ICompiler compiler = CompilerContext.instance().compiler();
+
+        if (compiler == null) {
+          log.error("No compiler instance available");
+          publishError(rabbitConnection, payload.requestId(),
+            "Compiler not available.");
+          return;
+        }
+
+        try {
+          this.securityCheck(payload.methodCode());
+        } catch (Exception ex) {
+          log.warn("Security check failed.", ex);
+          publishError(rabbitConnection, payload.requestId(),
+            "Security validation failed: " + ex.getMessage());
+          return;
+        }
+
+        final Object[][] argsArray = payload.arguments().stream()
+          .map(innerList -> innerList.toArray(new Object[0]))
+          .toArray(Object[][]::new);
+
+        try {
+          final List<TestRunResult> results =
+            compiler.compileAndRun(payload.methodCode(), argsArray);
+
+          publishSuccess(rabbitConnection, payload.requestId(), results);
+
+        } catch (Exception compileException) {
+          log.error("Compilation failed", compileException);
+
+          final TestError error = new TestError(
+            "Compiler",
+            compileException.getMessage()
+          );
+
+          final List<TestRunResult> result =
+            Collections.singletonList(
+              new TestRunResult(
+                null,
+                null,
+                Collections.emptyList(),
+                Collections.singletonList(error),
+                0,
+                0
+              )
+            );
+
+          publishSuccess(rabbitConnection, payload.requestId(), result);
+        }
+
+      } catch (Throwable fatal) {
+        // ABSOLUTE SAFETY NET
+        log.error("Fatal error in consumer callback", fatal);
+      }
+    };
+
+    final CancelCallback cancelCallback = consumerTag ->
+      log.warn("Consumer cancelled: {}", consumerTag);
+
     channel.basicConsume(queueName, true, deliverCallback, cancelCallback);
 
     configureHeartbeat(rabbitConnection, id, config);
+
+    log.info("Compiler consumer started. Queue={}", queueName);
+  }
+
+  private void publishSuccess(final RabbitConnection rabbitConnection,
+                              final UUID requestId,
+                              final List<TestRunResult> results) {
+    try (Connection connection = rabbitConnection.newConnection();
+         Channel channel = connection.createChannel()) {
+
+      CompileResponsePayload response =
+        new CompileResponsePayload(requestId, results);
+
+      String json = objectMapper.writeValueAsString(response);
+
+      channel.basicPublish(
+        RabbitConst.EXCHANGE_COMPILER_REPORT,
+        RabbitConst.KEY_COMPILER_REPORT,
+        null,
+        json.getBytes(StandardCharsets.UTF_8)
+      );
+
+    } catch (Exception e) {
+      log.error("Failed to publish success response", e);
+    }
+  }
+
+  private void publishError(final RabbitConnection rabbitConnection,
+                            final UUID requestId,
+                            final String message) {
+
+    try (Connection connection = rabbitConnection.newConnection();
+         Channel channel = connection.createChannel()) {
+
+      final TestError error = new TestError("Compiler", message);
+
+      final List<TestRunResult> result =
+        Collections.singletonList(
+          new TestRunResult(
+            null,
+            null,
+            Collections.emptyList(),
+            Collections.singletonList(error),
+            0,
+            0
+          )
+        );
+
+      CompileResponsePayload response =
+        new CompileResponsePayload(requestId, result);
+
+      String json = objectMapper.writeValueAsString(response);
+
+      channel.basicPublish(
+        RabbitConst.EXCHANGE_COMPILER_REPORT,
+        RabbitConst.KEY_COMPILER_REPORT,
+        null,
+        json.getBytes(StandardCharsets.UTF_8)
+      );
+
+    } catch (Exception e) {
+      log.error("Failed to publish error response", e);
+    }
   }
 
 
