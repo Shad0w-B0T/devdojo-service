@@ -43,20 +43,26 @@ public final class HeartbeatProcess implements IHeartbeatProcess {
     this.scheduler = Executors.newSingleThreadScheduledExecutor();
     this.scheduler.scheduleAtFixedRate(this::sendHeartbeat, 0, PERIOD, TimeUnit.SECONDS);
 
-    log.info("Heartbeat process started");
+    log.info("Heartbeat process started (compilerId={}, languageKey={}, period={}s)",
+      compilerId, languageKey, PERIOD);
   }
 
   @Override
   public void stop() {
     if (scheduler != null) {
       scheduler.shutdown();
+      log.info("Heartbeat process stopped (compilerId={})", compilerId);
+    } else {
+      log.warn("Heartbeat process stop requested but scheduler was null (compilerId={})",
+        compilerId);
     }
-    log.info("Heartbeat process stopped.");
   }
 
   @Override
   public void incrementTask() {
     this.task++;
+    log.debug("Task incremented. Current task count={} (compilerId={})",
+      task, compilerId);
   }
 
   private void sendHeartbeat() {
@@ -69,6 +75,12 @@ public final class HeartbeatProcess implements IHeartbeatProcess {
         getTotalMemoryInMb(),
         this.task);
 
+      log.debug("Preparing heartbeat (compilerId={}, tasks={}, cpu={}%, usedMem={}MB)",
+        compilerId,
+        task,
+        payload.cpuUsage(),
+        payload.memoryUsageMb());
+
       try (final Connection connection = rabbitConnection.newConnection();
            final Channel channel = connection.createChannel()) {
 
@@ -76,14 +88,20 @@ public final class HeartbeatProcess implements IHeartbeatProcess {
         channel.basicPublish(RabbitConst.EXCHANGE_HEARTBEAT, RabbitConst.KEY_HEARTBEAT,
           null, this.objectMapper.writeValueAsBytes(payload));
 
-        System.out.println(" [x] Published heartbeat to exchange '" +
-          RabbitConst.EXCHANGE_HEARTBEAT + "' with key '" + RabbitConst.KEY_HEARTBEAT + "'");
+        log.debug("Heartbeat published to exchange='{}' with key='{}' (compilerId={})",
+          RabbitConst.EXCHANGE_HEARTBEAT,
+          RabbitConst.KEY_HEARTBEAT,
+          compilerId);
+
       } catch (IOException | TimeoutException e) {
+        log.error("RabbitMQ error while sending heartbeat (compilerId={})",
+          compilerId, e);
         throw new RuntimeException(e);
       }
-      log.debug("Heartbeat sent...");
+
     } catch (Exception e) {
-      log.warn("Failed to send heartbeat to infrastructure.");
+      log.warn("Failed to send heartbeat to infrastructure (compilerId={})",
+        compilerId, e);
     }
   }
 
@@ -91,20 +109,21 @@ public final class HeartbeatProcess implements IHeartbeatProcess {
   private final static double MEGABYTES_CONST = 1024.;
 
   private double getCpuUsage() {
-    final OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+    final OperatingSystemMXBean osBean =
+      (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
     double load = osBean.getSystemLoadAverage();
     return (load >= 0) ? load * PERCENTAGE_CONST : -1.0;
   }
 
   private double getUsedMemoryInMb() {
-    long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+    long used = Runtime.getRuntime().totalMemory()
+      - Runtime.getRuntime().freeMemory();
     return used / (MEGABYTES_CONST * MEGABYTES_CONST);
   }
 
   private double getTotalMemoryInMb() {
-    return Runtime.getRuntime().maxMemory() / (MEGABYTES_CONST * MEGABYTES_CONST);
+    return Runtime.getRuntime().maxMemory()
+      / (MEGABYTES_CONST * MEGABYTES_CONST);
   }
-
-
 }
