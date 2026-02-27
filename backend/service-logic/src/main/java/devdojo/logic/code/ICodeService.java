@@ -20,7 +20,6 @@ public interface ICodeService {
   UUID executeCode(@NotNull final LanguageEntity languageEntity,
                    @Null final TaskEntity taskEntity,
                    @NotNull final String methodCode,
-                   @NotNull(message = "Unit tests list must not be null")
-                   final List<ITest> unitTests
+                   @NotNull(message = "Unit tests list must not be null") final List<ITest> unitTests
   );
 }

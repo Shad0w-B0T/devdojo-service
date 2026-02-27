@@ -2,7 +2,6 @@ package devdojo.logic.security.details;
 
 import devdojo.schema.user.UserRole;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 
 public interface ITokenDetails {
 

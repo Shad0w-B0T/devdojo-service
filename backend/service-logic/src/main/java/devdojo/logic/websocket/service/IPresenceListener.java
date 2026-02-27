@@ -2,7 +2,6 @@ package devdojo.logic.websocket.service;
 
 /**
  * Listener for WebSocket presence events.
- *
  * Implementations react to user connect and disconnect events
  * to update global presence state.
  */

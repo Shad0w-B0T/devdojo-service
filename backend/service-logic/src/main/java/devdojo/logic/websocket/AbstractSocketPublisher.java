@@ -1,7 +1,6 @@
 package devdojo.logic.websocket;
 
 import devdojo.logic.websocket.service.IPresenceService;
-import devdojo.logic.websocket.service.PresenceService;
 import devdojo.schema.code.TestRun;
 import jakarta.validation.constraints.NotNull;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
@@ -19,7 +18,7 @@ public abstract class AbstractSocketPublisher implements ISocketPublisher {
 
   protected AbstractSocketPublisher(
     @NotNull(message = "SimpMessagingTemplate must not be null") final SimpMessagingTemplate messagingTemplate,
-    @NotNull(message = "PresenceService must not be null")  final IPresenceService presenceService
+    @NotNull(message = "PresenceService must not be null") final IPresenceService presenceService
   ) {
     this.messagingTemplate = messagingTemplate;
     this.presenceService = presenceService;

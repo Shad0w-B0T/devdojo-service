@@ -1,6 +1,5 @@
 package devdojo.logic.security.ratelimit;
 
-import devdojo.logic.cache.bucket4j.IRateLimitService;
 import devdojo.logic.cache.bucket4j.exception.RateLimitExceededException;
 import devdojo.logic.cache.bucket4j.exception.RateLimitTimeoutException;
 import io.github.bucket4j.Bandwidth;

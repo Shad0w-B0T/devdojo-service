@@ -4,7 +4,7 @@ import devdojo.logic.security.jwt.IJwtBlacklistService;
 import devdojo.logic.security.jwt.IJwtService;
 import devdojo.logic.security.jwt.IRefreshTokenService;
 import devdojo.logic.security.jwt.RefreshCookie;
-import devdojo.logic.security.ldap.ILdapService;
+import devdojo.logic.security.ldap.service.ILdapService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
