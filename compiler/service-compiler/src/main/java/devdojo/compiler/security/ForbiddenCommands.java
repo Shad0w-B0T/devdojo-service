@@ -19,7 +19,6 @@ public final class ForbiddenCommands {
   private final static String RELATIVE_PATH_2 = "../";
   private final static String PATH_TRAVERSAL_1 = "/../";
   private final static String PATH_TRAVERSAL_2 = "\\..\\";
-  private final static String SLASHES = "\\";
 
   private final static String WGET = "wget";
   private final static String CURL = "curl";
@@ -40,7 +39,6 @@ public final class ForbiddenCommands {
       RELATIVE_PATH_2,
       PATH_TRAVERSAL_1,
       PATH_TRAVERSAL_2,
-      SLASHES,
       WGET,
       CURL,
       NETCAT,
