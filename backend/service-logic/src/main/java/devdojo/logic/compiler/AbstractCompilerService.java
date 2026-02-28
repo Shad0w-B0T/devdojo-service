@@ -26,6 +26,7 @@ import devdojo.schema.code.TestRun;
 import devdojo.schema.code.TestRunResult;
 import devdojo.schema.code.TestRunResultChecked;
 import devdojo.schema.compiler.CompilerResourceAnalytic;
+import devdojo.schema.exception.database.IllegalInputException;
 import devdojo.schema.exception.database.NotFoundException;
 import devdojo.schema.task.*;
 import jakarta.transaction.Transactional;
@@ -161,20 +162,23 @@ public abstract class AbstractCompilerService implements ICompilerService {
       state = computeProgressState(taskEntity, compilerTask.methodCode(), allPassed);
       score = allPassed ? taskEntity.difficulty().score() : 0;
 
+      try {
+        final TaskProgressEntity taskProgressEntity =
+          this.tasksProgressService.updateTaskProgress(
+            new ITasksProgressService.UpdateTaskProgress(
+              compilerTask.userId(),
+              taskEntity.externalId(),
+              compilerTask.methodCode().trim(),
+              state,
+              score
+            )
+          );
 
-      final TaskProgressEntity taskProgressEntity =
-        this.tasksProgressService.updateTaskProgress(
-          new ITasksProgressService.UpdateTaskProgress(
-            compilerTask.userId(),
-            taskEntity.externalId(),
-            compilerTask.methodCode().trim(),
-            state,
-            score
-          )
-        );
-
-      finished = taskProgressEntity.state() == TaskProgressState.FINISHED;
-      score = taskProgressEntity.score();
+        finished = taskProgressEntity.state() == TaskProgressState.FINISHED;
+        score = taskProgressEntity.score();
+      } catch (IllegalInputException ignore) {
+        /* ignore update*/
+      }
     }
 
     final TestRun run = new TestRun(

@@ -186,8 +186,7 @@ public abstract class AbstractTasksProgressService implements ITasksProgressServ
         updateTaskProgress.input(), updateTaskProgress.state(), updateTaskProgress.score());
     } else {
       if (taskProgressEntity.state() == TaskProgressState.FINISHED) {
-        log.info("Already finished");
-        return taskProgressEntity;
+        throw new IllegalInputException("Task already marked as finished, ignoring state update.");
       }
 
       taskProgressEntity.input(updateTaskProgress.input());
